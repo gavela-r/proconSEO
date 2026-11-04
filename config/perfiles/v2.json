@@ -1,0 +1,135 @@
+{
+    "version": "v2",
+    "fecha": "2026-11-04",
+    "nota": "v1 más los límites contra el abuso (SEG-11). Se ajustarán al probar en el servidor de Proconsi.",
+    "rastreo": {
+        "paginas_sitio_completo": {
+            "valor": 200,
+            "unidad": "páginas",
+            "justificacion": "Suficiente para webs de pymes"
+        },
+        "urls_contexto": {
+            "valor": 20,
+            "unidad": "URLs",
+            "justificacion": "Solo las que necesita un criterio"
+        },
+        "profundidad": {
+            "valor": 5,
+            "unidad": "clics",
+            "justificacion": "Habitual en webs pequeñas"
+        },
+        "redirecciones": {
+            "valor": 10,
+            "unidad": "saltos",
+            "justificacion": "Googlebot sigue como máximo 10"
+        }
+    },
+    "descarga": {
+        "html_max_bytes": {
+            "valor": 5242880,
+            "unidad": "bytes",
+            "justificacion": "5 MB; Google lee hasta 15 MB"
+        },
+        "robots_max_bytes": {
+            "valor": 512000,
+            "unidad": "bytes",
+            "justificacion": "Límite que aplica Google"
+        },
+        "sitemap_max_bytes": {
+            "valor": 10485760,
+            "unidad": "bytes",
+            "justificacion": "Se trunca y se declara"
+        },
+        "total_analisis_bytes": {
+            "valor": 209715200,
+            "unidad": "bytes",
+            "justificacion": "Protege el servidor"
+        }
+    },
+    "tiempo": {
+        "conexion": {
+            "valor": 5,
+            "unidad": "s",
+            "justificacion": "Servidores que no responden"
+        },
+        "peticion": {
+            "valor": 15,
+            "unidad": "s",
+            "justificacion": "Servidores colgados"
+        },
+        "analisis_url": {
+            "valor": 120,
+            "unidad": "s",
+            "justificacion": "URL individual y con contexto"
+        },
+        "analisis_sitio": {
+            "valor": 1800,
+            "unidad": "s",
+            "justificacion": "Sitio completo"
+        },
+        "reintentos": {
+            "valor": 2,
+            "unidad": "reintentos",
+            "justificacion": "Fallos puntuales de red"
+        },
+        "espera_reintentos": {
+            "valor": [
+                2,
+                4
+            ],
+            "unidad": "s",
+            "justificacion": "Retroceso"
+        }
+    },
+    "trafico": {
+        "peticiones_por_segundo_host": {
+            "valor": 1,
+            "unidad": "peticiones/s",
+            "justificacion": "No saturar la web analizada"
+        },
+        "analisis_simultaneos": {
+            "valor": 2,
+            "unidad": "análisis",
+            "justificacion": "Protege el servidor de Proconsi"
+        },
+        "puertos_permitidos": {
+            "valor": [
+                80,
+                443
+            ],
+            "unidad": "puertos",
+            "justificacion": "Webs normales"
+        }
+    },
+    "observacion": {
+        "idioma": {
+            "valor": "es-ES",
+            "unidad": "",
+            "justificacion": "Clientes de Proconsi"
+        },
+        "user_agent": {
+            "valor": "proconSEO/1.0 (+herramienta interna de Proconsi)",
+            "unidad": "",
+            "justificacion": "Transparencia ante la web analizada"
+        }
+    },
+    "apis": {
+        "pagespeed_llamadas_por_url": {
+            "valor": 2,
+            "unidad": "llamadas",
+            "justificacion": "Móvil y ordenador"
+        }
+    },
+    "abuso": {
+        "analisis_por_ip_hora": {
+            "valor": 30,
+            "unidad": "análisis/hora",
+            "justificacion": "Uso normal de una persona; frena scripts o abusos"
+        },
+        "analisis_por_dominio_hora": {
+            "valor": 10,
+            "unidad": "análisis/hora",
+            "justificacion": "No usar la herramienta para atacar una web"
+        }
+    }
+}

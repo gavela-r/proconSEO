@@ -14,6 +14,8 @@ use ProconSEO\Fetch\LimitesDescarga;
 use ProconSEO\Fetch\ValidadorDestino;
 use ProconSEO\Fetch\ValidadorUrl;
 use ProconSEO\Run\GuardadoResultados;
+use ProconSEO\Run\Interruptor;
+use ProconSEO\Run\RegistroAuditoria;
 use ProconSEO\Run\LanzadorAnalisis;
 use ProconSEO\Run\MotorProvisional;
 use ProconSEO\Run\Orquestador;
@@ -63,12 +65,21 @@ final class OrquestadorTest extends TestCase
     {
         if (isset($this->proyectoId)) {
             $this->bd->prepare('DELETE FROM proyectos WHERE id = ?')->execute([$this->proyectoId]);
+            // Solo los tests limpian la auditoría; la aplicación no puede.
+            $this->bd->prepare('DELETE FROM registro_auditoria WHERE proyecto_id = ?')->execute([$this->proyectoId]);
         }
     }
 
     private function validador(): ValidadorDestino
     {
         return new ValidadorDestino(new ValidadorUrl(), $this->dns);
+    }
+
+    private function lanzador(): LanzadorAnalisis
+    {
+        $auditoria = new RegistroAuditoria($this->bd);
+
+        return new LanzadorAnalisis(new RepositorioAnalisis($this->bd), $this->validador(), CatalogoJson::v1(), new Interruptor($this->bd, $auditoria), $auditoria);
     }
 
     private function orquestador(?MotorAnalisis $motor = null): Orquestador
@@ -86,7 +97,7 @@ final class OrquestadorTest extends TestCase
 
     private function lanzar(string $url = 'https://ejemplo.es/'): int
     {
-        $id = (new LanzadorAnalisis(new RepositorioAnalisis($this->bd), $this->validador(), CatalogoJson::v1()))
+        $id = $this->lanzador()
             ->lanzar($this->proyectoId, $url, 'url_individual', 'Prueba');
         $this->bd->prepare("UPDATE analisis SET estado = 'en_curso' WHERE id = ?")->execute([$id]);
 
@@ -141,6 +152,7 @@ final class OrquestadorTest extends TestCase
         self::assertSame(EstadoAnalisis::DetenidoSeguridad, $estado);
         self::assertCount(0, $this->transporte->peticiones, 'No se conecta a nada');
         self::assertSame('SEG-02', $this->valor('SELECT regla FROM eventos_seguridad WHERE analisis_id = ?', [$id]));
+        self::assertSame('SEG-02', $this->valor("SELECT regla FROM registro_auditoria WHERE analisis_id = ? AND accion = 'bloqueo_seguridad'", [$id]), 'El bloqueo queda también en la auditoría');
     }
 
     public function testCancelacionDuranteLasComprobacionesConservaLoObtenido(): void
@@ -175,13 +187,13 @@ final class OrquestadorTest extends TestCase
     public function testLanzadorRechazaUrlInsegura(): void
     {
         $this->expectException(\ProconSEO\Fetch\DestinoRechazado::class);
-        (new LanzadorAnalisis(new RepositorioAnalisis($this->bd), $this->validador(), CatalogoJson::v1()))
+        $this->lanzador()
             ->lanzar($this->proyectoId, 'http://192.168.1.1/', 'url_individual', null);
     }
 
     public function testCancelarEnColaLoCierraDirectamente(): void
     {
-        $id = (new LanzadorAnalisis(new RepositorioAnalisis($this->bd), $this->validador(), CatalogoJson::v1()))
+        $id = $this->lanzador()
             ->lanzar($this->proyectoId, 'https://ejemplo.es/', 'url_individual', null);
 
         (new RepositorioAnalisis($this->bd))->pedirCancelacion($id);

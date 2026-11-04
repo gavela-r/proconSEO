@@ -139,5 +139,8 @@ final class GuardadoResultados
                 $analisisId, $fase?->value, $this->sanitizador->url($senal->urlRecurso), $senal->regla,
                 mb_substr($this->sanitizador->texto($senal->descripcion), 0, 2000), $senal->decision->value,
             ]);
+
+        // Copia en la auditoría (SEG-15), que se conserva aunque se borre el análisis.
+        (new RegistroAuditoria($this->bd))->bloqueo($analisisId, $senal->urlRecurso, $senal->regla, $senal->descripcion);
     }
 }

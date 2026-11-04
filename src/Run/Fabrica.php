@@ -14,6 +14,7 @@ use ProconSEO\Fetch\ResolvedorDnsSistema;
 use ProconSEO\Fetch\ValidadorDestino;
 use ProconSEO\Fetch\ValidadorUrl;
 use ProconSEO\Shared\BaseDatos;
+use ProconSEO\Shared\Config;
 use ProconSEO\Shared\Contract\Catalogo;
 use ProconSEO\Shared\Contract\MotorAnalisis;
 
@@ -54,7 +55,23 @@ final class Fabrica
 
     public function lanzador(): LanzadorAnalisis
     {
-        return new LanzadorAnalisis($this->repositorio(), $this->validador(), $this->catalogo());
+        return new LanzadorAnalisis($this->repositorio(), $this->validador(), $this->catalogo(), $this->interruptor(), $this->auditoria());
+    }
+
+    public function auditoria(): RegistroAuditoria
+    {
+        return new RegistroAuditoria($this->bd());
+    }
+
+    public function interruptor(): Interruptor
+    {
+        return new Interruptor($this->bd(), $this->auditoria());
+    }
+
+    /** IP de quien hace la petición web actual. */
+    public static function ipOrigen(): ?string
+    {
+        return IpOrigen::desde($_SERVER, IpOrigen::proxies((string) Config::obtener('PROXIES_DE_CONFIANZA', '')));
     }
 
     /** Motor provisional hasta que la Parte 2 publique el suyo. */

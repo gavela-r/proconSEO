@@ -34,16 +34,18 @@ final class RepositorioAnalisis
         array $hostsAutorizados,
         int $perfilId,
         string $versionCatalogo,
+        ?string $ipOrigen = null,
+        ?string $dominio = null,
     ): int {
         $this->bd->beginTransaction();
         try {
             $this->bd->prepare(
-                'INSERT INTO analisis (proyecto_id, url_introducida, url_normalizada, alcance, objetivo, hosts_autorizados, perfil_id, version_catalogo, estado)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                'INSERT INTO analisis (proyecto_id, url_introducida, url_normalizada, alcance, objetivo, hosts_autorizados, perfil_id, version_catalogo, estado, ip_origen, dominio)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
             )->execute([
                 $proyectoId, $urlIntroducida, $urlNormalizada, $alcance->value, $objetivo,
                 json_encode(array_values($hostsAutorizados), JSON_THROW_ON_ERROR), $perfilId, $versionCatalogo,
-                EstadoAnalisis::EnCola->value,
+                EstadoAnalisis::EnCola->value, $ipOrigen, $dominio,
             ]);
             $id = (int) $this->bd->lastInsertId();
 
@@ -108,6 +110,24 @@ final class RepositorioAnalisis
         $consulta->execute([$perfilId]);
 
         return json_decode((string) $consulta->fetchColumn(), true, 16, JSON_THROW_ON_ERROR);
+    }
+
+    /** Análisis creados en la última hora desde esa IP (SEG-11). */
+    public function lanzadosUltimaHoraPorIp(string $ip): int
+    {
+        $consulta = $this->bd->prepare('SELECT COUNT(*) FROM analisis WHERE ip_origen = ? AND creado_en > NOW(3) - INTERVAL 1 HOUR');
+        $consulta->execute([$ip]);
+
+        return (int) $consulta->fetchColumn();
+    }
+
+    /** Análisis creados en la última hora sobre ese dominio, lance quien los lance (SEG-11). */
+    public function lanzadosUltimaHoraPorDominio(string $dominio): int
+    {
+        $consulta = $this->bd->prepare('SELECT COUNT(*) FROM analisis WHERE dominio = ? AND creado_en > NOW(3) - INTERVAL 1 HOUR');
+        $consulta->execute([$dominio]);
+
+        return (int) $consulta->fetchColumn();
     }
 
     public function enCurso(): int

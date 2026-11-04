@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use ProconSEO\Run\Fabrica;
+use ProconSEO\Run\RegistroAuditoria;
 use ProconSEO\Shared\BaseDatos;
 use ProconSEO\Shared\Enum\Alcance;
 use ProconSEO\Shared\Enum\EstadoAnalisis;
@@ -29,6 +30,7 @@ return static function (Router $r): void {
             'alcances' => Alcance::opciones(),
             'valores' => $valores,
             'error' => $error,
+            'detenidos' => (new Fabrica())->interruptor()->activo(),
         ]), $estado);
     };
 
@@ -55,7 +57,7 @@ return static function (Router $r): void {
         ];
 
         try {
-            $id = (new Fabrica())->lanzador()->lanzar($valores['proyecto'], $valores['url'], $valores['alcance'], $valores['objetivo'], $valores['hosts_extra']);
+            $id = (new Fabrica())->lanzador()->lanzar($valores['proyecto'], $valores['url'], $valores['alcance'], $valores['objetivo'], $valores['hosts_extra'], Fabrica::ipOrigen());
         } catch (ErrorDominio $e) {
             return $formulario($valores, $e->getMessage(), $e->estadoHttp);
         }
@@ -102,10 +104,12 @@ return static function (Router $r): void {
     });
 
     $cancelar = static function (Peticion $p): int {
-        $repo = (new Fabrica())->repositorio();
+        $fabrica = new Fabrica();
+        $repo = $fabrica->repositorio();
         $id = (int) $p->parametro('id');
-        $repo->obtener($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+        $analisis = $repo->obtener($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
         $repo->pedirCancelacion($id);
+        $fabrica->auditoria()->registrar(RegistroAuditoria::CANCELACION_PEDIDA, $id, (int) $analisis['proyecto_id'], Fabrica::ipOrigen());
 
         return $id;
     };
