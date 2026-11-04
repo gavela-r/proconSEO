@@ -81,6 +81,8 @@ final class Aplicacion
             session_start([
                 'cookie_httponly' => true,
                 'cookie_samesite' => 'Strict',
+                // Fuera del ordenador local la herramienta va siempre por HTTPS (SEG-18).
+                'cookie_secure' => !Config::esDesarrollo(),
                 'use_strict_mode' => true,
             ]);
         }
