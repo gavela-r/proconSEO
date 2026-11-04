@@ -1,6 +1,6 @@
 {
   "id": "IA-08",
-  "bloque": "IA",
+  "bloque": "ia",
   "nombre": "Canonical, sitemap y enlazado interno",
   "que_comprueba": "Que la URL declare su versión canónica, aparezca en un sitemap y reciba enlaces internos, dentro del alcance analizado.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",
@@ -56,7 +56,7 @@
         "robots_txt",
         "sitemap"
       ],
-      "alcance_minimo": "url_con_contexto",
+      "alcance_minimo": "url_contexto",
       "wcag": [],
       "kit_digital": [],
       "reutiliza": []
@@ -90,7 +90,7 @@
       "necesita": [
         "otras_urls"
       ],
-      "alcance_minimo": "url_con_contexto",
+      "alcance_minimo": "url_contexto",
       "wcag": [],
       "kit_digital": [],
       "reutiliza": []

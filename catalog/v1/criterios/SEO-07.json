@@ -1,6 +1,6 @@
 {
   "id": "SEO-07",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Enlazado interno",
   "que_comprueba": "Enlaces rastreables, enlaces internos rotos y textos de enlace ambiguos. Incluye el mínimo de páginas del Kit Digital.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",
@@ -57,7 +57,7 @@
       "necesita": [
         "otras_urls"
       ],
-      "alcance_minimo": "url_con_contexto",
+      "alcance_minimo": "url_contexto",
       "wcag": [],
       "kit_digital": [],
       "reutiliza": []
@@ -91,7 +91,7 @@
       "necesita": [
         "otras_urls"
       ],
-      "alcance_minimo": "url_con_contexto",
+      "alcance_minimo": "url_contexto",
       "wcag": [],
       "kit_digital": [
         "paginas_minimas"

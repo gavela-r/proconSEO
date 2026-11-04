@@ -1,6 +1,6 @@
 {
   "id": "IA-06",
-  "bloque": "IA",
+  "bloque": "ia",
   "nombre": "Coherencia temporal",
   "que_comprueba": "Fechas, precios, versiones y expresiones como «este año» coherentes entre sí y con la fecha del análisis. Una fecha antigua no es un problema por sí sola.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

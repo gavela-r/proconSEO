@@ -1,6 +1,6 @@
 {
   "id": "SEO-16",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Paginación, filtros y facetas",
   "que_comprueba": "Patrones de paginación y navegación por facetas, muestreando sin generar combinaciones masivas.",
   "cuando_aplica": "Webs con listados paginados o filtros (tiendas, blogs).",

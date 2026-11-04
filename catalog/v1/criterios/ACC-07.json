@@ -1,6 +1,6 @@
 {
   "id": "ACC-07",
-  "bloque": "ACC",
+  "bloque": "acc",
   "nombre": "Tiempo, movimiento y parpadeo",
   "que_comprueba": "Límites de tiempo ajustables, pausa de contenido en movimiento y ausencia de destellos peligrosos.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",
@@ -22,7 +22,7 @@
       "criterio": "2.2.1",
       "nombre": "Tiempo ajustable",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable",
       "ficha_investigacion": null
     },
@@ -30,7 +30,7 @@
       "criterio": "2.2.2",
       "nombre": "Pausar, detener, ocultar",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide",
       "ficha_investigacion": null
     },
@@ -38,7 +38,7 @@
       "criterio": "2.3.1",
       "nombre": "Umbral de tres destellos o menos",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold",
       "ficha_investigacion": null
     }

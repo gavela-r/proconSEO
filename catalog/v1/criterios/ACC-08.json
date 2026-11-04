@@ -1,6 +1,6 @@
 {
   "id": "ACC-08",
-  "bloque": "ACC",
+  "bloque": "acc",
   "nombre": "Entrada y objetivos táctiles",
   "que_comprueba": "Gestos, cancelación del puntero, etiqueta en el nombre, activación por movimiento, arrastre y tamaño mínimo de los objetivos táctiles.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",
@@ -22,7 +22,7 @@
       "criterio": "2.5.1",
       "nombre": "Gestos del puntero",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/pointer-gestures",
       "ficha_investigacion": null
     },
@@ -30,7 +30,7 @@
       "criterio": "2.5.2",
       "nombre": "Cancelación del puntero",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/pointer-cancellation",
       "ficha_investigacion": null
     },
@@ -38,7 +38,7 @@
       "criterio": "2.5.3",
       "nombre": "Etiqueta en el nombre",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/label-in-name",
       "ficha_investigacion": null
     },
@@ -46,7 +46,7 @@
       "criterio": "2.5.4",
       "nombre": "Activación mediante movimiento",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/motion-actuation",
       "ficha_investigacion": null
     },
@@ -54,7 +54,7 @@
       "criterio": "2.5.7",
       "nombre": "Movimientos de arrastre",
       "nivel": "AA",
-      "en_wcag_2_1": false,
+      "version_wcag": "2.2",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements",
       "ficha_investigacion": null
     },
@@ -62,7 +62,7 @@
       "criterio": "2.5.8",
       "nombre": "Tamaño del objetivo (mínimo)",
       "nivel": "AA",
-      "en_wcag_2_1": false,
+      "version_wcag": "2.2",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum",
       "ficha_investigacion": null
     }

@@ -1,6 +1,6 @@
 {
   "id": "ACC-11",
-  "bloque": "ACC",
+  "bloque": "acc",
   "nombre": "Consistencia entre páginas",
   "que_comprueba": "Ayuda en el mismo sitio, varias formas de llegar a cada página, navegación e identificación coherentes entre páginas.",
   "cuando_aplica": "Requiere comparar varias páginas del sitio.",
@@ -22,7 +22,7 @@
       "criterio": "3.2.6",
       "nombre": "Ayuda coherente",
       "nivel": "A",
-      "en_wcag_2_1": false,
+      "version_wcag": "2.2",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-help",
       "ficha_investigacion": null
     },
@@ -30,7 +30,7 @@
       "criterio": "2.4.5",
       "nombre": "Múltiples vías",
       "nivel": "AA",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways",
       "ficha_investigacion": null
     },
@@ -38,7 +38,7 @@
       "criterio": "3.2.3",
       "nombre": "Navegación coherente",
       "nivel": "AA",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-navigation",
       "ficha_investigacion": null
     },
@@ -46,7 +46,7 @@
       "criterio": "3.2.4",
       "nombre": "Identificación coherente",
       "nivel": "AA",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-identification",
       "ficha_investigacion": null
     }

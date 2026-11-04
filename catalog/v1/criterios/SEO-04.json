@@ -1,6 +1,6 @@
 {
   "id": "SEO-04",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Meta description",
   "que_comprueba": "Presencia, marcado correcto y coherencia de la meta description. No hay longitud fija.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

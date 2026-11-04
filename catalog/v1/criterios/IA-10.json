@@ -1,6 +1,6 @@
 {
   "id": "IA-10",
-  "bloque": "IA",
+  "bloque": "ia",
   "nombre": "Contexto textual de imágenes y vídeos",
   "que_comprueba": "Que imágenes y vídeos necesarios para entender la página tengan contexto en texto, y que la información esencial esté disponible como texto.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

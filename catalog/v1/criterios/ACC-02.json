@@ -1,6 +1,6 @@
 {
   "id": "ACC-02",
-  "bloque": "ACC",
+  "bloque": "acc",
   "nombre": "Audio, vídeo y multimedia",
   "que_comprueba": "Alternativas para audio y vídeo (transcripción, subtítulos, audiodescripción) y control del audio que suena solo.",
   "cuando_aplica": "Solo si la página contiene audio o vídeo.",
@@ -22,7 +22,7 @@
       "criterio": "1.2.1",
       "nombre": "Solo audio y solo vídeo (grabado)",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-only-and-video-only-prerecorded",
       "ficha_investigacion": null
     },
@@ -30,7 +30,7 @@
       "criterio": "1.2.2",
       "nombre": "Subtítulos (grabados)",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/captions-prerecorded",
       "ficha_investigacion": null
     },
@@ -38,7 +38,7 @@
       "criterio": "1.2.3",
       "nombre": "Audiodescripción o medio alternativo (grabado)",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-description-or-media-alternative-prerecorded",
       "ficha_investigacion": null
     },
@@ -46,7 +46,7 @@
       "criterio": "1.4.2",
       "nombre": "Control del audio",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-control",
       "ficha_investigacion": null
     },
@@ -54,7 +54,7 @@
       "criterio": "1.2.4",
       "nombre": "Subtítulos (en directo)",
       "nivel": "AA",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/captions-live",
       "ficha_investigacion": null
     },
@@ -62,7 +62,7 @@
       "criterio": "1.2.5",
       "nombre": "Audiodescripción (grabada)",
       "nivel": "AA",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-description-prerecorded",
       "ficha_investigacion": null
     }

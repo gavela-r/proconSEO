@@ -1,6 +1,6 @@
 {
   "id": "ACC-12",
-  "bloque": "ACC",
+  "bloque": "acc",
   "nombre": "Nombre, rol, estado y mensajes de estado",
   "que_comprueba": "Que controles e iframes tengan nombre, rol y estado accesibles, que ARIA se use correctamente y que los mensajes de estado se anuncien. Incluye la detección de chatbots.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",
@@ -32,7 +32,7 @@
       "criterio": "4.1.2",
       "nombre": "Nombre, función, valor",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/name-role-value",
       "ficha_investigacion": null
     },
@@ -40,7 +40,7 @@
       "criterio": "4.1.3",
       "nombre": "Mensajes de estado",
       "nivel": "AA",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/status-messages",
       "ficha_investigacion": null
     }

@@ -1,6 +1,6 @@
 {
   "id": "IA-09",
-  "bloque": "IA",
+  "bloque": "ia",
   "nombre": "Valor y especificidad del contenido",
   "que_comprueba": "Si el contenido aporta datos, casos, metodología y ejemplos adecuados a su propósito.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

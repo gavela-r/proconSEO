@@ -1,6 +1,6 @@
 {
   "id": "SEO-10",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Móvil: viewport y equivalencia de contenido",
   "que_comprueba": "Meta viewport y equivalencia de contenido y señales entre móvil y ordenador.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

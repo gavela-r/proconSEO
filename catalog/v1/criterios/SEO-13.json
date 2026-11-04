@@ -1,6 +1,6 @@
 {
   "id": "SEO-13",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Intersticiales, overlays y anuncios",
   "que_comprueba": "Ventanas emergentes, capas y anuncios que tapan el contenido principal.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

@@ -11,7 +11,7 @@ Cada análisis guarda la versión del catálogo que usó (RF-61). **Un fichero d
 
 | Campo | Qué es |
 |---|---|
-| `id`, `bloque`, `nombre` | Identificador de la Guía (`SEO-03`), bloque (`IA`, `SEO`, `ACC`) y nombre |
+| `id`, `bloque`, `nombre` | Identificador de la Guía (`SEO-03`), bloque (`ia`, `seo`, `acc`, como el enum `Bloque`) y nombre |
 | `que_comprueba`, `cuando_aplica` | Descripción y condición de aplicación |
 | `explicacion_sencilla` | Qué es y por qué importa, sin jerga, para cualquier persona de Proconsi |
 | `modo` | `automatico`, `hibrido` o `humano` (se deduce de sus subcomprobaciones) |
@@ -20,7 +20,7 @@ Cada análisis guarda la versión del catálogo que usó (RF-61). **Un fichero d
 | `ref_investigacion` | Referencias a la Investigación ejecutiva (C02, O5, T1…) |
 | `reutiliza` | Otros criterios cuyos datos aprovecha |
 | `fuentes` | Fuentes oficiales; `fecha_verificacion` se rellena al comprobarlas |
-| `wcag` | Solo en ACC: criterios WCAG con número, nombre, nivel, `en_wcag_2_1` (falso = nuevo en 2.2) y ficha de la Investigación |
+| `wcag` | Solo en ACC: criterios WCAG con número, nombre, nivel, `version_wcag` (`2.1` si ya estaba en WCAG 2.1, `2.2` si es nuevo) y ficha de la Investigación |
 | `umbrales` | Valores normativos cuando los hay (Core Web Vitals, contraste…) |
 | `subcomprobaciones` | Lista de subcomprobaciones (abajo) |
 
@@ -34,7 +34,7 @@ Cada análisis guarda la versión del catálogo que usó (RF-61). **Un fichero d
 | `modo`, `mvp` | Como en el criterio |
 | `motivo_no_mvp` | Si `mvp` es `no`: `navegador`, `ia`, `humano` o `baja_prioridad` |
 | `necesita` | Qué datos hacen falta (`pagina`, `robots_txt`, `otras_urls`, `psi`…). Si falta alguno, el resultado es `no_verificable` |
-| `alcance_minimo` | Alcance mínimo con el que se puede ejecutar |
+| `alcance_minimo` | Alcance mínimo con el que se puede ejecutar (valores del enum `Alcance`) |
 | `wcag` | Criterios WCAG que cubre (solo ACC y alguna de IA/SEO relacionada) |
 | `kit_digital` | Compromisos Kit Digital en los que aparece (vista RF-07) |
 | `gravedad_si_problema` | Solo cuando la especificación fija la gravedad (p. ej. `SEO-01.noindex-desarrollo` → `critico`) |

@@ -1,6 +1,6 @@
 {
   "id": "IA-11",
-  "bloque": "IA",
+  "bloque": "ia",
   "nombre": "Acciones esenciales identificables",
   "que_comprueba": "En páginas funcionales (comprar, contactar, reservar…), que las acciones esenciales sean identificables por nombre, rol y estado. Reutiliza ACC-12.",
   "cuando_aplica": "Páginas con acciones principales (formularios, botones de compra, contacto o reserva).",

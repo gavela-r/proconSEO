@@ -16,9 +16,9 @@ final class CatalogoV1Test extends TestCase
 
     /** Criterios de la especificación, sección 6. */
     private const CRITERIOS_ESPERADOS = [
-        'IA' => 11,
-        'SEO' => 16,
-        'ACC' => 12,
+        'ia' => 11,
+        'seo' => 16,
+        'acc' => 12,
     ];
 
     /** Los 55 criterios WCAG 2.2 A y AA (4.1.1 eliminado). */
@@ -116,7 +116,7 @@ final class CatalogoV1Test extends TestCase
         $esperados = [];
         foreach (self::CRITERIOS_ESPERADOS as $bloque => $total) {
             for ($i = 1; $i <= $total; $i++) {
-                $esperados[] = sprintf('%s-%02d', $bloque, $i);
+                $esperados[] = sprintf('%s-%02d', strtoupper($bloque), $i);
             }
         }
         sort($esperados);
@@ -128,7 +128,7 @@ final class CatalogoV1Test extends TestCase
     {
         foreach (self::criterios() as $fichero => $criterio) {
             self::assertSame($fichero, $criterio['id']);
-            self::assertStringStartsWith($criterio['bloque'] . '-', $criterio['id']);
+            self::assertStringStartsWith(strtoupper($criterio['bloque']) . '-', $criterio['id']);
         }
     }
 
@@ -257,7 +257,7 @@ final class CatalogoV1Test extends TestCase
     {
         $cubiertos = [];
         foreach (self::criterios() as $id => $criterio) {
-            if ($criterio['bloque'] !== 'ACC') {
+            if ($criterio['bloque'] !== 'acc') {
                 self::assertSame([], $criterio['wcag'], "$id no es de accesibilidad");
                 continue;
             }
@@ -273,7 +273,8 @@ final class CatalogoV1Test extends TestCase
 
         foreach ($cubiertos as $numero => $w) {
             self::assertSame(self::WCAG_A_AA[$numero], $w['nivel'], "Nivel de $numero");
-            self::assertSame(!in_array((string) $numero, self::NUEVOS_22, true), $w['en_wcag_2_1'], "Versión de $numero");
+            $version = in_array((string) $numero, self::NUEVOS_22, true) ? '2.2' : '2.1';
+            self::assertSame($version, $w['version_wcag'], "Versión de $numero");
             self::assertNotSame('', trim($w['nombre']));
         }
     }

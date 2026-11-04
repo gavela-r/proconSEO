@@ -1,6 +1,6 @@
 {
   "id": "SEO-15",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Versiones por idioma (hreflang)",
   "que_comprueba": "Códigos y destinos hreflang, autorreferencia y reciprocidad.",
   "cuando_aplica": "Solo si la web tiene más de un idioma.",
@@ -76,7 +76,7 @@
       "necesita": [
         "otras_urls"
       ],
-      "alcance_minimo": "url_con_contexto",
+      "alcance_minimo": "url_contexto",
       "wcag": [],
       "kit_digital": [
         "segundo_idioma"
@@ -95,7 +95,7 @@
       "necesita": [
         "otras_urls"
       ],
-      "alcance_minimo": "url_con_contexto",
+      "alcance_minimo": "url_contexto",
       "wcag": [],
       "kit_digital": [
         "segundo_idioma"

@@ -1,6 +1,6 @@
 {
   "id": "IA-07",
-  "bloque": "IA",
+  "bloque": "ia",
   "nombre": "Datos estructurados",
   "que_comprueba": "JSON-LD, Microdata y RDFa: sintaxis, tipos de schema.org y coherencia con lo visible. Su ausencia no es un problema.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

@@ -1,6 +1,6 @@
 {
   "id": "SEO-12",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Imágenes y vídeo",
   "que_comprueba": "Descubrimiento, formato y contexto de imágenes; y, solo si la página tiene vídeo, detección, miniatura, marcado y página dedicada.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

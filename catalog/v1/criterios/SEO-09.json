@@ -1,6 +1,6 @@
 {
   "id": "SEO-09",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Contenido en HTML inicial, DOM o tras interacción",
   "que_comprueba": "Si el contenido está en el HTML inicial, aparece al ejecutar JavaScript o solo tras una interacción (clic, scroll).",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

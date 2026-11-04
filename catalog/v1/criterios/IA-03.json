@@ -1,6 +1,6 @@
 {
   "id": "IA-03",
-  "bloque": "IA",
+  "bloque": "ia",
   "nombre": "Respuesta utilizable y contenido principal recuperable",
   "que_comprueba": "Que la URL devuelva una respuesta útil: código HTTP, redirecciones, bloqueos (403, 429, CAPTCHA) y si el contenido principal está en el HTML inicial o solo aparece tras ejecutar JavaScript.",
   "cuando_aplica": "Siempre.",

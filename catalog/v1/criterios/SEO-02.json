@@ -1,6 +1,6 @@
 {
   "id": "SEO-02",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Redirecciones, URL final, canonical y variantes",
   "que_comprueba": "URL solicitada frente a URL final, cadenas y bucles de redirección, coherencia del canonical y variantes de la misma URL (http/https, www, barra final).",
   "cuando_aplica": "Siempre.",
@@ -93,7 +93,7 @@
         "pagina",
         "otras_urls"
       ],
-      "alcance_minimo": "url_con_contexto",
+      "alcance_minimo": "url_contexto",
       "wcag": [],
       "kit_digital": [],
       "reutiliza": [
@@ -112,7 +112,7 @@
       "necesita": [
         "otras_urls"
       ],
-      "alcance_minimo": "url_con_contexto",
+      "alcance_minimo": "url_contexto",
       "wcag": [],
       "kit_digital": [],
       "reutiliza": []

@@ -1,6 +1,6 @@
 {
   "id": "ACC-06",
-  "bloque": "ACC",
+  "bloque": "acc",
   "nombre": "Teclado, foco y navegación",
   "que_comprueba": "Uso completo con teclado, sin trampas, atajos, saltar bloques, orden y visibilidad del foco, y propósito de los enlaces.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",
@@ -27,7 +27,7 @@
       "criterio": "2.1.1",
       "nombre": "Teclado",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/keyboard",
       "ficha_investigacion": null
     },
@@ -35,7 +35,7 @@
       "criterio": "2.1.2",
       "nombre": "Sin trampas para el foco del teclado",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/no-keyboard-trap",
       "ficha_investigacion": null
     },
@@ -43,7 +43,7 @@
       "criterio": "2.1.4",
       "nombre": "Atajos de teclado de un solo carácter",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts",
       "ficha_investigacion": null
     },
@@ -51,7 +51,7 @@
       "criterio": "2.4.1",
       "nombre": "Evitar bloques",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/bypass-blocks",
       "ficha_investigacion": null
     },
@@ -59,7 +59,7 @@
       "criterio": "2.4.3",
       "nombre": "Orden del foco",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-order",
       "ficha_investigacion": null
     },
@@ -67,7 +67,7 @@
       "criterio": "2.4.4",
       "nombre": "Propósito de los enlaces (en contexto)",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-in-context",
       "ficha_investigacion": null
     },
@@ -75,7 +75,7 @@
       "criterio": "2.4.7",
       "nombre": "Foco visible",
       "nivel": "AA",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-visible",
       "ficha_investigacion": null
     },
@@ -83,7 +83,7 @@
       "criterio": "2.4.11",
       "nombre": "Foco no oculto (mínimo)",
       "nivel": "AA",
-      "en_wcag_2_1": false,
+      "version_wcag": "2.2",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum",
       "ficha_investigacion": null
     }

@@ -1,6 +1,6 @@
 {
   "id": "ACC-01",
-  "bloque": "ACC",
+  "bloque": "acc",
   "nombre": "Contenido no textual",
   "que_comprueba": "Que imágenes y otros elementos no textuales tengan una alternativa en texto. La presencia del alt se comprueba automáticamente; su adecuación la valora una persona.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",
@@ -27,7 +27,7 @@
       "criterio": "1.1.1",
       "nombre": "Contenido no textual",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-content",
       "ficha_investigacion": null
     }

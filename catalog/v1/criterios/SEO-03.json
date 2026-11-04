@@ -1,6 +1,6 @@
 {
   "id": "SEO-03",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Title de la página",
   "que_comprueba": "Presencia del title y que describa el propósito concreto de la página. La longitud es solo un dato auxiliar.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

@@ -1,6 +1,6 @@
 {
   "id": "IA-01",
-  "bloque": "IA",
+  "bloque": "ia",
   "nombre": "Permiso de rastreo en robots.txt para buscadores y asistentes con IA",
   "que_comprueba": "Si el robots.txt permite rastrear la URL a Googlebot, bingbot, OAI-SearchBot, Claude-SearchBot y PerplexityBot, aplicando el protocolo completo (grupos, comodines, empates y códigos 4xx/429/5xx). Se informa aparte de GPTBot, ClaudeBot y Google-Extended, que se usan para entrenar modelos y no para buscar.",
   "cuando_aplica": "Siempre. Si no se puede obtener robots.txt, lo que depende de él queda «No verificable».",
@@ -150,7 +150,7 @@
       "necesita": [
         "otras_urls"
       ],
-      "alcance_minimo": "url_con_contexto",
+      "alcance_minimo": "url_contexto",
       "wcag": [],
       "kit_digital": [],
       "reutiliza": []

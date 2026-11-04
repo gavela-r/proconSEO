@@ -1,6 +1,6 @@
 {
   "id": "IA-04",
-  "bloque": "IA",
+  "bloque": "ia",
   "nombre": "Coherencia entre title, H1, introducción y contenido",
   "que_comprueba": "Que el título, el encabezado principal, la introducción y el resto de encabezados traten del mismo tema que el contenido.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

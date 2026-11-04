@@ -1,6 +1,6 @@
 {
   "id": "SEO-05",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Encabezados H1–H6 y estructura",
   "que_comprueba": "Presencia de H1 y estructura de encabezados. Varios H1 o saltos de nivel no son errores automáticos.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

@@ -1,6 +1,6 @@
 {
   "id": "ACC-05",
-  "bloque": "ACC",
+  "bloque": "acc",
   "nombre": "Color y contraste",
   "que_comprueba": "Que la información no dependa solo del color y que el contraste de texto y de elementos gráficos sea suficiente. En el MVP, el contraste de texto viene de PageSpeed Insights.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",
@@ -27,7 +27,7 @@
       "criterio": "1.4.1",
       "nombre": "Uso del color",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/use-of-color",
       "ficha_investigacion": null
     },
@@ -35,7 +35,7 @@
       "criterio": "1.4.3",
       "nombre": "Contraste (mínimo)",
       "nivel": "AA",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum",
       "ficha_investigacion": null
     },
@@ -43,7 +43,7 @@
       "criterio": "1.4.11",
       "nombre": "Contraste no textual",
       "nivel": "AA",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast",
       "ficha_investigacion": null
     }

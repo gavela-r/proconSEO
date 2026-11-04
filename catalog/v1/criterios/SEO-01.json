@@ -1,6 +1,6 @@
 {
   "id": "SEO-01",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Estado técnico, rastreabilidad e indexabilidad",
   "que_comprueba": "Código HTTP, HTTPS y certificado básico, permiso de rastreo, indexabilidad y errores servidos con HTTP 200 (posible soft 404). Incluye el noindex de desarrollo olvidado y la detección de CMS.",
   "cuando_aplica": "Siempre.",

@@ -1,6 +1,6 @@
 {
   "id": "SEO-14",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Datos estructurados y resultados enriquecidos",
   "que_comprueba": "Elegibilidad para resultados enriquecidos de Google (reutiliza IA-07) y perfil de producto.",
   "cuando_aplica": "Si la página tiene datos estructurados, o es una página de producto.",

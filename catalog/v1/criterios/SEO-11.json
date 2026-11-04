@@ -1,6 +1,6 @@
 {
   "id": "SEO-11",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Core Web Vitals",
   "que_comprueba": "LCP, INP y CLS en el percentil 75, separando móvil y ordenador, y sin mezclar datos de campo (visitas reales, 28 días) con datos de laboratorio (simulación).",
   "cuando_aplica": "Siempre que la API de PageSpeed Insights esté configurada y responda.",

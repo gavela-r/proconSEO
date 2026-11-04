@@ -9,9 +9,9 @@
   ],
   "valores": {
     "bloque": {
-      "IA": "Búsqueda con IA",
-      "SEO": "SEO",
-      "ACC": "Accesibilidad"
+      "ia": "Búsqueda con IA",
+      "seo": "SEO",
+      "acc": "Accesibilidad"
     },
     "modo": {
       "automatico": "Lo comprueba el código sin intervención humana",
@@ -48,7 +48,7 @@
     },
     "alcance_minimo": {
       "url_individual": "URL individual",
-      "url_con_contexto": "URL con contexto",
+      "url_contexto": "URL con contexto",
       "sitio_completo": "Sitio completo"
     },
     "condicion": {

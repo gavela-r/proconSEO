@@ -1,6 +1,6 @@
 {
   "id": "IA-05",
-  "bloque": "IA",
+  "bloque": "ia",
   "nombre": "Autoría, responsable y respaldo de las afirmaciones",
   "que_comprueba": "Si se identifica quién escribe o responde del contenido y si las afirmaciones relevantes están respaldadas. No se concluye falsedad ni falta de experiencia.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

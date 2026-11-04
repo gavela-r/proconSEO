@@ -1,6 +1,6 @@
 {
   "id": "IA-02",
-  "bloque": "IA",
+  "bloque": "ia",
   "nombre": "Directivas de indexación y de fragmentos",
   "que_comprueba": "noindex, nosnippet, max-snippet, max-image-preview, data-nosnippet y X-Robots-Tag, por plataforma (genérico, googlebot, bingbot…) y por alcance. Rastrear, indexar y mostrar fragmentos son cosas distintas.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",

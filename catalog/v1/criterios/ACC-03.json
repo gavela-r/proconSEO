@@ -1,6 +1,6 @@
 {
   "id": "ACC-03",
-  "bloque": "ACC",
+  "bloque": "acc",
   "nombre": "Estructura, relaciones y orden",
   "que_comprueba": "Que la estructura visual esté en el código (encabezados, listas, tablas, regiones), que la página tenga título y que el orden tenga sentido. Las etiquetas de formulario se comprueban en ACC-09. Incluye la detección de la declaración de accesibilidad.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",
@@ -29,7 +29,7 @@
       "criterio": "1.3.1",
       "nombre": "Información y relaciones",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships",
       "ficha_investigacion": null
     },
@@ -37,7 +37,7 @@
       "criterio": "1.3.2",
       "nombre": "Secuencia significativa",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/meaningful-sequence",
       "ficha_investigacion": null
     },
@@ -45,7 +45,7 @@
       "criterio": "1.3.3",
       "nombre": "Características sensoriales",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/sensory-characteristics",
       "ficha_investigacion": null
     },
@@ -53,7 +53,7 @@
       "criterio": "2.4.2",
       "nombre": "Página titulada",
       "nivel": "A",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/page-titled",
       "ficha_investigacion": null
     },
@@ -61,7 +61,7 @@
       "criterio": "2.4.6",
       "nombre": "Encabezados y etiquetas",
       "nivel": "AA",
-      "en_wcag_2_1": true,
+      "version_wcag": "2.1",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/headings-and-labels",
       "ficha_investigacion": null
     }

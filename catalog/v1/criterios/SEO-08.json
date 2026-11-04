@@ -1,6 +1,6 @@
 {
   "id": "SEO-08",
-  "bloque": "SEO",
+  "bloque": "seo",
   "nombre": "Duplicidad y variantes",
   "que_comprueba": "Contenido duplicado y variantes de URL. Solo es problema si hay una contradicción técnica observable.",
   "cuando_aplica": "Siempre que la página se haya podido descargar.",
