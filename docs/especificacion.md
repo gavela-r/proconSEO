@@ -4,7 +4,7 @@ Herramienta web interna de Proconsi para analizar sitios web en tres bloques: **
 
 | | |
 |---|---|
-| Versión | 1.0 (borrador para revisión del equipo) |
+| Versión | 1.1 (MVP, gravedad, esfuerzo y límites acordados) |
 | Fecha | 4 de noviembre de 2026 |
 | Fuentes | Guía para el análisis web + Anexos (Amilivia) · Investigación ejecutiva (José María) · Informe ejecutivo (Adrián) |
 | Regla de precedencia | Si dos fuentes no coinciden, manda la Guía + Anexos. Las decisiones del equipo están en [decisiones.md](decisiones.md). |
@@ -160,7 +160,8 @@ Cada resultado sigue la secuencia **Estado → Evidencia → Justificación → 
 | Límite o revisión | Qué no demuestra este resultado y si necesita revisión humana (con motivo) |
 | WCAG (solo accesibilidad) | Número, nombre y nivel exactos, p. ej. "1.1.1 Contenido no textual · A" |
 | Modo (solo accesibilidad) | Automático, Híbrido o Humano |
-| Gravedad | Solo si el estado es "Problema detectado" |
+| Gravedad | Crítico, Alto, Medio o Bajo. Solo si el estado es "Problema detectado" |
+| Esfuerzo | Bajo, Medio o Alto. Lo hereda del catálogo del criterio; es orientativo |
 | Fuente | Herramienta o fuente externa y su fecha, si el dato viene de fuera |
 
 ### Estados
@@ -188,13 +189,34 @@ Orden recomendado:
 2. Información incorrecta o contradictoria y carencias importantes de contenido o arquitectura.
 3. Mejoras complementarias: experiencia, autoridad y detalle.
 
-**Pendiente de decidir**: los niveles concretos de gravedad y si se añaden esfuerzo (bajo, medio o alto) e impacto descriptivo como campos informativos, nunca como puntuación.
+### Niveles de gravedad
+
+Solo para resultados en estado "Problema detectado". Las inferencias, hipótesis y mejoras no tienen gravedad.
+
+| Nivel | Código | Cuándo se usa | Ejemplo |
+|---|---|---|---|
+| **Crítico** | `critico` | Impide el acceso, la indexación o una función esencial | `noindex` no intencionado en la página principal; error 500 persistente; formulario de contacto imposible de usar con teclado |
+| **Alto** | `alto` | Barrera importante, aunque la página siga siendo usable | Imágenes informativas sin texto alternativo; contraste insuficiente en el texto principal |
+| **Medio** | `medio` | Afecta a una parte concreta de la página o del sitio | Enlace interno roto en el pie de página; código hreflang mal escrito |
+| **Bajo** | `bajo` | Detalle con un efecto pequeño | Cadena de dos redirecciones evitable |
+
+### Esfuerzo
+
+Estimación orientativa de cuánto cuesta corregir, fijada en el catálogo para cada criterio. Ayuda al cliente a planificar (primero lo crítico y barato). No es una puntuación.
+
+| Nivel | Código | Significado |
+|---|---|---|
+| **Bajo** | `bajo` | Cambiar un texto, un atributo o una configuración puntual |
+| **Medio** | `medio` | Modificar una plantilla o coordinar varias páginas |
+| **Alto** | `alto` | Rehacer una sección, el diseño o crear contenido nuevo |
+
+El "impacto" que propone la Investigación ejecutiva no se usa como campo propio: lo cubre "Consecuencia", que además está respaldada por evidencia.
 
 ---
 
 ## 6. Criterios de evaluación
 
-La columna **Ref.** enlaza con la Investigación ejecutiva, donde está la explicación de cada criterio. **MVP** indica la propuesta para la primera versión (pendiente de confirmar): **Sí** = se implementa; **Parcial** = solo lo comprobable sin navegador ni IA; **No** = aparece como "No implementada".
+La columna **Ref.** enlaza con la Investigación ejecutiva, donde está la explicación de cada criterio. **MVP** indica qué entra en la primera versión: **Sí** = se implementa; **Parcial** = solo lo comprobable sin navegador propio ni IA; **PSI** = se obtiene de la API de Google PageSpeed Insights; **No** = aparece como "No implementada".
 
 ### 6.1 Búsqueda con IA
 
@@ -228,16 +250,16 @@ Fuera del alcance de la URL (fase futura, con datos externos): citas, menciones 
 | SEO-08 | Duplicidad y variantes; solo es problema si hay una contradicción técnica observable. | T6 | Parcial |
 | SEO-09 | Contenido en HTML inicial, en DOM automático o solo tras interacción. | T9 | No (navegador) |
 | SEO-10 | Equivalencia de contenido y señales en móvil. | T10 | No (navegador) |
-| SEO-11 | Core Web Vitals (ver 6.4). | V1–V4, C17 | No (navegador/API) |
-| SEO-12 | Imágenes: descubrimiento, formato y contexto. | O7 | Sí |
+| SEO-11 | Core Web Vitals (ver 6.4). | V1–V4, C17 | PSI |
+| SEO-12 | Imágenes y vídeo: descubrimiento, formato y contexto. Subcomprobaciones de vídeo solo si la página lo tiene (ver 6.5). | O7, O8 | Sí (imágenes) · Parcial (vídeo) |
 | SEO-13 | Intersticiales, overlays y anuncios que tapan el contenido. | T12 | No (navegador) |
-| SEO-14 | Datos estructurados y elegibilidad para resultados enriquecidos (reutiliza IA-07). | T13 | Parcial |
+| SEO-14 | Datos estructurados y elegibilidad para resultados enriquecidos (reutiliza IA-07). Incluye el perfil de producto (ver 6.6). | T13 | Parcial |
 | SEO-15 | Versiones por idioma: códigos y destinos hreflang y reciprocidad. | T14 | Sí |
 | SEO-16 | Paginación, filtros y facetas, muestreando patrones sin generar combinaciones masivas. | T16 | No |
 
 Fuera del alcance de la URL (fase futura, con acceso autorizado o APIs): indexación real, canonical elegida por Google, acciones manuales, búsquedas, impresiones, clics y posiciones (M1–M4), enlaces entrantes y métricas de autoridad (E1–E3), y SEO local con Perfil de Empresa (O10).
 
-**Pendiente de decidir**: la Investigación incluye vídeos (O8) y páginas de producto como criterios SEO propios; la Guía no los tiene. Proponemos tratarlos en una versión posterior como subcomprobaciones de SEO-12 y SEO-14.
+Vídeos (O8) y páginas de producto no son criterios nuevos: se tratan como subcomprobaciones condicionales de criterios existentes (ver 6.5 y 6.6).
 
 ### 6.3 Accesibilidad (WCAG 2.2 A y AA)
 
@@ -249,7 +271,7 @@ Los 55 criterios A y AA se agrupan en 12 bloques. Cada incidencia indica el crit
 | ACC-02 | Audio, vídeo y multimedia | 1.2.1, 1.2.2, 1.2.3, 1.4.2 A · 1.2.4, 1.2.5 AA | Parcial (detección de medios y pistas) |
 | ACC-03 | Estructura, relaciones y orden | 1.3.1, 1.3.2, 1.3.3, 2.4.2 A · 2.4.6 AA | Parcial (title, tablas, labels) |
 | ACC-04 | Adaptación y presentación | 1.3.4, 1.4.4, 1.4.5, 1.4.10, 1.4.12, 1.4.13 AA | No (navegador) |
-| ACC-05 | Color y contraste | 1.4.1 A · 1.4.3, 1.4.11 AA | No (navegador) |
+| ACC-05 | Color y contraste | 1.4.1 A · 1.4.3, 1.4.11 AA | PSI (contraste de texto 1.4.3) |
 | ACC-06 | Teclado, foco y navegación | 2.1.1, 2.1.2, 2.1.4, 2.4.1, 2.4.3, 2.4.4 A · 2.4.7, 2.4.11 AA | Parcial (nombres de enlace) |
 | ACC-07 | Tiempo, movimiento y parpadeo | 2.2.1, 2.2.2, 2.3.1 A | No |
 | ACC-08 | Entrada y objetivos táctiles | 2.5.1, 2.5.2, 2.5.3, 2.5.4 A · 2.5.7, 2.5.8 AA | No (navegador) |
@@ -286,6 +308,31 @@ Las excepciones de cada criterio se aplican siempre. Las fichas de la Investigac
 - Se evalúa el percentil 75, separando móvil y ordenador.
 - Datos de campo (visitas reales, últimos 28 días) y de laboratorio (simulación) no se mezclan. Si la URL no tiene datos propios y se muestran los del origen, se indica.
 - INP solo se evalúa con interacciones documentadas. La ausencia de datos de campo no demuestra lentitud.
+- En el MVP, los datos vienen de la API de Google PageSpeed Insights. Cada resultado indica "Fuente: Google PageSpeed Insights", la fecha y si es dato de campo o de laboratorio.
+
+### 6.5 Vídeo (subcomprobaciones de SEO-12)
+
+Solo se activan si la página contiene vídeo. Su ausencia nunca es un problema.
+
+| Subcomprobación | Qué comprueba | MVP |
+|---|---|---|
+| `SEO-12.video-detectado` | Hay vídeos (`<video>`, iframes de YouTube o Vimeo…) y cuál es el principal | Sí |
+| `SEO-12.video-miniatura` | El vídeo tiene una imagen de presentación accesible | Parcial |
+| `SEO-12.video-datos` | Si existe marcado `VideoObject`, es válido y coincide con el vídeo visible | Sí (sintaxis) |
+| `SEO-12.video-pagina-dedicada` | Si el vídeo es el contenido principal, la página está dedicada a él | No (IA) |
+
+La accesibilidad del vídeo (subtítulos, transcripción y audiodescripción) se evalúa en ACC-02, sin duplicarla aquí.
+
+### 6.6 Perfil de producto (subcomprobaciones de SEO-14 e IA-06)
+
+Solo se activan en páginas de producto: cuando hay marcado `Product` o cuando el usuario lo indica al lanzar el análisis.
+
+| Subcomprobación | Qué comprueba | MVP |
+|---|---|---|
+| `SEO-14.producto-marcado` | El marcado `Product`/`Offer` es válido y tiene las propiedades necesarias | Sí |
+| `SEO-14.producto-precio-coherente` | El precio del marcado coincide con el visible | No |
+| `SEO-14.producto-disponibilidad` | La disponibilidad marcada coincide con la visible; un producto agotado no es un error por sí solo | No |
+| `IA-06.producto-vigencia` | Precios, ofertas y condiciones no están vencidos ni se contradicen | No (IA) |
 
 ---
 
@@ -326,7 +373,30 @@ Antes de la primera ejecución se crea un perfil **versionado** con estos parám
 
 Ante una respuesta 429, se pausa ese host y se respeta `Retry-After`. Nunca se cambia de identidad para evitar un bloqueo. Si la espera supera el tiempo disponible, el análisis se cierra como parcial.
 
-**Pendiente de decidir**: todos los valores numéricos, que se calibrarán en el servidor de Proconsi.
+### Valores iniciales (perfil v1)
+
+Se ajustarán al probar en el servidor de Proconsi. Si un análisis llega a un límite, se cierra como "parcial" y se indica qué límite se alcanzó.
+
+| Límite | Valor | Justificación |
+|---|---|---|
+| Páginas en "sitio completo" | 200 | Suficiente para webs de pymes; ampliable |
+| URLs extra en "URL con contexto" | 20 | Solo las que necesita un criterio |
+| Profundidad de rastreo | 5 clics desde la URL inicial | Habitual en webs pequeñas |
+| Redirecciones seguidas | 10 | Googlebot sigue como máximo 10 |
+| Tamaño máximo del HTML | 5 MB | Google lee hasta 15 MB; 5 MB cubre casi cualquier página y protege la memoria de PHP |
+| Tamaño máximo de robots.txt | 500 KB | Límite que aplica Google |
+| Tamaño máximo de un sitemap | 10 MB | El protocolo admite 50 MB; se trunca y se declara |
+| Descarga total por análisis | 200 MB | Protege el servidor |
+| Tiempo de conexión | 5 s | Evita esperar a servidores que no responden |
+| Tiempo por petición | 15 s | Evita esperar a servidores colgados |
+| Tiempo total del análisis | 2 min (URL individual y con contexto) · 30 min (sitio completo) | Al llegar al tope se cierra como "parcial" |
+| Reintentos | 2, esperando 2 s y luego 4 s | Para fallos puntuales de red |
+| Ritmo | 1 petición por segundo al mismo sitio | Para no saturar la web analizada |
+| Análisis a la vez | 2 | Protege el servidor de Proconsi |
+| Puertos permitidos | 80 y 443 | Los de las webs normales |
+| Idioma | `es-ES` | Clientes de Proconsi |
+| User-agent | Propio e identificable (p. ej. `proconSEO/1.0`) | Transparencia ante la web analizada |
+| Llamadas a PageSpeed Insights | 2 por URL (móvil y ordenador) | Las dos versiones que mide Google |
 
 ---
 
@@ -374,15 +444,24 @@ Una entrega se acepta si las decisiones obligatorias están tomadas, la cobertur
 - Proyectos, histórico, borrado, dashboard, detalle, filtros, revisión humana y exportaciones.
 - Los tres alcances con progreso, cancelación y límites.
 - Seguridad SEG-01, 02, 03, 05, 06 y 09 para todo lo que hace esta versión.
-- Las comprobaciones marcadas como "Sí" o "Parcial" en la sección 6.
+- Las comprobaciones marcadas como "Sí" o "Parcial" en la sección 6: todo lo que se puede comprobar leyendo el HTML y las respuestas HTTP.
+- **API de Google PageSpeed Insights**: Core Web Vitals (de campo y de laboratorio, en móvil y en ordenador) y contraste de texto, sin necesidad de un navegador propio. La clave de la API va en `.env`. Solo se le envía la URL pública analizada.
 - Todas las demás subcomprobaciones aparecen como "No implementada" con su motivo.
+
+Qué aporta frente a las herramientas profesionales (Screaming Frog, Semrush, Ahrefs, Lighthouse, axe, WAVE):
+
+- **Sin notas engañosas**: no da un "95 sobre 100" que el cliente confunda con "todo está bien".
+- **Honestidad**: muestra qué se ha comprobado, qué no y por qué.
+- **Los tres bloques juntos**, con cada causa agrupada una sola vez.
+- **Revisión humana con historial**, para que el consultor pueda defender el informe ante el cliente.
+- **Preparación específica para buscadores con IA**, por ejemplo robots.txt para cada crawler de IA, algo que pocas herramientas revisan.
 
 **Datos de prueba:** solo en proyectos de demostración marcados como tales, para enseñar cómo se verán las funciones futuras. Nunca dentro de un análisis real.
 
 **Fases futuras:**
 - **Navegador aislado**: renderizado y DOM, móvil, contraste, reflow, teclado y foco, objetivos táctiles, intersticiales, Core Web Vitals de laboratorio y capturas automáticas. Requiere SEG-04 y SEG-08.
 - **IA semántica**: IA-04, 05, 06 y 09, SEO-06 y calidad de title y description. Requiere SEG-07 y una rúbrica versionada.
-- **APIs**: datos de campo de Core Web Vitals, Search Console, Bing Webmaster, enlaces entrantes, medición de citas en IA y perfiles locales.
+- **Más APIs**: Search Console, Bing Webmaster, enlaces entrantes, medición de citas en IA y perfiles locales.
 - **Análisis programados y comparación entre análisis**: al repetir una prueba se conservan ambos resultados. Que el cambio se haya aplicado no significa que el buscador ya lo haya procesado.
 - **Más formatos**: PDF (con PDF/UA como referencia), multimedia y documentos embebidos.
 - **Modalidad de ensayo autorizado**: formularios y flujos con autenticación en entornos de prueba.
