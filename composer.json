@@ -31,7 +31,7 @@
         "test": "phpunit",
         "migrar": "@php bin/migrar.php",
         "demo": "@php bin/migrar.php --demo",
-        "servidor": "@php -S localhost:8080 -t public"
+        "servidor": "@php -S localhost:8090 -t public"
     },
     "config": {
         "sort-packages": true
