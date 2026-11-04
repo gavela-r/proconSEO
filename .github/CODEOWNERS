@@ -1,0 +1,20 @@
+# Responsable de revisar cada carpeta
+
+/src/Fetch/          @Amilivia
+/src/Run/            @Amilivia
+/templates/run/      @Amilivia
+/bin/                @Amilivia
+
+/src/Engine/         @josemariamerino20-cmd
+/catalog/            @josemariamerino20-cmd
+/templates/catalog/  @josemariamerino20-cmd
+
+/src/Projects/       @gavela-r
+/src/Results/        @gavela-r
+/src/Review/         @gavela-r
+/src/Export/         @gavela-r
+/templates/projects/ @gavela-r
+/templates/results/  @gavela-r
+
+/src/Shared/         @Amilivia @josemariamerino20-cmd @gavela-r
+/db/                 @Amilivia @josemariamerino20-cmd @gavela-r
