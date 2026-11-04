@@ -1,0 +1,23 @@
+{
+  "descripcion": "robots.txt que bloquea a todos los robots (típico de una web en desarrollo).",
+  "url_solicitada": "https://www.panaderia.example/robots.txt",
+  "url_final": "https://www.panaderia.example/robots.txt",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/plain; charset=utf-8"
+  },
+  "tipo_contenido": "text/plain",
+  "cuerpo": "robots/bloquea-todo.txt",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "IA-01.robots-recuperado": "correcto"
+  }
+}

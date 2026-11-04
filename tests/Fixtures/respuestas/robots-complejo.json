@@ -1,0 +1,21 @@
+{
+  "descripcion": "Grupos con varios user-agent, comodines, empates, mayúsculas y líneas no válidas (RFC 9309).",
+  "url_solicitada": "https://www.cumple.example/robots.txt",
+  "url_final": "https://www.cumple.example/robots.txt",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/plain; charset=utf-8"
+  },
+  "tipo_contenido": "text/plain",
+  "cuerpo": "robots/complejo.txt",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {}
+}

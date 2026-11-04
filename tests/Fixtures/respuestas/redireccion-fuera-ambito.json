@@ -1,0 +1,32 @@
+{
+  "descripcion": "La página redirige a otro dominio que no está en el ámbito: la redirección se registra y no se sigue.",
+  "url_solicitada": "https://www.cumple.example/tienda/",
+  "url_final": "https://www.cumple.example/tienda/",
+  "resultado": "fuera_de_ambito",
+  "estado_http": 302,
+  "redirecciones": [
+    {
+      "url": "https://www.cumple.example/tienda/",
+      "estado": 302,
+      "destino": "https://tienda-externa.example/"
+    }
+  ],
+  "cabeceras": {},
+  "tipo_contenido": null,
+  "cuerpo": null,
+  "tls_verificado": true,
+  "motivo": "Redirección a un host fuera del ámbito: tienda-externa.example",
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "SEO-03.title-presente": "no_verificable",
+    "SEO-04.description-presente": "no_verificable",
+    "SEO-05.h1-presente": "no_verificable",
+    "IA-02.meta-robots": "no_verificable",
+    "ACC-01.img-alt-presente": "no_verificable",
+    "ACC-10.lang-presente": "no_verificable"
+  }
+}

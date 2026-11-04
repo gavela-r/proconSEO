@@ -1,0 +1,23 @@
+{
+  "descripcion": "robots.txt limitado por el servidor (429).",
+  "url_solicitada": "https://www.cumple.example/robots.txt",
+  "url_final": "https://www.cumple.example/robots.txt",
+  "resultado": "limitado_429",
+  "estado_http": 429,
+  "redirecciones": [],
+  "cabeceras": {
+    "retry-after": "120"
+  },
+  "tipo_contenido": null,
+  "cuerpo": null,
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "IA-01.permiso-buscadores": "no_verificable"
+  }
+}

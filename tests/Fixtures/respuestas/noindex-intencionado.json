@@ -1,0 +1,23 @@
+{
+  "descripcion": "La misma web, pero con el objetivo «no indexar» declarado al lanzar el análisis: el noindex es correcto (especificación 10).",
+  "url_solicitada": "https://www.panaderia.example/",
+  "url_final": "https://www.panaderia.example/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/wordpress-noindex-desarrollo.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": "web_kit_digital",
+    "sector": null,
+    "objetivo": "no_indexar"
+  },
+  "esperado": {
+    "SEO-01.noindex-desarrollo": "correcto"
+  }
+}

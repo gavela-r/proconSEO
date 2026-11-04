@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clínica dental Ejemplo en León</title>
+  <meta name="description" content="Clínica dental en León. Pide cita con nuestro asistente virtual.">
+</head>
+<body>
+  <main>
+    <h1>Clínica dental Ejemplo</h1>
+    <p>Pide cita las 24 horas con nuestro asistente virtual.</p>
+  </main>
+
+  <!-- Widget de chatbot: botón solo con icono (sin nombre) e iframe sin title -->
+  <div id="chatbot-widget" class="chatbot-launcher">
+    <button class="chatbot-boton" onclick="abrirChat()"><img src="https://www.clinica.example/chat/icono.svg" alt=""></button>
+    <iframe id="chatbot-ventana" src="https://bot.chatbot.example/widget?cliente=clinica" hidden></iframe>
+  </div>
+  <script src="https://bot.chatbot.example/widget.js" async></script>
+</body>
+</html>

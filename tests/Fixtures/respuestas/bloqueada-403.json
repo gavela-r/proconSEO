@@ -1,0 +1,28 @@
+{
+  "descripcion": "El servidor responde 403 con una página de CAPTCHA. Su title y su noindex son del muro, no de la web: nada de lo que depende de la página se puede valorar (especificación 10, «Página bloqueada»).",
+  "url_solicitada": "https://www.bloqueada.example/",
+  "url_final": "https://www.bloqueada.example/",
+  "resultado": "error_http",
+  "estado_http": 403,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/bloqueada-captcha.html",
+  "tls_verificado": true,
+  "motivo": "403 Forbidden con desafío CAPTCHA",
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "SEO-03.title-presente": "no_verificable",
+    "SEO-04.description-presente": "no_verificable",
+    "SEO-05.h1-presente": "no_verificable",
+    "IA-02.meta-robots": "no_verificable",
+    "ACC-01.img-alt-presente": "no_verificable",
+    "ACC-10.lang-presente": "no_verificable"
+  }
+}

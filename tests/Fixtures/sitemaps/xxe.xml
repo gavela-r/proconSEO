@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SEG-05: el parser NUNCA debe resolver estas entidades externas -->
+<!DOCTYPE urlset [
+  <!ENTITY secreto SYSTEM "file:///etc/passwd">
+  <!ENTITY remoto SYSTEM "http://169.254.169.254/latest/meta-data/">
+]>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://www.cumple.example/&secreto;</loc>
+  </url>
+  <url>
+    <loc>https://www.cumple.example/&remoto;</loc>
+  </url>
+</urlset>

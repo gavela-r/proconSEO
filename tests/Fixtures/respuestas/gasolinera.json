@@ -1,0 +1,24 @@
+{
+  "descripcion": "Gasolinera con marcado GasStation, precios con fecha y horario visibles. Su página de contacto da otro teléfono y otro horario.",
+  "url_solicitada": "https://www.gasolinera.example/",
+  "url_final": "https://www.gasolinera.example/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/gasolinera.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": "web_cliente",
+    "sector": "hidrocarburos",
+    "objetivo": null
+  },
+  "esperado": {
+    "IA-07.negocio-local": "correcto",
+    "IA-07.jsonld-sintaxis": "correcto"
+  }
+}

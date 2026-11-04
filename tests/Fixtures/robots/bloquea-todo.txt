@@ -1,0 +1,3 @@
+# Lo que deja WordPress/servidores de desarrollo: bloquea a todos
+User-agent: *
+Disallow: /

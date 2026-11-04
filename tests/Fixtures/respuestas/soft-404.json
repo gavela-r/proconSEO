@@ -1,0 +1,21 @@
+{
+  "descripcion": "Responde 200 pero el contenido dice «página no encontrada»: posible soft 404 (inferencia, no hecho).",
+  "url_solicitada": "https://www.nocumple.example/servicio-antiguo/",
+  "url_final": "https://www.nocumple.example/servicio-antiguo/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/soft-404.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {}
+}

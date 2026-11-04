@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Autobuses Ejemplo | Horarios y billetes</title>
+  <meta name="description" content="Compra billetes de autobús entre León, Astorga y Ponferrada.">
+</head>
+<body>
+  <main>
+    <h1>Compra tu billete</h1>
+    <form action="https://www.autobuses.example/buscar" method="get" class="buscador-billetes">
+      <label for="origen">Origen</label>
+      <select id="origen" name="origen" autocomplete="off">
+        <option>León</option><option>Astorga</option>
+      </select>
+      <!-- Destino y fecha sin etiqueta: caso de ACC-09.formulario-billetes -->
+      <select name="destino"><option>Ponferrada</option></select>
+      <input type="date" name="fecha">
+      <button type="submit">Buscar billetes</button>
+    </form>
+
+    <h2>Horarios y tarifas</h2>
+    <!-- Horarios solo en imagen y PDF: caso de IA-10.horarios-texto -->
+    <img src="https://www.autobuses.example/img/horarios-invierno.png" alt="Horarios">
+    <p><a href="https://www.autobuses.example/docs/tarifas-2026.pdf">Descargar tarifas (PDF)</a></p>
+  </main>
+</body>
+</html>
