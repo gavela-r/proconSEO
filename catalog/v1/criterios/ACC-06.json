@@ -1,0 +1,288 @@
+{
+  "id": "ACC-06",
+  "bloque": "ACC",
+  "nombre": "Teclado, foco y navegación",
+  "que_comprueba": "Uso completo con teclado, sin trampas, atajos, saltar bloques, orden y visibilidad del foco, y propósito de los enlaces.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Hay personas que no pueden usar el ratón y navegan solo con el teclado. Tienen que poder llegar a todo y ver en qué punto están.",
+  "modo": "hibrido",
+  "esfuerzo": "medio",
+  "mvp": "parcial",
+  "ref_investigacion": [],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "W3C — WCAG 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "W3C — ACT Rules",
+      "url": "https://www.w3.org/WAI/standards-guidelines/act/rules/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [
+    {
+      "criterio": "2.1.1",
+      "nombre": "Teclado",
+      "nivel": "A",
+      "en_wcag_2_1": true,
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/keyboard",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.1.2",
+      "nombre": "Sin trampas para el foco del teclado",
+      "nivel": "A",
+      "en_wcag_2_1": true,
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/no-keyboard-trap",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.1.4",
+      "nombre": "Atajos de teclado de un solo carácter",
+      "nivel": "A",
+      "en_wcag_2_1": true,
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.4.1",
+      "nombre": "Evitar bloques",
+      "nivel": "A",
+      "en_wcag_2_1": true,
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/bypass-blocks",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.4.3",
+      "nombre": "Orden del foco",
+      "nivel": "A",
+      "en_wcag_2_1": true,
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-order",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.4.4",
+      "nombre": "Propósito de los enlaces (en contexto)",
+      "nivel": "A",
+      "en_wcag_2_1": true,
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-in-context",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.4.7",
+      "nombre": "Foco visible",
+      "nivel": "AA",
+      "en_wcag_2_1": true,
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-visible",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.4.11",
+      "nombre": "Foco no oculto (mínimo)",
+      "nivel": "AA",
+      "en_wcag_2_1": false,
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum",
+      "ficha_investigacion": null
+    }
+  ],
+  "subcomprobaciones": [
+    {
+      "id": "ACC-06.enlaces-nombre",
+      "nombre": "Enlaces con nombre",
+      "que_comprueba": "Todos los enlaces tienen un texto o nombre accesible.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.4.4",
+        "4.1.2"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-06.enlaces-proposito",
+      "nombre": "Propósito de los enlaces",
+      "que_comprueba": "Enlaces con textos genéricos («aquí», «más») cuyo propósito no se entiende por el contexto.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "hibrido",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.4.4"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": [
+        "SEO-07"
+      ]
+    },
+    {
+      "id": "ACC-06.saltar-bloques",
+      "nombre": "Mecanismo para saltar bloques",
+      "que_comprueba": "Hay un enlace para saltar al contenido, o regiones y encabezados que lo permitan.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.4.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-06.tabindex-positivo",
+      "nombre": "tabindex positivo",
+      "que_comprueba": "Elementos con tabindex mayor que 0, que alteran el orden natural del foco.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.4.3"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-06.teclado",
+      "nombre": "Operable con teclado",
+      "que_comprueba": "Toda la funcionalidad se puede usar con teclado.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.1.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-06.trampa-foco",
+      "nombre": "Sin trampas de foco",
+      "que_comprueba": "El foco no queda atrapado en ningún componente.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.1.2"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-06.atajos-caracter",
+      "nombre": "Atajos de un solo carácter",
+      "que_comprueba": "Los atajos de una sola tecla se pueden desactivar o cambiar.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.1.4"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-06.foco-visible",
+      "nombre": "Foco visible",
+      "que_comprueba": "El foco del teclado siempre se ve.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.4.7"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-06.foco-no-oculto",
+      "nombre": "Foco no oculto",
+      "que_comprueba": "El elemento con foco no queda totalmente tapado por otro contenido.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.4.11"
+      ],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

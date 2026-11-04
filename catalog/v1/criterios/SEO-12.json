@@ -1,0 +1,162 @@
+{
+  "id": "SEO-12",
+  "bloque": "SEO",
+  "nombre": "Imágenes y vídeo",
+  "que_comprueba": "Descubrimiento, formato y contexto de imágenes; y, solo si la página tiene vídeo, detección, miniatura, marcado y página dedicada.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Las imágenes y los vídeos también se buscan en Google. Para que aparezcan, tienen que poder encontrarse y estar bien descritos.",
+  "modo": "hibrido",
+  "esfuerzo": "bajo",
+  "mvp": "si",
+  "ref_investigacion": [
+    "O7",
+    "O8"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Imágenes en la Búsqueda de Google",
+      "url": "https://developers.google.com/search/docs/appearance/google-images",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Vídeos en la Búsqueda de Google",
+      "url": "https://developers.google.com/search/docs/appearance/video",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-12.imagenes-rastreables",
+      "nombre": "Imágenes rastreables",
+      "que_comprueba": "Las imágenes de contenido usan <img> (o <picture>) con una URL rastreable, no solo fondos CSS.",
+      "cuando_aplica": "Si la página tiene imágenes.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "seo_on_page"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-12.imagenes-alt",
+      "nombre": "Texto alternativo de imágenes",
+      "que_comprueba": "Las imágenes de contenido tienen atributo alt.",
+      "cuando_aplica": "Si la página tiene imágenes.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "seo_on_page"
+      ],
+      "reutiliza": [
+        "ACC-01"
+      ]
+    },
+    {
+      "id": "SEO-12.imagenes-formato",
+      "nombre": "Formato y dimensiones",
+      "que_comprueba": "Formato de imagen (WebP, AVIF, JPEG, PNG, SVG…) y dimensiones declaradas (width y height).",
+      "cuando_aplica": "Si la página tiene imágenes.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "seo_on_page"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-12.video-detectado",
+      "nombre": "Vídeo detectado",
+      "que_comprueba": "Hay vídeos (<video>, iframes de YouTube o Vimeo…) y cuál es el principal.",
+      "cuando_aplica": "Solo si la página tiene vídeo. Su ausencia nunca es un problema.",
+      "condicion": "video",
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-12.video-miniatura",
+      "nombre": "Miniatura del vídeo",
+      "que_comprueba": "El vídeo tiene una imagen de presentación accesible.",
+      "cuando_aplica": "Solo si la página tiene vídeo.",
+      "condicion": "video",
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-12.video-datos",
+      "nombre": "Marcado VideoObject",
+      "que_comprueba": "Si existe marcado VideoObject, es válido y coincide con el vídeo visible (en el MVP, solo sintaxis).",
+      "cuando_aplica": "Solo si la página tiene vídeo.",
+      "condicion": "video",
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": [
+        "IA-07"
+      ]
+    },
+    {
+      "id": "SEO-12.video-pagina-dedicada",
+      "nombre": "Página dedicada al vídeo",
+      "que_comprueba": "Si el vídeo es el contenido principal, la página está dedicada a él.",
+      "cuando_aplica": "Solo si la página tiene vídeo.",
+      "condicion": "video",
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ],
+  "notas": "Imágenes: Sí en el MVP. Vídeo: Parcial. La accesibilidad del vídeo se evalúa en ACC-02, sin duplicarla aquí."
+}
