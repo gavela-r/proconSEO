@@ -43,3 +43,12 @@ Requisitos: PHP 8.2 o superior (con curl, pdo_mysql, mbstring, intl, gd, zip y o
 4. `composer migrar` (o `composer demo` para cargar además los datos de demostración).
 5. `composer servidor` y abre http://localhost:8090
 6. Tests: `composer test`
+
+**Windows y HTTPS.** PHP en Windows no trae la lista de autoridades de certificación, así que rechaza todos los HTTPS (es lo seguro). Descarga `cacert.pem` de https://curl.se/ca/cacert.pem, comprueba su huella SHA-256 con https://curl.se/ca/cacert.pem.sha256 y apunta a él en `php.ini`:
+
+```ini
+curl.cainfo = "C:\ruta\a\cacert.pem"
+openssl.cafile = "C:\ruta\a\cacert.pem"
+```
+
+Nunca desactives la verificación de certificados para que funcione.
