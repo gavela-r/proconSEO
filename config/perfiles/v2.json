@@ -122,14 +122,14 @@
     },
     "abuso": {
         "analisis_por_ip_hora": {
-            "valor": 30,
+            "valor": 120,
             "unidad": "análisis/hora",
-            "justificacion": "Uso normal de una persona; frena scripts o abusos"
+            "justificacion": "Unos 2 por minuto: ninguna persona lanza más a mano, aunque toda la oficina comparta IP; frena scripts"
         },
         "analisis_por_dominio_hora": {
-            "valor": 10,
+            "valor": 20,
             "unidad": "análisis/hora",
-            "justificacion": "No usar la herramienta para atacar una web"
+            "justificacion": "Permite repetir el análisis de una web mientras se corrige, sin usar la herramienta para saturarla"
         }
     }
 }
