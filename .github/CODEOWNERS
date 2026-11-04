@@ -18,3 +18,13 @@
 
 /src/Shared/         @Amilivia @josemariamerino20-cmd @gavela-r
 /db/                 @Amilivia @josemariamerino20-cmd @gavela-r
+
+/routes/comun.php      @Amilivia @josemariamerino20-cmd @gavela-r
+/routes/run.php        @Amilivia
+/routes/catalogo.php   @josemariamerino20-cmd
+/routes/proyectos.php  @gavela-r
+/routes/resultados.php @gavela-r
+/routes/revision.php   @gavela-r
+/routes/exportar.php   @gavela-r
+/config/perfiles/      @Amilivia
+/public/assets/css/base.css @Amilivia @josemariamerino20-cmd @gavela-r
