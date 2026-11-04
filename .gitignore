@@ -7,3 +7,5 @@
 *.log
 .DS_Store
 Thumbs.db
+.phpunit.cache/
+.claude/launch.json

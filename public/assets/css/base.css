@@ -1,0 +1,160 @@
+/* Estilos base comunes (Parte 0). Cada parte añade su propio fichero CSS; no editar este sin avisar. */
+
+:root {
+    --fondo: #ffffff;
+    --superficie: #f5f6f8;
+    --texto: #1b1f24;
+    --texto-suave: #4a525c;
+    --borde: #cfd4da;
+    --primario: #0b5cad;
+    --primario-texto: #ffffff;
+    --foco: #ffbf47;
+
+    /* Estados de resultado: el color nunca va solo, siempre acompañado del texto del estado (WCAG 1.4.1). */
+    --estado-correcto: #1e6b34;
+    --estado-mejorable: #8a5a00;
+    --estado-problema: #b3261e;
+    --estado-decision: #5b3fa0;
+    --estado-no-verificable: #4a525c;
+    --estado-no-aplicable: #6b7280;
+
+    --radio: 6px;
+    --espacio: 1rem;
+    --ancho-maximo: 72rem;
+    --fuente: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --fondo: #121417;
+        --superficie: #1d2126;
+        --texto: #eceff3;
+        --texto-suave: #b4bcc6;
+        --borde: #3a414a;
+        --primario: #6cb2ff;
+        --primario-texto: #0b1a2b;
+        --estado-correcto: #6fd08c;
+        --estado-mejorable: #f0b74a;
+        --estado-problema: #ff8a80;
+        --estado-decision: #c3a8ff;
+        --estado-no-verificable: #b4bcc6;
+        --estado-no-aplicable: #9aa3ad;
+    }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: 100%; }
+
+body {
+    margin: 0;
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: var(--fuente);
+    line-height: 1.5;
+}
+
+.contenedor {
+    width: 100%;
+    max-width: var(--ancho-maximo);
+    margin: 0 auto;
+    padding: 0 var(--espacio);
+}
+
+main.contenedor { padding-top: 1.5rem; padding-bottom: 3rem; }
+main:focus { outline: none; }
+
+h1, h2, h3 { line-height: 1.25; }
+h1 { font-size: 1.75rem; margin: 0 0 .75rem; }
+h2 { font-size: 1.3rem; }
+
+a { color: var(--primario); }
+
+/* Foco siempre visible (WCAG 2.4.7). */
+:focus-visible {
+    outline: 3px solid var(--foco);
+    outline-offset: 2px;
+}
+
+.saltar {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    padding: .5rem 1rem;
+    background: var(--primario);
+    color: var(--primario-texto);
+    z-index: 10;
+}
+.saltar:focus { left: 0; }
+
+.cabecera { background: var(--superficie); border-bottom: 1px solid var(--borde); }
+.cabecera__fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; min-height: 3.5rem; }
+.marca { font-weight: 700; font-size: 1.15rem; text-decoration: none; color: var(--texto); }
+.menu { display: flex; flex-wrap: wrap; gap: .25rem 1rem; list-style: none; margin: 0; padding: 0; }
+.menu a { display: inline-block; padding: .5rem .25rem; min-height: 24px; }
+
+.pie { border-top: 1px solid var(--borde); color: var(--texto-suave); font-size: .9rem; padding: 1rem 0; }
+
+.entradilla { font-size: 1.1rem; color: var(--texto-suave); max-width: 45rem; }
+
+.tarjetas { display: grid; gap: var(--espacio); grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); margin: 1.5rem 0; }
+.tarjeta {
+    display: block;
+    padding: 1.25rem;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    background: var(--superficie);
+    color: var(--texto);
+    text-decoration: none;
+}
+.tarjeta:hover { border-color: var(--primario); }
+.tarjeta h2 { margin: 0 0 .25rem; color: var(--primario); }
+.tarjeta p { margin: 0; }
+
+.aviso { padding: .75rem 1rem; border-radius: var(--radio); border-left: 4px solid; background: var(--superficie); }
+.aviso--error { border-color: var(--estado-problema); }
+.aviso--prueba { border-color: var(--estado-mejorable); }
+
+/* Etiquetas de estado: usar siempre con el texto del estado dentro. */
+.estado { display: inline-block; padding: .1rem .5rem; border-radius: 999px; border: 1px solid currentColor; font-size: .85rem; font-weight: 600; }
+.estado--correcto { color: var(--estado-correcto); }
+.estado--mejorable { color: var(--estado-mejorable); }
+.estado--problema { color: var(--estado-problema); }
+.estado--decision_revisar { color: var(--estado-decision); }
+.estado--no_verificable { color: var(--estado-no-verificable); }
+.estado--no_aplicable { color: var(--estado-no-aplicable); }
+
+/* Formularios y botones comunes. */
+label { display: block; font-weight: 600; margin: .75rem 0 .25rem; }
+input, select, textarea {
+    width: 100%;
+    max-width: 40rem;
+    padding: .5rem .6rem;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    background: var(--fondo);
+    color: var(--texto);
+    font: inherit;
+}
+.boton {
+    display: inline-block;
+    min-height: 44px;
+    padding: .6rem 1.1rem;
+    border: 0;
+    border-radius: var(--radio);
+    background: var(--primario);
+    color: var(--primario-texto);
+    font: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+.boton--secundario { background: transparent; color: var(--primario); border: 1px solid var(--primario); }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .5rem; border-bottom: 1px solid var(--borde); vertical-align: top; }
+.tabla-desplazable { overflow-x: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+}
