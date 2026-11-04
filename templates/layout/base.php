@@ -13,6 +13,9 @@ $titulo = $titulo ?? 'proconSEO';
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($titulo) ?> · proconSEO</title>
     <link rel="stylesheet" href="/assets/css/base.css">
+    <?php foreach (($estilos ?? []) as $css): /* CSS propio de cada parte: 'estilos' => ['/assets/css/run.css'] */ ?>
+        <link rel="stylesheet" href="<?= e($css) ?>">
+    <?php endforeach; ?>
 </head>
 <body>
 <a class="saltar" href="#contenido">Saltar al contenido</a>

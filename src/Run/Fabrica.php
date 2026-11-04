@@ -1,0 +1,81 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ProconSEO\Run;
+
+use PDO;
+use ProconSEO\Engine\Catalogo\CatalogoJson;
+use ProconSEO\Fetch\Ambito;
+use ProconSEO\Fetch\ClienteHttpSeguro;
+use ProconSEO\Fetch\Http\TransporteCurl;
+use ProconSEO\Fetch\LimitesDescarga;
+use ProconSEO\Fetch\ResolvedorDnsSistema;
+use ProconSEO\Fetch\ValidadorDestino;
+use ProconSEO\Fetch\ValidadorUrl;
+use ProconSEO\Shared\BaseDatos;
+use ProconSEO\Shared\Contract\Catalogo;
+use ProconSEO\Shared\Contract\MotorAnalisis;
+
+/**
+ * Monta las piezas reales de la Parte 1 (para las rutas web y el worker).
+ * En los tests se construyen a mano con transporte y DNS simulados.
+ */
+final class Fabrica
+{
+    private ?Catalogo $catalogo = null;
+
+    public function __construct(private readonly ?PDO $bd = null)
+    {
+    }
+
+    public function bd(): PDO
+    {
+        return $this->bd ?? BaseDatos::conexion();
+    }
+
+    public function repositorio(): RepositorioAnalisis
+    {
+        return new RepositorioAnalisis($this->bd());
+    }
+
+    public function catalogo(): Catalogo
+    {
+        return $this->catalogo ??= CatalogoJson::v1();
+    }
+
+    public function validador(): ValidadorDestino
+    {
+        $perfil = $this->repositorio()->perfilVigente();
+        $puertos = $perfil === null ? [80, 443] : LimitesDescarga::desdePerfil($perfil['parametros'])->puertosPermitidos;
+
+        return new ValidadorDestino(new ValidadorUrl($puertos), new ResolvedorDnsSistema());
+    }
+
+    public function lanzador(): LanzadorAnalisis
+    {
+        return new LanzadorAnalisis($this->repositorio(), $this->validador(), $this->catalogo());
+    }
+
+    /** Motor provisional hasta que la Parte 2 publique el suyo. */
+    public function motor(): MotorAnalisis
+    {
+        return new MotorProvisional($this->catalogo());
+    }
+
+    public function orquestador(): Orquestador
+    {
+        return new Orquestador(
+            $this->repositorio(),
+            new GuardadoResultados($this->bd()),
+            $this->motor(),
+            $this->validador(),
+            static fn (Ambito $ambito, LimitesDescarga $limites): ClienteHttpSeguro => new ClienteHttpSeguro(
+                new TransporteCurl(),
+                new ValidadorDestino(new ValidadorUrl($limites->puertosPermitidos), new ResolvedorDnsSistema()),
+                $ambito,
+                $limites,
+            ),
+        );
+    }
+}
