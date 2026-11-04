@@ -83,6 +83,44 @@
       "reutiliza": []
     },
     {
+      "id": "SEO-01.contenido-mixto",
+      "nombre": "Contenido mixto",
+      "que_comprueba": "Imágenes, scripts o estilos cargados por HTTP en una página HTTPS (especificación v1.3).",
+      "cuando_aplica": "Si la página se sirve por HTTPS.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "dominio_https"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-01.formulario-sin-cifrar",
+      "nombre": "Formulario que envía sin cifrar",
+      "que_comprueba": "Formularios cuyo destino (action) es una dirección HTTP (especificación v1.3).",
+      "cuando_aplica": "Si la página tiene formularios.",
+      "condicion": "formulario",
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "dominio_https"
+      ],
+      "reutiliza": []
+    },
+    {
       "id": "SEO-01.rastreable",
       "nombre": "Rastreable por Googlebot",
       "que_comprueba": "robots.txt permite a Googlebot rastrear la URL.",
