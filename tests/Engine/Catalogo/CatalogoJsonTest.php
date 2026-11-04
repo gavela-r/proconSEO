@@ -27,7 +27,7 @@ final class CatalogoJsonTest extends TestCase
     {
         $ids = array_map(static fn ($f) => $f->id, CatalogoJson::v1()->todas());
 
-        self::assertCount(166, $ids);
+        self::assertCount(168, $ids);
         self::assertSame($ids, array_values(array_unique($ids)));
     }
 

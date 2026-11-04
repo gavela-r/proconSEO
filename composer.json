@@ -34,7 +34,9 @@
         "migrar": "@php bin/migrar.php",
         "demo": "@php bin/migrar.php --demo",
         "servidor": "@php -S localhost:8090 -t public",
-        "worker": "@php bin/worker.php"
+        "worker": "@php bin/worker.php",
+        "interruptor": "@php bin/interruptor.php",
+        "auditoria": "@php bin/auditoria.php"
     },
     "config": {
         "sort-packages": true

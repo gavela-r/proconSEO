@@ -42,7 +42,7 @@ final class CatalogoV1Test extends TestCase
     /** Subcomprobaciones con ID fijado en la especificación (6.2, 6.5 a 6.8). */
     private const SUBCOMPROBACIONES_ESPECIFICACION = [
         'SEO-03.title-presente',
-        'SEO-01.noindex-desarrollo', 'SEO-01.cms-detectado', 'SEO-07.paginas-minimas', 'SEO-10.viewport',
+        'SEO-01.noindex-desarrollo', 'SEO-01.cms-detectado', 'SEO-01.contenido-mixto', 'SEO-01.formulario-sin-cifrar', 'SEO-07.paginas-minimas', 'SEO-10.viewport',
         'SEO-12.video-detectado', 'SEO-12.video-miniatura', 'SEO-12.video-datos', 'SEO-12.video-pagina-dedicada',
         'SEO-14.producto-marcado', 'SEO-14.producto-precio-coherente', 'SEO-14.producto-disponibilidad',
         'IA-06.producto-vigencia', 'IA-06.precios-carburante',

@@ -28,7 +28,8 @@ $maxSimultaneos = (int) ($perfil['parametros']['trafico']['analisis_simultaneos'
 echo '[' . date('H:i:s') . "] Worker en marcha (máximo {$maxSimultaneos} análisis a la vez)." . PHP_EOL;
 
 while (true) {
-    $id = $fabrica->repositorio()->reservarSiguiente($maxSimultaneos);
+    // Con el interruptor general activado no se empieza nada nuevo (SEG-11).
+    $id = $fabrica->interruptor()->activo() ? null : $fabrica->repositorio()->reservarSiguiente($maxSimultaneos);
 
     if ($id === null) {
         if ($unaVez) {
