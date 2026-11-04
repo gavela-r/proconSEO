@@ -21,6 +21,8 @@
 11. **Páginas de producto**: perfil que solo se activa en páginas de producto (SEO-14 e IA-06). En el MVP, solo validar el marcado de producto.
 12. **Enfoque Proconsi**: la herramienta se centra en controlar la calidad de las webs y tiendas del Kit Digital que hace Proconsi (WCAG 2.1 AA, SEO básico, indexación, responsive), en diagnosticar webs de clientes por sector, en las webs propias de Proconsi y en sus chatbots. Detalle en la [especificación, sección 3.1](especificacion.md#31-para-qué-la-usa-proconsi).
 13. **Usuarios**: cualquier persona de Proconsi. Cada resultado lleva una explicación sencilla. El informe es interno en el MVP; la versión para cliente queda para más adelante.
+14. **Seguridad de la propia herramienta** (SEG-10 a SEG-19): acceso solo desde la red interna o la VPN, límites contra el abuso, cortafuegos de salida, mínimos privilegios, registro de auditoría, control de dependencias y pentest antes de producción. Detalle en la [especificación, sección 7.1](especificacion.md#71-seguridad-de-la-propia-herramienta).
+15. **Seguridad de las webs analizadas**: en el MVP solo contenido mixto y formularios sin cifrar, dentro de SEO-01. Un posible bloque de "Ciberseguridad básica" (solo pasivo) queda como fase futura pendiente de decisión.
 
 ## Pendientes
 
@@ -29,4 +31,5 @@
 - Borrado de análisis: definitivo o recuperable.
 - Excel: `.xlsx` o CSV.
 - Quién crea la clave de la API de PageSpeed Insights (cuenta de Google de Proconsi).
-- Excel: `.xlsx` o CSV.
+- Red o VPN desde la que se podrá acceder a la herramienta (SEG-10) y si sistemas puede aplicar el cortafuegos de salida (SEG-12).
+- Plazo de conservación del registro de auditoría (SEG-15).

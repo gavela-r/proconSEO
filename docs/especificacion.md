@@ -4,7 +4,7 @@ Herramienta web interna de Proconsi para analizar sitios web en tres bloques: **
 
 | | |
 |---|---|
-| Versión | 1.2 (enfoque en los usos de Proconsi: Kit Digital, sectores y chatbots) |
+| Versión | 1.3 (seguridad de la propia herramienta, SEG-10 a SEG-19) |
 | Fecha | 4 de noviembre de 2026 |
 | Fuentes | Guía para el análisis web + Anexos (Amilivia) · Investigación ejecutiva (José María) · Informe ejecutivo (Adrián) |
 | Regla de precedencia | Si dos fuentes no coinciden, manda la Guía + Anexos. Las decisiones del equipo están en [decisiones.md](decisiones.md). |
@@ -267,7 +267,7 @@ Fuera del alcance de la URL (fase futura, con datos externos): citas, menciones 
 
 | ID | Qué comprueba | Ref. | MVP |
 |---|---|---|---|
-| SEO-01 | Estado técnico, rastreabilidad e indexabilidad; HTTP/HTTPS y certificado básico; errores con HTTP 200 (posible soft 404). | T1, T2, T3, T8, T11 | Sí |
+| SEO-01 | Estado técnico, rastreabilidad e indexabilidad; HTTP/HTTPS y certificado básico; errores con HTTP 200 (posible soft 404). Incluye `SEO-01.contenido-mixto` (imágenes, scripts o estilos cargados por HTTP en una página HTTPS) y `SEO-01.formulario-sin-cifrar` (formularios que envían datos a una dirección HTTP). | T1, T2, T3, T8, T11 | Sí |
 | SEO-02 | URL solicitada frente a final, cadenas y bucles de redirección, canonical y variantes. | T4, T6, T7 | Sí |
 | SEO-03 | Title: presencia y descripción específica del propósito. La longitud es solo un dato auxiliar. | O5, O4 | Parcial (presencia) |
 | SEO-04 | Meta description: presencia, marcado y coherencia. Sin longitud fija. | O6 | Parcial (presencia) |
@@ -417,7 +417,24 @@ Estos controles protegen **a la herramienta y su infraestructura**; no son una a
 
 Ante un riesgo, la herramienta decide **continuar**, **limitar** (se conserva lo válido y se declaran las pruebas afectadas) o **detener**. Toda limitación se registra con fase, recurso, condición y decisión. Ninguna protección se desactiva para completar una prueba.
 
-Seguridad de la propia aplicación: consultas SQL parametrizadas, protección CSRF en los formularios, escapado de toda salida HTML, archivos subidos validados y guardados fuera de la carpeta pública, y neutralización de fórmulas en las exportaciones a Excel/CSV.
+### 7.1 Seguridad de la propia herramienta
+
+Proconsi es una empresa certificada en ENS e ISO 27001: la herramienta debe poder pasar una revisión de su propio equipo de ciberseguridad. Estos controles protegen la aplicación, el servidor y a terceros frente a un uso indebido.
+
+| ID | Control | Responsable | Versión |
+|---|---|---|---|
+| SEG-10 | **Acceso solo desde la red interna o la VPN de Proconsi**, configurado en el servidor web (lista de IPs o red permitida). La aplicación no tiene login, así que nunca debe quedar expuesta a internet. Si algún día se publica, antes se añaden login y límites estrictos. | Parte 1 (configuración y documentación de despliegue) | MVP |
+| SEG-11 | **Límites contra el abuso**: máximo de análisis por IP de origen y hora, y por dominio analizado y hora; registro de la IP de quien lanza cada análisis; interruptor general para detener todos los análisis en curso. | Parte 1 | MVP |
+| SEG-12 | **Cortafuegos de salida** en el servidor: el proceso que analiza no puede conectarse a redes internas aunque falle el código. Es una segunda barrera, independiente de SEG-02. | Parte 1 (documentar la regla; la aplica sistemas) | Al desplegar |
+| SEG-13 | **Mínimos privilegios**: el worker se ejecuta con un usuario del sistema sin privilegios, sin acceso a otros ficheros del servidor, y con un usuario de base de datos propio que solo tiene los permisos que necesita. | Parte 1 | Al desplegar |
+| SEG-14 | **Ficheros descargados**: nunca se guardan ejecutables ni ficheros completos de la web analizada; se comprueba el tipo real, no la extensión. Las capturas subidas por revisores solo pueden ser PNG o JPG, se recodifican y se guardan fuera de `public/`. | Parte 1 (descargas) y Parte 3 (subidas) | MVP |
+| SEG-15 | **Registro de auditoría**: quién lanzó cada análisis, cuándo, desde qué IP, qué se bloqueó y por qué. No se puede borrar desde la aplicación y se conserva durante un plazo definido. | Parte 1 | MVP |
+| SEG-16 | **Dependencias y código**: Dependabot y escaneo de secretos activados en GitHub; `composer audit` y Psalm con análisis de flujo de datos (detecta inyección SQL y XSS) en cada PR. | Los tres (lo configura la Parte 1) | MVP |
+| SEG-17 | **Claves de APIs**: solo en `.env`, nunca en el navegador ni en el repositorio. La clave de PageSpeed Insights se restringe en Google a esa API y a la IP del servidor. | Parte 1 | MVP |
+| SEG-18 | **Despliegue**: HTTPS obligatorio, cookies `Secure`, cabecera HSTS y checklist de despliegue en `docs/despliegue.md`. | Parte 1 | Al desplegar |
+| SEG-19 | **Validación final**: pentest del equipo de ciberseguridad de Proconsi antes de producción, tomando como guía OWASP ASVS nivel 1. | Los tres | Antes de producción |
+
+Además, en todo el código: consultas SQL parametrizadas, protección CSRF en los formularios, escapado de toda salida HTML, cabeceras de seguridad (CSP, `nosniff`, `frame-ancestors`) y neutralización de fórmulas en las exportaciones a Excel/CSV.
 
 ---
 
@@ -528,6 +545,7 @@ Qué aporta frente a las herramientas profesionales (Screaming Frog, Semrush, Ah
 - **Navegador aislado**: renderizado y DOM, móvil, contraste, reflow, teclado y foco, objetivos táctiles, intersticiales, Core Web Vitals de laboratorio y capturas automáticas. Requiere SEG-04 y SEG-08.
 - **IA semántica**: IA-04, 05, 06 y 09, SEO-06 y calidad de title y description. Requiere SEG-07 y una rúbrica versionada.
 - **Más APIs**: Search Console, Bing Webmaster, enlaces entrantes, medición de citas en IA y perfiles locales.
+- **Posible cuarto bloque "Ciberseguridad básica"**, solo pasivo y pendiente de decisión del equipo, porque la Guía deja la seguridad de la web analizada fuera del alcance. Incluiría enlaces a sitios maliciosos o de phishing (API de Google Web Risk o Safe Browsing), cabeceras de seguridad de la web y versiones de CMS o plugins desactualizadas visibles públicamente. Nunca se harían pruebas activas de vulnerabilidades sin autorización expresa del cliente, porque tiene riesgo legal. Serviría también como puente con el servicio de ciberseguridad de Proconsi.
 - **Análisis programados y comparación entre análisis**: al repetir una prueba se conservan ambos resultados. Que el cambio se haya aplicado no significa que el buscador ya lo haya procesado.
 - **Más formatos**: PDF (con PDF/UA como referencia), multimedia y documentos embebidos.
 - **Informe para el cliente**: versión del PDF sin notas internas, con explicaciones sencillas y la imagen de Proconsi.
