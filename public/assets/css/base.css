@@ -44,6 +44,9 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* Que el atributo hidden gane siempre a los estilos de componentes como .boton. */
+[hidden] { display: none !important; }
+
 html { font-size: 100%; }
 
 body {

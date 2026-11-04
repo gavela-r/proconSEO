@@ -1,0 +1,188 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ProconSEO\Run;
+
+use PDO;
+use ProconSEO\Shared\Enum\Alcance;
+use ProconSEO\Shared\Enum\EstadoAnalisis;
+use ProconSEO\Shared\Enum\EstadoFase;
+use ProconSEO\Shared\Enum\Fase;
+
+/**
+ * Acceso a las tablas analisis y fases_analisis desde la Parte 1 (ejecución).
+ * Solo sentencias preparadas.
+ */
+final class RepositorioAnalisis
+{
+    public function __construct(private readonly PDO $bd)
+    {
+    }
+
+    /**
+     * Crea el análisis en cola con sus ocho fases en estado pendiente.
+     *
+     * @param list<string> $hostsAutorizados
+     */
+    public function crear(
+        int $proyectoId,
+        string $urlIntroducida,
+        string $urlNormalizada,
+        Alcance $alcance,
+        ?string $objetivo,
+        array $hostsAutorizados,
+        int $perfilId,
+        string $versionCatalogo,
+    ): int {
+        $this->bd->beginTransaction();
+        try {
+            $this->bd->prepare(
+                'INSERT INTO analisis (proyecto_id, url_introducida, url_normalizada, alcance, objetivo, hosts_autorizados, perfil_id, version_catalogo, estado)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            )->execute([
+                $proyectoId, $urlIntroducida, $urlNormalizada, $alcance->value, $objetivo,
+                json_encode(array_values($hostsAutorizados), JSON_THROW_ON_ERROR), $perfilId, $versionCatalogo,
+                EstadoAnalisis::EnCola->value,
+            ]);
+            $id = (int) $this->bd->lastInsertId();
+
+            $fase = $this->bd->prepare('INSERT INTO fases_analisis (analisis_id, fase, estado) VALUES (?, ?, ?)');
+            foreach (Fase::cases() as $f) {
+                $fase->execute([$id, $f->value, EstadoFase::Pendiente->value]);
+            }
+
+            $this->bd->commit();
+        } catch (\Throwable $e) {
+            $this->bd->rollBack();
+            throw $e;
+        }
+
+        return $id;
+    }
+
+    /** @return array<string, mixed>|null */
+    public function obtener(int $id): ?array
+    {
+        $consulta = $this->bd->prepare('SELECT * FROM analisis WHERE id = ?');
+        $consulta->execute([$id]);
+        $fila = $consulta->fetch();
+
+        return $fila === false ? null : $fila;
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function fases(int $id): array
+    {
+        $consulta = $this->bd->prepare('SELECT fase, estado, hechos, total, mensaje, iniciada_en, terminada_en FROM fases_analisis WHERE analisis_id = ? ORDER BY id');
+        $consulta->execute([$id]);
+
+        return $consulta->fetchAll();
+    }
+
+    /** @return array<string, mixed>|null */
+    public function proyecto(int $id): ?array
+    {
+        $consulta = $this->bd->prepare('SELECT id, nombre, url_principal, tipo, sector, es_dato_prueba FROM proyectos WHERE id = ?');
+        $consulta->execute([$id]);
+        $fila = $consulta->fetch();
+
+        return $fila === false ? null : $fila;
+    }
+
+    /** @return array{id: int, parametros: array<string, mixed>}|null */
+    public function perfilVigente(): ?array
+    {
+        $fila = $this->bd->query('SELECT id, parametros FROM perfiles_ejecucion ORDER BY id DESC LIMIT 1')->fetch();
+        if ($fila === false) {
+            return null;
+        }
+
+        return ['id' => (int) $fila['id'], 'parametros' => json_decode((string) $fila['parametros'], true, 16, JSON_THROW_ON_ERROR)];
+    }
+
+    /** @return array<string, mixed> */
+    public function parametrosPerfil(int $perfilId): array
+    {
+        $consulta = $this->bd->prepare('SELECT parametros FROM perfiles_ejecucion WHERE id = ?');
+        $consulta->execute([$perfilId]);
+
+        return json_decode((string) $consulta->fetchColumn(), true, 16, JSON_THROW_ON_ERROR);
+    }
+
+    public function enCurso(): int
+    {
+        return (int) $this->bd->query("SELECT COUNT(*) FROM analisis WHERE estado IN ('en_curso', 'cancelando')")->fetchColumn();
+    }
+
+    /**
+     * Reserva el siguiente análisis en cola, de forma atómica: aunque haya dos workers, cada
+     * análisis lo coge uno solo. Respeta el máximo de análisis simultáneos.
+     */
+    public function reservarSiguiente(int $maxSimultaneos): ?int
+    {
+        if ($this->enCurso() >= $maxSimultaneos) {
+            return null;
+        }
+
+        $candidatos = $this->bd->query("SELECT id FROM analisis WHERE estado = 'en_cola' ORDER BY id LIMIT 5")->fetchAll(PDO::FETCH_COLUMN);
+        $reservar = $this->bd->prepare("UPDATE analisis SET estado = 'en_curso', iniciado_en = NOW(3) WHERE id = ? AND estado = 'en_cola'");
+        foreach ($candidatos as $id) {
+            $reservar->execute([$id]);
+            if ($reservar->rowCount() === 1) {
+                return (int) $id;
+            }
+        }
+
+        return null;
+    }
+
+    public function pedirCancelacion(int $id): void
+    {
+        // En cola: se cancela directamente. En curso: lo detiene el orquestador en la siguiente comprobación.
+        $this->bd->prepare("UPDATE analisis SET estado = 'cancelado', cancelacion_pedida = 1, terminado_en = NOW(3), motivo_cierre = 'Cancelado antes de empezar.' WHERE id = ? AND estado = 'en_cola'")->execute([$id]);
+        $this->bd->prepare("UPDATE analisis SET estado = 'cancelando', cancelacion_pedida = 1 WHERE id = ? AND estado = 'en_curso'")->execute([$id]);
+    }
+
+    public function cancelacionPedida(int $id): bool
+    {
+        $consulta = $this->bd->prepare('SELECT cancelacion_pedida FROM analisis WHERE id = ?');
+        $consulta->execute([$id]);
+
+        return (bool) $consulta->fetchColumn();
+    }
+
+    public function marcarFase(int $id, Fase $fase): void
+    {
+        $this->bd->prepare('UPDATE analisis SET fase_actual = ? WHERE id = ?')->execute([$fase->value, $id]);
+    }
+
+    public function actualizarFase(int $id, Fase $fase, EstadoFase $estado, int $hechos = 0, int $total = 0, string $mensaje = ''): void
+    {
+        $this->bd->prepare(
+            'UPDATE fases_analisis SET estado = ?, hechos = ?, total = ?, mensaje = ?,
+                iniciada_en = COALESCE(iniciada_en, NOW(3)),
+                terminada_en = IF(? IN (\'terminada\', \'parcial\', \'omitida\', \'fallida\'), NOW(3), NULL)
+             WHERE analisis_id = ? AND fase = ?'
+        )->execute([$estado->value, $hechos, $total, mb_substr($mensaje, 0, 500), $estado->value, $id, $fase->value]);
+    }
+
+    /** Marca como omitidas las fases que no llegaron a empezar (al cancelar o al fallar). */
+    public function cerrarFasesPendientes(int $id, string $mensaje): void
+    {
+        $this->bd->prepare("UPDATE fases_analisis SET estado = 'omitida', mensaje = ?, terminada_en = NOW(3) WHERE analisis_id = ? AND estado IN ('pendiente', 'en_curso')")
+            ->execute([$mensaje, $id]);
+    }
+
+    public function cerrar(int $id, EstadoAnalisis $estado, ?string $motivo, ?string $urlFinal, array $consumo): void
+    {
+        $this->bd->prepare('UPDATE analisis SET estado = ?, motivo_cierre = ?, url_final = COALESCE(?, url_final), consumo = ?, terminado_en = NOW(3) WHERE id = ?')
+            ->execute([$estado->value, $motivo, $urlFinal, json_encode($consumo, JSON_THROW_ON_ERROR), $id]);
+    }
+
+    public function guardarConfiguracion(int $id, array $configuracion): void
+    {
+        $this->bd->prepare('UPDATE analisis SET configuracion_efectiva = ? WHERE id = ?')
+            ->execute([json_encode($configuracion, JSON_THROW_ON_ERROR), $id]);
+    }
+}

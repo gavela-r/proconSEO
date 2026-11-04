@@ -1,0 +1,191 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ProconSEO\Tests\Run;
+
+use PDO;
+use PHPUnit\Framework\TestCase;
+use ProconSEO\Engine\Catalogo\CatalogoJson;
+use ProconSEO\Fetch\Ambito;
+use ProconSEO\Fetch\ClienteHttpSeguro;
+use ProconSEO\Fetch\Http\RespuestaHttp;
+use ProconSEO\Fetch\LimitesDescarga;
+use ProconSEO\Fetch\ValidadorDestino;
+use ProconSEO\Fetch\ValidadorUrl;
+use ProconSEO\Run\GuardadoResultados;
+use ProconSEO\Run\LanzadorAnalisis;
+use ProconSEO\Run\MotorProvisional;
+use ProconSEO\Run\Orquestador;
+use ProconSEO\Run\RepositorioAnalisis;
+use ProconSEO\Shared\BaseDatos;
+use ProconSEO\Shared\Config;
+use ProconSEO\Shared\Contract\ContextoAnalisis;
+use ProconSEO\Shared\Contract\InformadorProgreso;
+use ProconSEO\Shared\Contract\MotorAnalisis;
+use ProconSEO\Shared\Contract\ProveedorRecursos;
+use ProconSEO\Shared\Contract\SalidaMotor;
+use ProconSEO\Shared\Contract\TokenCancelacion;
+use ProconSEO\Shared\Enum\EstadoAnalisis;
+use ProconSEO\Tests\Fetch\DnsFalso;
+use ProconSEO\Tests\Fetch\RelojFalso;
+use ProconSEO\Tests\Fetch\TransporteFalso;
+
+/**
+ * Flujo completo de un análisis contra la base de datos local, con la red simulada.
+ * Crea un proyecto de prueba y lo borra al terminar. Se salta si no hay base de datos.
+ */
+final class OrquestadorTest extends TestCase
+{
+    private PDO $bd;
+    private int $proyectoId;
+    private TransporteFalso $transporte;
+    private DnsFalso $dns;
+
+    protected function setUp(): void
+    {
+        Config::cargar(dirname(__DIR__, 2));
+        try {
+            $this->bd = BaseDatos::conexion();
+            $this->bd->query('SELECT 1 FROM perfiles_ejecucion LIMIT 1');
+        } catch (\Throwable) {
+            self::markTestSkipped('Sin base de datos local (composer migrar).');
+        }
+
+        $this->bd->exec("INSERT INTO proyectos (nombre, url_principal, tipo, es_dato_prueba) VALUES ('[TEST] Orquestador', 'https://ejemplo.es/', 'web_kit_digital', 1)");
+        $this->proyectoId = (int) $this->bd->lastInsertId();
+
+        $this->transporte = new TransporteFalso();
+        $this->dns = new DnsFalso(['ejemplo.es' => ['93.184.216.34'], 'trampa.es' => ['93.184.216.40']]);
+    }
+
+    protected function tearDown(): void
+    {
+        if (isset($this->proyectoId)) {
+            $this->bd->prepare('DELETE FROM proyectos WHERE id = ?')->execute([$this->proyectoId]);
+        }
+    }
+
+    private function validador(): ValidadorDestino
+    {
+        return new ValidadorDestino(new ValidadorUrl(), $this->dns);
+    }
+
+    private function orquestador(?MotorAnalisis $motor = null): Orquestador
+    {
+        $reloj = new RelojFalso();
+
+        return new Orquestador(
+            new RepositorioAnalisis($this->bd),
+            new GuardadoResultados($this->bd),
+            $motor ?? new MotorProvisional(CatalogoJson::v1()),
+            $this->validador(),
+            fn (Ambito $a, LimitesDescarga $l): ClienteHttpSeguro => new ClienteHttpSeguro($this->transporte, $this->validador(), $a, $l, $reloj),
+        );
+    }
+
+    private function lanzar(string $url = 'https://ejemplo.es/'): int
+    {
+        $id = (new LanzadorAnalisis(new RepositorioAnalisis($this->bd), $this->validador(), CatalogoJson::v1()))
+            ->lanzar($this->proyectoId, $url, 'url_individual', 'Prueba');
+        $this->bd->prepare("UPDATE analisis SET estado = 'en_curso' WHERE id = ?")->execute([$id]);
+
+        return $id;
+    }
+
+    private function valor(string $sql, array $parametros): mixed
+    {
+        $consulta = $this->bd->prepare($sql);
+        $consulta->execute($parametros);
+
+        return $consulta->fetchColumn();
+    }
+
+    public function testAnalisisCompletoGuardaUnResultadoPorSubcomprobacion(): void
+    {
+        $this->transporte->responder(new RespuestaHttp(200, [], "User-agent: *\nAllow: /"));
+        $this->transporte->responder(new RespuestaHttp(200, ['content-type' => 'text/html', 'set-cookie' => 'x=secreto'], '<html><title>Hola</title></html>'));
+        $id = $this->lanzar();
+
+        $estado = $this->orquestador()->ejecutar($id);
+
+        self::assertSame(EstadoAnalisis::Completado, $estado);
+        self::assertSame(count(CatalogoJson::v1()->todas()), (int) $this->valor('SELECT COUNT(*) FROM resultados WHERE analisis_id = ?', [$id]));
+        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND estado <> 'no_verificable'", [$id]), 'Lo no implementado solo puede ser no_verificable');
+        self::assertSame(2, (int) $this->valor('SELECT COUNT(*) FROM recursos WHERE analisis_id = ?', [$id]));
+        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM fases_analisis WHERE analisis_id = ? AND estado IN ('pendiente', 'en_curso')", [$id]));
+        self::assertSame('omitida', $this->valor("SELECT estado FROM fases_analisis WHERE analisis_id = ? AND fase = 'renderizado'", [$id]));
+    }
+
+    public function testPaginaQueNoRespondeDaAnalisisParcial(): void
+    {
+        $this->transporte->responder(new RespuestaHttp(404));
+        $this->transporte->responder(new RespuestaHttp(500));
+        $this->transporte->responder(new RespuestaHttp(500));
+        $this->transporte->responder(new RespuestaHttp(500));
+        $id = $this->lanzar();
+
+        $estado = $this->orquestador()->ejecutar($id);
+
+        self::assertSame(EstadoAnalisis::Parcial, $estado);
+        self::assertStringContainsString('HTTP 500', (string) $this->valor('SELECT motivo_cierre FROM analisis WHERE id = ?', [$id]));
+    }
+
+    public function testDominioQueCambiaAIpInternaSeDetienePorSeguridad(): void
+    {
+        $id = $this->lanzar('https://trampa.es/');
+        $this->dns->tabla['trampa.es'] = ['127.0.0.1']; // cambia entre encolar y ejecutar
+
+        $estado = $this->orquestador()->ejecutar($id);
+
+        self::assertSame(EstadoAnalisis::DetenidoSeguridad, $estado);
+        self::assertCount(0, $this->transporte->peticiones, 'No se conecta a nada');
+        self::assertSame('SEG-02', $this->valor('SELECT regla FROM eventos_seguridad WHERE analisis_id = ?', [$id]));
+    }
+
+    public function testCancelacionDuranteLasComprobacionesConservaLoObtenido(): void
+    {
+        $this->transporte->responder(new RespuestaHttp(200, [], ''));
+        $this->transporte->responder(new RespuestaHttp(200, [], '<html></html>'));
+        $id = $this->lanzar();
+        $repo = new RepositorioAnalisis($this->bd);
+
+        // Motor que pide la cancelación a mitad de trabajo, como haría el usuario con el botón.
+        $motor = new class ($repo, $id) implements MotorAnalisis {
+            public function __construct(private RepositorioAnalisis $repo, private int $id)
+            {
+            }
+
+            public function ejecutar(ContextoAnalisis $c, ProveedorRecursos $p, InformadorProgreso $i, TokenCancelacion $t): SalidaMotor
+            {
+                $this->repo->pedirCancelacion($this->id);
+                usleep(1_100_000); // el token consulta la base de datos como mucho una vez por segundo
+
+                return (new MotorProvisional(CatalogoJson::v1()))->ejecutar($c, $p, $i, $t);
+            }
+        };
+
+        $estado = $this->orquestador($motor)->ejecutar($id);
+
+        self::assertSame(EstadoAnalisis::Cancelado, $estado);
+        self::assertSame(2, (int) $this->valor('SELECT COUNT(*) FROM recursos WHERE analisis_id = ?', [$id]), 'Se conservan los recursos descargados');
+        self::assertLessThan(count(CatalogoJson::v1()->todas()), (int) $this->valor('SELECT COUNT(*) FROM resultados WHERE analisis_id = ?', [$id]));
+    }
+
+    public function testLanzadorRechazaUrlInsegura(): void
+    {
+        $this->expectException(\ProconSEO\Fetch\DestinoRechazado::class);
+        (new LanzadorAnalisis(new RepositorioAnalisis($this->bd), $this->validador(), CatalogoJson::v1()))
+            ->lanzar($this->proyectoId, 'http://192.168.1.1/', 'url_individual', null);
+    }
+
+    public function testCancelarEnColaLoCierraDirectamente(): void
+    {
+        $id = (new LanzadorAnalisis(new RepositorioAnalisis($this->bd), $this->validador(), CatalogoJson::v1()))
+            ->lanzar($this->proyectoId, 'https://ejemplo.es/', 'url_individual', null);
+
+        (new RepositorioAnalisis($this->bd))->pedirCancelacion($id);
+
+        self::assertSame('cancelado', $this->valor('SELECT estado FROM analisis WHERE id = ?', [$id]));
+    }
+}

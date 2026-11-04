@@ -1,0 +1,38 @@
+/* Parte 1: pantallas de nuevo análisis y progreso. */
+
+.ayuda { color: var(--texto-suave); font-size: .9rem; margin: .25rem 0 0; max-width: 40rem; }
+.opcional { font-weight: 400; color: var(--texto-suave); }
+fieldset { border: 1px solid var(--borde); border-radius: var(--radio); margin: 1rem 0; padding: .5rem 1rem 1rem; max-width: 40rem; }
+legend { font-weight: 600; padding: 0 .25rem; }
+.opcion { display: flex; align-items: center; gap: .5rem; min-height: 32px; }
+.opcion input { width: auto; }
+.opcion label { margin: 0; font-weight: 400; }
+
+.fases { list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: .5rem; }
+.fase {
+    display: grid;
+    grid-template-columns: minmax(10rem, 1fr) minmax(8rem, auto);
+    gap: .25rem 1rem;
+    padding: .6rem .8rem;
+    border: 1px solid var(--borde);
+    border-left-width: 4px;
+    border-radius: var(--radio);
+}
+.fase__nombre { font-weight: 600; }
+.fase__estado { text-align: right; }
+.fase__mensaje { grid-column: 1 / -1; color: var(--texto-suave); font-size: .9rem; }
+.fase__mensaje:empty { display: none; }
+.fase--en_curso { border-left-color: var(--primario); }
+.fase--terminada { border-left-color: var(--estado-correcto); }
+.fase--parcial { border-left-color: var(--estado-mejorable); }
+.fase--fallida { border-left-color: var(--estado-problema); }
+.fase--omitida, .fase--pendiente { border-left-color: var(--borde); }
+
+.acciones { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin: 1rem 0; }
+.detalles { margin-top: 1.5rem; }
+.detalles summary { cursor: pointer; font-weight: 600; min-height: 24px; }
+
+@media (max-width: 30rem) {
+    .fase { grid-template-columns: 1fr; }
+    .fase__estado { text-align: left; }
+}
