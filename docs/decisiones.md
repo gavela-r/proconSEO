@@ -19,6 +19,8 @@
 9. **Límites iniciales**: los de la [especificación, sección 8](especificacion.md#8-perfil-de-ejecución). Se ajustarán al probar en el servidor real.
 10. **Vídeos**: subcomprobaciones de SEO-12, activas solo si la página tiene vídeo.
 11. **Páginas de producto**: perfil que solo se activa en páginas de producto (SEO-14 e IA-06). En el MVP, solo validar el marcado de producto.
+12. **Enfoque Proconsi**: la herramienta se centra en controlar la calidad de las webs y tiendas del Kit Digital que hace Proconsi (WCAG 2.1 AA, SEO básico, indexación, responsive), en diagnosticar webs de clientes por sector, en las webs propias de Proconsi y en sus chatbots. Detalle en la [especificación, sección 3.1](especificacion.md#31-para-qué-la-usa-proconsi).
+13. **Usuarios**: cualquier persona de Proconsi. Cada resultado lleva una explicación sencilla. El informe es interno en el MVP; la versión para cliente queda para más adelante.
 
 ## Pendientes
 

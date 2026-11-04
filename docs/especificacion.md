@@ -4,7 +4,7 @@ Herramienta web interna de Proconsi para analizar sitios web en tres bloques: **
 
 | | |
 |---|---|
-| Versión | 1.1 (MVP, gravedad, esfuerzo y límites acordados) |
+| Versión | 1.2 (enfoque en los usos de Proconsi: Kit Digital, sectores y chatbots) |
 | Fecha | 4 de noviembre de 2026 |
 | Fuentes | Guía para el análisis web + Anexos (Amilivia) · Investigación ejecutiva (José María) · Informe ejecutivo (Adrián) |
 | Regla de precedencia | Si dos fuentes no coinciden, manda la Guía + Anexos. Las decisiones del equipo están en [decisiones.md](decisiones.md). |
@@ -43,11 +43,34 @@ La herramienta detecta obstáculos y oportunidades, los justifica con evidencias
 
 | Requisito | Detalle |
 |---|---|
-| Usuarios | Equipo interno de Proconsi. Sin login en la primera versión. |
+| Usuarios | Cualquier persona de Proconsi, sin necesidad de ser experta en SEO o accesibilidad. Sin login en la primera versión. |
+| Destino del informe | Uso interno en la primera versión. Más adelante, también una versión para entregar al cliente. |
 | Tecnología | PHP + MySQL, desplegable en el servidor de la empresa. |
 | Dispositivos | Responsive: móvil, tablet y escritorio. |
 | Prioridad | Usabilidad y claridad antes que diseño visual avanzado. |
 | Ampliación | Preparada para integrar APIs y servicios externos en el futuro. |
+| Lenguaje | Cada resultado incluye una explicación sencilla, sin jerga, para quien no sea especialista. |
+
+### 3.1 Para qué la usa Proconsi
+
+Proconsi es una empresa de software de gestión de León (más de 120 profesionales y más de 5.500 clientes) con líneas para hidrocarburos, transporte, salud y alimentación, además de ciberseguridad, bots con IA y Kit Digital. Su web publica que **las webs y tiendas del Kit Digital las desarrolla su propio equipo** y que se comprometen a:
+
+- web responsive con al menos 3 páginas y un gestor de contenidos;
+- **accesibilidad WCAG 2.1 nivel AA**;
+- SEO básico: palabras clave, SEO on-page en 2 páginas e indexación;
+- preparada para un idioma además del castellano;
+- tiendas con WooCommerce (básica) o PrestaShop (profesional) y al menos 100 productos.
+
+Por eso la herramienta se centra en estos usos, de más a menos importante:
+
+| Uso | Qué necesita de la herramienta |
+|---|---|
+| **1. Control de calidad de webs y tiendas del Kit Digital** antes de entregarlas y durante el periodo de mantenimiento | Comprobar lo que Proconsi promete: indexación, SEO on-page, accesibilidad WCAG 2.1 AA, responsive e idioma. Avisar de errores típicos de entrega, como el `noindex` de desarrollo olvidado. |
+| **2. Diagnóstico de la web de un cliente o posible cliente** | Un informe claro que cualquier persona de Proconsi entienda y pueda explicar. |
+| **3. Webs propias de Proconsi y de sus productos** (proconsi.com, GotelGest, Estafuel…) | Visibilidad en buscadores y en buscadores con IA para software B2B. |
+| **4. Chatbots con IA que Proconsi instala en webs** | Comprobar que el chatbot es accesible (Guía, apartado "Interfaces con IA integrada"; ver 6.8). |
+
+No se ha podido confirmar si hay clientes de administraciones públicas ni de transporte interurbano con venta online. Las comprobaciones específicas de esos casos quedan como condicionales (ver 6.8).
 
 ---
 
@@ -59,6 +82,8 @@ La herramienta detecta obstáculos y oportunidades, los justifica con evidencias
 |---|---|
 | RF-01 | Crear, editar, listar y buscar proyectos. |
 | RF-02 | Un proyecto tiene nombre (obligatorio), cliente (opcional), URL principal, descripción o notas, estado y tipo (opcional). |
+| RF-06 | Tipos de proyecto: **Web Kit Digital**, **Tienda Kit Digital**, **Web de cliente** (con sector opcional: hidrocarburos, transporte, salud, alimentación, otro), **Web propia de Proconsi** y **Otra**. El tipo activa las comprobaciones condicionales que le corresponden (ver 6.7 y 6.8). |
+| RF-07 | Para los tipos Kit Digital, el dashboard muestra una vista **"Compromisos Kit Digital"** que agrupa los resultados relacionados con lo que Proconsi promete (ver 6.7). No es una nota: es la misma lista de resultados filtrada. |
 | RF-03 | Puede haber proyectos internos o de prueba sin cliente. |
 | RF-04 | Cada proyecto muestra su histórico de análisis. |
 | RF-05 | Exportación completa del proyecto: análisis, resultados, evidencias y revisiones. |
@@ -163,6 +188,8 @@ Cada resultado sigue la secuencia **Estado → Evidencia → Justificación → 
 | Gravedad | Crítico, Alto, Medio o Bajo. Solo si el estado es "Problema detectado" |
 | Esfuerzo | Bajo, Medio o Alto. Lo hereda del catálogo del criterio; es orientativo |
 | Fuente | Herramienta o fuente externa y su fecha, si el dato viene de fuera |
+| Explicación sencilla | Qué pasa y por qué importa, en una o dos frases sin jerga |
+| Cómo corregirlo en el CMS | Si se ha detectado WordPress, WooCommerce o PrestaShop, instrucciones concretas para esa plataforma |
 
 ### Estados
 
@@ -254,8 +281,8 @@ Fuera del alcance de la URL (fase futura, con datos externos): citas, menciones 
 | SEO-12 | Imágenes y vídeo: descubrimiento, formato y contexto. Subcomprobaciones de vídeo solo si la página lo tiene (ver 6.5). | O7, O8 | Sí (imágenes) · Parcial (vídeo) |
 | SEO-13 | Intersticiales, overlays y anuncios que tapan el contenido. | T12 | No (navegador) |
 | SEO-14 | Datos estructurados y elegibilidad para resultados enriquecidos (reutiliza IA-07). Incluye el perfil de producto (ver 6.6). | T13 | Parcial |
-| SEO-15 | Versiones por idioma: códigos y destinos hreflang y reciprocidad. | T14 | Sí |
-| SEO-16 | Paginación, filtros y facetas, muestreando patrones sin generar combinaciones masivas. | T16 | No |
+| SEO-15 | Versiones por idioma: códigos y destinos hreflang y reciprocidad. Solo si la web tiene más de un idioma. | T14 | Sí |
+| SEO-16 | Paginación, filtros y facetas, muestreando patrones sin generar combinaciones masivas. Poco relevante para las tiendas pequeñas del Kit Digital. | T16 | No (baja prioridad) |
 
 Fuera del alcance de la URL (fase futura, con acceso autorizado o APIs): indexación real, canonical elegida por Google, acciones manuales, búsquedas, impresiones, clics y posiciones (M1–M4), enlaces entrantes y métricas de autoridad (E1–E3), y SEO local con Perfil de Empresa (O10).
 
@@ -264,6 +291,10 @@ Vídeos (O8) y páginas de producto no son criterios nuevos: se tratan como subc
 ### 6.3 Accesibilidad (WCAG 2.2 A y AA)
 
 Los 55 criterios A y AA se agrupan en 12 bloques. Cada incidencia indica el criterio WCAG exacto. 4.1.1 no se evalúa porque se eliminó en WCAG 2.2, y los criterios AAA nunca cuentan como incumplimiento.
+
+**Referencia legal.** Lo que Proconsi promete en el Kit Digital, y lo que exige la norma UNE-EN 301 549 en la que se apoya la Ley 11/2023 de accesibilidad, es **WCAG 2.1 AA**. La herramienta evalúa WCAG 2.2, pero cada resultado indica si el criterio forma parte de WCAG 2.1 o es nuevo de 2.2. Los nuevos son **2.4.11, 2.5.7, 2.5.8, 3.2.6, 3.3.7 y 3.3.8**. Así, el informe sirve para comprobar el compromiso del Kit Digital sin mezclar requisitos que no se prometieron.
+
+**Declaración de accesibilidad.** Se detecta si la web enlaza una página de declaración de accesibilidad. Si no la tiene, el resultado es "Decisión a revisar": es obligatoria en el sector público y recomendable en el resto.
 
 | ID | Tema | Criterios WCAG | MVP |
 |---|---|---|---|
@@ -333,6 +364,38 @@ Solo se activan en páginas de producto: cuando hay marcado `Product` o cuando e
 | `SEO-14.producto-precio-coherente` | El precio del marcado coincide con el visible | No |
 | `SEO-14.producto-disponibilidad` | La disponibilidad marcada coincide con la visible; un producto agotado no es un error por sí solo | No |
 | `IA-06.producto-vigencia` | Precios, ofertas y condiciones no están vencidos ni se contradicen | No (IA) |
+
+### 6.7 Compromisos Kit Digital (tipos Web Kit Digital y Tienda Kit Digital)
+
+No son criterios nuevos: es una vista que agrupa resultados de criterios existentes según lo que Proconsi promete en su web del Kit Digital. Algunas subcomprobaciones son nuevas y van dentro del criterio que corresponde.
+
+| Compromiso | Resultados que lo muestran | MVP |
+|---|---|---|
+| Indexación correcta | IA-02 y SEO-01, más `SEO-01.noindex-desarrollo`: detecta el `noindex` o el bloqueo en robots.txt que suele quedarse puesto al publicar la web (en WordPress: "Disuadir a los motores de búsqueda") → gravedad **crítico** si no es intencionado | Sí |
+| SEO on-page | SEO-03, SEO-04, SEO-05 y SEO-12 | Sí |
+| Al menos 3 páginas | `SEO-07.paginas-minimas`: páginas internas enlazadas y accesibles (alcance con contexto o sitio completo) | Sí |
+| Responsive | `SEO-10.viewport`: meta viewport presente y válido; más el resultado de PageSpeed en móvil | Sí / PSI |
+| Accesibilidad WCAG 2.1 AA | Todos los ACC, marcando los criterios de 2.1 (ver 6.3) | Parcial |
+| Segundo idioma (si se contrató) | SEO-15 y ACC-10 (`lang` de cada versión) | Sí |
+| Dominio y HTTPS | SEO-01 (certificado válido y redirección de HTTP a HTTPS) | Sí |
+| Tienda: catálogo y producto | Perfil de producto (6.6) | Parcial |
+
+Detección de CMS (`SEO-01.cms-detectado`): se identifican WordPress, WooCommerce y PrestaShop a partir de señales públicas, como la meta `generator` o las rutas típicas. Es informativa: sirve para dar instrucciones de corrección concretas para esa plataforma.
+
+### 6.8 Comprobaciones según el sector (tipo Web de cliente)
+
+Se activan solo si el proyecto tiene ese sector o si la página muestra las señales correspondientes.
+
+| Sector | Subcomprobación | Qué comprueba | MVP |
+|---|---|---|---|
+| Todos con atención local (gasolineras, clínicas, tiendas físicas…) | `IA-08.datos-negocio-coherentes` | Nombre, dirección, teléfono y horarios coinciden entre las páginas analizadas | Sí |
+| Todos con atención local | `IA-07.negocio-local` | Marcado `LocalBusiness` (o su tipo específico: `GasStation`, `MedicalClinic`…) válido y coherente con lo visible | Sí |
+| Hidrocarburos | `IA-06.precios-carburante` | Si se publican precios, que tengan fecha y no se contradigan | No (IA) |
+| Transporte | `ACC-09.formulario-billetes` | Formularios de búsqueda o compra de billetes con etiquetas e instrucciones accesibles | Parcial |
+| Transporte | `IA-10.horarios-texto` | Horarios y tarifas disponibles como texto, no solo en imagen o PDF | Parcial |
+| Webs con chatbot (de Proconsi o de otro proveedor) | `ACC-12.chatbot-detectado` | Se detecta el widget y se revisa su estado inicial: nombre del botón, rol y foco. La conversación queda para la fase del navegador | Parcial |
+
+La coherencia con fuentes externas (Perfil de Empresa de Google y directorios) queda para la fase de APIs.
 
 ---
 
@@ -433,6 +496,8 @@ Para cada subcomprobación obligatoria hay que probar un caso que cumple, uno qu
 | SEG-04/08 | Con archivos y credenciales señuelo: sin acceso al entorno ni contaminación entre dos análisis. |
 | SEG-05/06/09 | Recursos sobredimensionados, controles con efecto externo y payloads señuelo: se aplican límites, se bloquean efectos y se sanitiza la salida. |
 | Prompt injection | Una página con instrucciones dirigidas al analizador no altera ningún resultado. |
+| `noindex` de desarrollo olvidado | Una web Kit Digital con `noindex` (o con robots.txt bloqueando todo) y sin objetivo declarado se marca como problema **crítico** en la vista "Compromisos Kit Digital". Con el objetivo "no indexar" declarado, es "Correcto". |
+| Criterio nuevo de WCAG 2.2 | Un fallo en 2.5.8 aparece marcado como "nuevo en 2.2" y no se presenta como incumplimiento del compromiso WCAG 2.1 AA. |
 
 Una entrega se acepta si las decisiones obligatorias están tomadas, la cobertura comprometida está implementada y probada, y no hay fallos abiertos en controles de seguridad.
 
@@ -446,6 +511,7 @@ Una entrega se acepta si las decisiones obligatorias están tomadas, la cobertur
 - Seguridad SEG-01, 02, 03, 05, 06 y 09 para todo lo que hace esta versión.
 - Las comprobaciones marcadas como "Sí" o "Parcial" en la sección 6: todo lo que se puede comprobar leyendo el HTML y las respuestas HTTP.
 - **API de Google PageSpeed Insights**: Core Web Vitals (de campo y de laboratorio, en móvil y en ordenador) y contraste de texto, sin necesidad de un navegador propio. La clave de la API va en `.env`. Solo se le envía la URL pública analizada.
+- **Enfoque Proconsi**: tipos de proyecto, vista "Compromisos Kit Digital", detección de CMS con instrucciones para WordPress, WooCommerce y PrestaShop, y las comprobaciones por sector marcadas en 6.7 y 6.8.
 - Todas las demás subcomprobaciones aparecen como "No implementada" con su motivo.
 
 Qué aporta frente a las herramientas profesionales (Screaming Frog, Semrush, Ahrefs, Lighthouse, axe, WAVE):
@@ -464,6 +530,7 @@ Qué aporta frente a las herramientas profesionales (Screaming Frog, Semrush, Ah
 - **Más APIs**: Search Console, Bing Webmaster, enlaces entrantes, medición de citas en IA y perfiles locales.
 - **Análisis programados y comparación entre análisis**: al repetir una prueba se conservan ambos resultados. Que el cambio se haya aplicado no significa que el buscador ya lo haya procesado.
 - **Más formatos**: PDF (con PDF/UA como referencia), multimedia y documentos embebidos.
+- **Informe para el cliente**: versión del PDF sin notas internas, con explicaciones sencillas y la imagen de Proconsi.
 - **Modalidad de ensayo autorizado**: formularios y flujos con autenticación en entornos de prueba.
 
 ---
@@ -476,5 +543,7 @@ Qué aporta frente a las herramientas profesionales (Screaming Frog, Semrush, Ah
 - web.dev y PageSpeed Insights: Core Web Vitals.
 - W3C: WCAG 2.2, ACT Rules y WCAG-EM; PDF/UA como referencia complementaria.
 - OWASP: SSRF Prevention Cheat Sheet, GenAI Security Project y API Security Top 10.
+- Proconsi: [Kit Digital – Sitio web](https://www.proconsi.com/kit-digital/web/), [Kit Digital – Comercio electrónico](https://www.proconsi.com/kit-digital/comercio-electronico/), [Bots conversacionales con IA](https://proconsi.com/bots-conversacionales-con-ia/) (consultadas el 4 de noviembre de 2026).
+- Ley 11/2023 de accesibilidad y UNE-EN 301 549.
 
 Fuentes verificadas el 9 de octubre de 2026 según los documentos de investigación. Antes de implementar cada regla, hay que volver a comprobar su fuente y registrar la fecha.
