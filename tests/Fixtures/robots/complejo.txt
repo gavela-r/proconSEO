@@ -1,0 +1,32 @@
+# Casos del protocolo completo (RFC 9309) para el parser de IA-01
+
+# Grupo con varios user-agent: se aplica a los dos
+User-agent: Googlebot
+User-agent: bingbot
+Disallow: /buscar
+Allow: /buscar/ayuda
+
+# Comodines: * cualquier secuencia, $ fin de la URL
+User-agent: OAI-SearchBot
+Disallow: /*.pdf$
+Disallow: /*?sesion=
+Allow: /
+
+# Empate de longitud entre allow y disallow: gana allow
+User-agent: Claude-SearchBot
+Disallow: /pagina
+Allow: /pagina
+
+# El nombre del user-agent no distingue mayúsculas
+user-agent: PERPLEXITYBOT
+disallow: /interno/
+
+# Líneas no válidas que se deben ignorar
+Esto no es una regla
+Crawl-delay: 10
+Disallow /sin-dos-puntos
+
+User-agent: *
+Disallow: /tmp/
+
+Sitemap: https://www.cumple.example/sitemap_index.xml

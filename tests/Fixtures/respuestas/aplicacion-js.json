@@ -1,0 +1,24 @@
+{
+  "descripcion": "Aplicación de JavaScript cuyo HTML inicial está vacío. Sin navegador no se puede afirmar que falte contenido (especificación 10).",
+  "url_solicitada": "https://app.reservas.example/",
+  "url_final": "https://app.reservas.example/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/aplicacion-js.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "IA-03.contenido-html-inicial": "no_verificable",
+    "SEO-05.h1-presente": "no_verificable"
+  }
+}

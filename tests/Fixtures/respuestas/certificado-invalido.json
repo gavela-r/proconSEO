@@ -1,0 +1,26 @@
+{
+  "descripcion": "Certificado TLS caducado: no se ignora (SEG-03) y no se descarga la página.",
+  "url_solicitada": "https://www.caducado.example/",
+  "url_final": "https://www.caducado.example/",
+  "resultado": "error_tls",
+  "estado_http": null,
+  "redirecciones": [],
+  "cabeceras": {},
+  "tipo_contenido": null,
+  "cuerpo": null,
+  "tls_verificado": false,
+  "motivo": "Certificado caducado",
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "SEO-03.title-presente": "no_verificable",
+    "SEO-04.description-presente": "no_verificable",
+    "SEO-05.h1-presente": "no_verificable",
+    "IA-02.meta-robots": "no_verificable",
+    "ACC-01.img-alt-presente": "no_verificable",
+    "ACC-10.lang-presente": "no_verificable"
+  }
+}

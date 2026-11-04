@@ -1,0 +1,51 @@
+{
+  "descripcion": "Web Kit Digital que cumple lo comprobable en el HTML: title, description, canonical, viewport, lang, H1, alt, etiquetas de formulario, iframe con title, hreflang, JSON-LD y declaración de accesibilidad.",
+  "url_solicitada": "https://www.cumple.example/",
+  "url_final": "https://www.cumple.example/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/cumple.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": "web_kit_digital",
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "SEO-01.estado-http": "correcto",
+    "SEO-01.indexable": "correcto",
+    "SEO-01.contenido-mixto": "correcto",
+    "SEO-01.formulario-sin-cifrar": "correcto",
+    "IA-02.meta-robots": "correcto",
+    "IA-02.x-robots-tag": "correcto",
+    "IA-07.jsonld-sintaxis": "correcto",
+    "IA-08.canonical-declarado": "correcto",
+    "SEO-03.title-presente": "correcto",
+    "SEO-03.title-unico": "correcto",
+    "SEO-04.description-presente": "correcto",
+    "SEO-04.description-unica": "correcto",
+    "SEO-05.h1-presente": "correcto",
+    "SEO-10.viewport": "correcto",
+    "SEO-12.video-detectado": "no_aplicable",
+    "SEO-14.producto-marcado": "no_aplicable",
+    "SEO-15.hreflang-codigos": "correcto",
+    "SEO-15.hreflang-autorreferencia": "correcto",
+    "ACC-01.img-alt-presente": "correcto",
+    "ACC-03.title-pagina": "correcto",
+    "ACC-03.declaracion-accesibilidad": "correcto",
+    "ACC-06.enlaces-nombre": "correcto",
+    "ACC-09.labels-asociados": "correcto",
+    "ACC-09.autocomplete": "correcto",
+    "ACC-10.lang-presente": "correcto",
+    "ACC-10.lang-valido": "correcto",
+    "ACC-12.iframe-title": "correcto",
+    "ACC-12.chatbot-detectado": "no_aplicable",
+    "SEO-03.title-descriptivo": "no_verificable"
+  }
+}

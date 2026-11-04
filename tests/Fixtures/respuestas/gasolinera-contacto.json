@@ -1,0 +1,21 @@
+{
+  "descripcion": "Página de contacto de la gasolinera, con teléfono y horario distintos de la principal (IA-08.datos-negocio-coherentes, con alcance con contexto).",
+  "url_solicitada": "https://www.gasolinera.example/contacto/",
+  "url_final": "https://www.gasolinera.example/contacto/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/gasolinera-contacto.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": "web_cliente",
+    "sector": "hidrocarburos",
+    "objetivo": null
+  },
+  "esperado": {}
+}

@@ -1,0 +1,38 @@
+{
+  "descripcion": "http sin www → https sin www → https con www: dos saltos evitables (gravedad baja, especificación 5).",
+  "url_solicitada": "http://cumple.example/",
+  "url_final": "https://www.cumple.example/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [
+    {
+      "url": "http://cumple.example/",
+      "estado": 301,
+      "destino": "https://cumple.example/"
+    },
+    {
+      "url": "https://cumple.example/",
+      "estado": 301,
+      "destino": "https://www.cumple.example/"
+    }
+  ],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/cumple.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "SEO-02.url-final": "correcto",
+    "SEO-02.cadena-redirecciones": "problema"
+  },
+  "gravedad_esperada": {
+    "SEO-02.cadena-redirecciones": "bajo"
+  }
+}

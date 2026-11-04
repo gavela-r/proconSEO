@@ -1,0 +1,25 @@
+{
+  "descripcion": "noindex enviado en la cabecera X-Robots-Tag en lugar de en el HTML.",
+  "url_solicitada": "https://www.cumple.example/borrador/",
+  "url_final": "https://www.cumple.example/borrador/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8",
+    "x-robots-tag": "noindex"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/cumple.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "IA-02.x-robots-tag": "decision_revisar",
+    "SEO-01.indexable": "decision_revisar"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "descripcion": "Página dedicada a un vídeo con VideoObject válido, subtítulos y miniatura; además, un vídeo de YouTube y un audio que se reproduce solo.",
+  "url_solicitada": "https://www.cumple.example/videos/purgar-radiador/",
+  "url_final": "https://www.cumple.example/videos/purgar-radiador/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/video.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "SEO-12.video-detectado": "correcto",
+    "SEO-12.video-datos": "correcto",
+    "ACC-02.pistas-subtitulos": "correcto",
+    "ACC-02.audio-automatico": "no_verificable",
+    "ACC-12.iframe-title": "correcto"
+  }
+}

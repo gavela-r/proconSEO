@@ -1,0 +1,24 @@
+{
+  "descripcion": "La misma página en un proyecto que no es Kit Digital: el noindex es una decisión a revisar y la comprobación de desarrollo no aplica.",
+  "url_solicitada": "https://www.panaderia.example/",
+  "url_final": "https://www.panaderia.example/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/wordpress-noindex-desarrollo.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": "otra",
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "SEO-01.noindex-desarrollo": "no_aplicable",
+    "IA-02.meta-robots": "decision_revisar"
+  }
+}

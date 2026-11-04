@@ -1,0 +1,25 @@
+{
+  "descripcion": "Ficha de producto de una tienda WooCommerce con marcado Product y Offer completo.",
+  "url_solicitada": "https://tienda.almazara.example/producto/aceite-5l/",
+  "url_final": "https://tienda.almazara.example/producto/aceite-5l/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/woocommerce-producto.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": "tienda_kit_digital",
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "IA-07.jsonld-sintaxis": "correcto",
+    "SEO-14.producto-marcado": "correcto",
+    "SEO-12.video-detectado": "no_aplicable"
+  }
+}

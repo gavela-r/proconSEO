@@ -1,0 +1,24 @@
+{
+  "descripcion": "Clínica con widget de chatbot: el botón que lo abre solo tiene un icono sin nombre y su iframe no tiene title.",
+  "url_solicitada": "https://www.clinica.example/",
+  "url_final": "https://www.clinica.example/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/chatbot.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": "web_cliente",
+    "sector": "salud",
+    "objetivo": null
+  },
+  "esperado": {
+    "ACC-12.chatbot-detectado": "problema",
+    "ACC-12.nombres-controles": "problema"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "descripcion": "Web Kit Digital en WordPress publicada con «Disuadir a los motores de búsqueda» activado y sin objetivo declarado: problema crítico.",
+  "url_solicitada": "https://www.panaderia.example/",
+  "url_final": "https://www.panaderia.example/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/wordpress-noindex-desarrollo.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": "web_kit_digital",
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "SEO-01.noindex-desarrollo": "problema",
+    "SEO-01.indexable": "decision_revisar",
+    "IA-02.meta-robots": "decision_revisar",
+    "ACC-03.declaracion-accesibilidad": "correcto"
+  },
+  "gravedad_esperada": {
+    "SEO-01.noindex-desarrollo": "critico"
+  }
+}

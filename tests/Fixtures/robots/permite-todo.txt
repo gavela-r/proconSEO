@@ -1,0 +1,5 @@
+# Permite rastrear todo
+User-agent: *
+Allow: /
+
+Sitemap: https://www.cumple.example/sitemap.xml

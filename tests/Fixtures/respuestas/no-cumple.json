@@ -1,0 +1,43 @@
+{
+  "descripcion": "Página con los fallos típicos detectables en el HTML: sin title, sin lang, sin viewport, imágenes sin alt, campos sin etiqueta, controles sin nombre, rol ARIA inventado, JSON-LD roto, hreflang inválido, contenido mixto y formulario por HTTP.",
+  "url_solicitada": "https://www.nocumple.example/",
+  "url_final": "https://www.nocumple.example/",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/no-cumple.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "SEO-01.contenido-mixto": "problema",
+    "SEO-01.formulario-sin-cifrar": "problema",
+    "IA-07.jsonld-sintaxis": "problema",
+    "SEO-03.title-presente": "problema",
+    "SEO-05.h1-presente": "problema",
+    "SEO-05.encabezados-vacios": "problema",
+    "SEO-07.enlaces-rastreables": "problema",
+    "SEO-10.viewport": "problema",
+    "SEO-15.hreflang-codigos": "problema",
+    "ACC-01.img-alt-presente": "problema",
+    "ACC-01.img-enlace-sin-nombre": "problema",
+    "ACC-01.input-image-alt": "problema",
+    "ACC-03.title-pagina": "problema",
+    "ACC-03.declaracion-accesibilidad": "decision_revisar",
+    "ACC-06.enlaces-nombre": "problema",
+    "ACC-09.labels-asociados": "problema",
+    "ACC-09.placeholder-como-etiqueta": "problema",
+    "ACC-10.lang-presente": "problema",
+    "ACC-12.iframe-title": "problema",
+    "ACC-12.nombres-controles": "problema",
+    "ACC-12.roles-aria-validos": "problema"
+  }
+}

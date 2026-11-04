@@ -1,0 +1,21 @@
+{
+  "descripcion": "Sitemap con expansión exponencial de entidades: debe rechazarse (SEG-05).",
+  "url_solicitada": "https://www.cumple.example/sitemap-bomba.xml",
+  "url_final": "https://www.cumple.example/sitemap-bomba.xml",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "application/xml; charset=utf-8"
+  },
+  "tipo_contenido": "application/xml",
+  "cuerpo": "sitemaps/bomba-entidades.xml",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {}
+}

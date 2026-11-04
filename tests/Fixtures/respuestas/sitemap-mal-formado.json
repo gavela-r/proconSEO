@@ -1,0 +1,21 @@
+{
+  "descripcion": "Sitemap con XML mal formado.",
+  "url_solicitada": "https://www.cumple.example/sitemap-roto.xml",
+  "url_final": "https://www.cumple.example/sitemap-roto.xml",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "application/xml; charset=utf-8"
+  },
+  "tipo_contenido": "application/xml",
+  "cuerpo": "sitemaps/mal-formado.xml",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {}
+}

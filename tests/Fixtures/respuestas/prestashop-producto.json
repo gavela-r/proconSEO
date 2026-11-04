@@ -1,0 +1,21 @@
+{
+  "descripcion": "Ficha de producto de PrestaShop con Microdata Product; la Offer no declara price ni priceCurrency (el precio solo está en el texto).",
+  "url_solicitada": "https://www.deportes.example/es/calzado/12-zapatillas-trekking.html",
+  "url_final": "https://www.deportes.example/es/calzado/12-zapatillas-trekking.html",
+  "resultado": "correcto",
+  "estado_http": 200,
+  "redirecciones": [],
+  "cabeceras": {
+    "content-type": "text/html; charset=utf-8"
+  },
+  "tipo_contenido": "text/html",
+  "cuerpo": "paginas/prestashop-producto.html",
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": "tienda_kit_digital",
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {}
+}

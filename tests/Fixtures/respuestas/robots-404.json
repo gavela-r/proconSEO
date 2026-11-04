@@ -1,0 +1,22 @@
+{
+  "descripcion": "robots.txt inexistente: 4xx equivale a «sin restricciones».",
+  "url_solicitada": "https://www.cumple.example/robots.txt",
+  "url_final": "https://www.cumple.example/robots.txt",
+  "resultado": "error_http",
+  "estado_http": 404,
+  "redirecciones": [],
+  "cabeceras": {},
+  "tipo_contenido": null,
+  "cuerpo": null,
+  "tls_verificado": true,
+  "motivo": null,
+  "contexto": {
+    "tipo_proyecto": null,
+    "sector": null,
+    "objetivo": null
+  },
+  "esperado": {
+    "IA-01.robots-recuperado": "correcto",
+    "IA-01.permiso-buscadores": "correcto"
+  }
+}
