@@ -1,0 +1,64 @@
+# SEG-16: revisión automática de cada PR (tests, seguridad del código y dependencias).
+name: Revisión
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Tests (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.2', '8.3']
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: proconseo
+          MYSQL_USER: proconseo
+          MYSQL_PASSWORD: solo-para-ci
+          MYSQL_ROOT_PASSWORD: solo-para-ci-root
+        ports: ['3306:3306']
+        options: --health-cmd="mysqladmin ping -h 127.0.0.1" --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      # Base de datos desechable que solo existe durante la revisión.
+      APP_ENV: ci
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: proconseo
+      DB_USER: proconseo
+      DB_PASS: solo-para-ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl, dom, intl, json, mbstring, pdo_mysql
+          coverage: none
+      - run: composer install --no-interaction --no-progress
+      - run: php bin/migrar.php
+      - run: vendor/bin/phpunit
+
+  seguridad:
+    name: Seguridad del código
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, dom, intl, json, mbstring, pdo_mysql
+          coverage: none
+      - run: composer install --no-interaction --no-progress
+      - name: Dependencias con fallos de seguridad conocidos
+        run: composer audit
+      - name: Psalm (errores de código)
+        run: vendor/bin/psalm --no-progress --output-format=github
+      - name: Psalm (inyección SQL, XSS y otros datos sin limpiar)
+        run: vendor/bin/psalm --taint-analysis --no-progress --output-format=github

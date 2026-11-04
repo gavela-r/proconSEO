@@ -1,0 +1,12 @@
+# SEG-16: avisa con un PR cuando una dependencia tiene una versión nueva o un fallo de seguridad.
+version: 2
+updates:
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
