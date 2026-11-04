@@ -4,11 +4,16 @@
  * @var array<string, string> $alcances
  * @var array<string, mixed> $valores
  * @var string|null $error
+ * @var bool $detenidos
  */
 $v = static fn (string $clave): string => (string) ($valores[$clave] ?? '');
 ?>
 <h1>Nuevo análisis</h1>
 <p class="entradilla">Indica la web que quieres analizar. Antes de empezar se comprueba que la dirección es segura.</p>
+
+<?php if ($detenidos): ?>
+    <p class="aviso aviso--error" role="status">Los análisis están detenidos temporalmente por seguridad. Ahora no se pueden lanzar nuevos.</p>
+<?php endif; ?>
 
 <?php if ($error !== null): ?>
     <p class="aviso aviso--error" role="alert" id="error-formulario"><?= e($error) ?></p>
