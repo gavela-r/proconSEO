@@ -7,6 +7,7 @@ namespace ProconSEO\Tests\Run;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use ProconSEO\Engine\Catalogo\CatalogoJson;
+use ProconSEO\Engine\Motor;
 use ProconSEO\Fetch\Ambito;
 use ProconSEO\Fetch\ClienteHttpSeguro;
 use ProconSEO\Fetch\Http\RespuestaHttp;
@@ -95,10 +96,10 @@ final class OrquestadorTest extends TestCase
         );
     }
 
-    private function lanzar(string $url = 'https://ejemplo.es/'): int
+    private function lanzar(string $url = 'https://ejemplo.es/', string $alcance = 'url_individual'): int
     {
         $id = $this->lanzador()
-            ->lanzar($this->proyectoId, $url, 'url_individual', 'Prueba');
+            ->lanzar($this->proyectoId, $url, $alcance, 'Prueba');
         $this->bd->prepare("UPDATE analisis SET estado = 'en_curso' WHERE id = ?")->execute([$id]);
 
         return $id;
@@ -126,6 +127,46 @@ final class OrquestadorTest extends TestCase
         self::assertSame(2, (int) $this->valor('SELECT COUNT(*) FROM recursos WHERE analisis_id = ?', [$id]));
         self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM fases_analisis WHERE analisis_id = ? AND estado IN ('pendiente', 'en_curso')", [$id]));
         self::assertSame('omitida', $this->valor("SELECT estado FROM fases_analisis WHERE analisis_id = ? AND fase = 'renderizado'", [$id]));
+    }
+
+    public function testSitioCompletoAnalizaCadaPaginaConElMotorReal(): void
+    {
+        $html = static fn (string ...$hrefs): RespuestaHttp => new RespuestaHttp(200, ['content-type' => 'text/html'],
+            '<html lang="es"><head><title>T</title></head><body>' . implode('', array_map(static fn (string $h): string => "<a href=\"{$h}\">x</a>", $hrefs)) . '</body></html>');
+        $this->transporte->porUrl = [
+            'https://ejemplo.es/robots.txt' => new RespuestaHttp(200, ['content-type' => 'text/plain'], "User-agent: *\nDisallow: /privado"),
+            'https://ejemplo.es/' => $html('/servicios', '/contacto', '/privado/x', 'https://otra.es/'),
+            'https://ejemplo.es/servicios' => $html('/', '/contacto'),
+            'https://ejemplo.es/contacto' => $html('/'),
+            'https://ejemplo.es/sitemap.xml' => new RespuestaHttp(404),
+        ];
+        $id = $this->lanzar('https://ejemplo.es/', 'sitio_completo');
+
+        $estado = $this->orquestador(Motor::v1())->ejecutar($id);
+
+        self::assertSame(EstadoAnalisis::Completado, $estado);
+        self::assertStringContainsString('3 páginas analizadas, 1 no permitidas por robots.txt', (string) $this->valor("SELECT mensaje FROM fases_analisis WHERE analisis_id = ? AND fase = 'descubrimiento'", [$id]));
+        foreach (['https://ejemplo.es/servicios', 'https://ejemplo.es/contacto'] as $pagina) {
+            self::assertGreaterThan(0, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND url_recurso = ? AND cobertura <> 'no_implementada'", [$id, $pagina]), "Resultados de {$pagina}");
+        }
+        $noImplementadas = count(array_filter(Motor::v1()->catalogo()->todas(), static fn ($f): bool => $f->cobertura === \ProconSEO\Shared\Enum\Cobertura::NoImplementada));
+        self::assertSame($noImplementadas, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND cobertura = 'no_implementada'", [$id]), 'Lo no implementado aparece una sola vez, no por página');
+        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url LIKE '%privado%'", [$id]), 'No se pide lo que robots.txt prohíbe');
+        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url LIKE '%otra.es%'", [$id]));
+    }
+
+    public function testUrlConContextoNoRecorreElSitio(): void
+    {
+        $this->transporte->porUrl = [
+            'https://ejemplo.es/robots.txt' => new RespuestaHttp(200, [], "User-agent: *\nAllow: /"),
+            'https://ejemplo.es/' => new RespuestaHttp(200, ['content-type' => 'text/html'], '<html><body><a href="/otra">x</a></body></html>'),
+        ];
+        $id = $this->lanzar('https://ejemplo.es/', 'url_contexto');
+
+        $this->orquestador(Motor::v1())->ejecutar($id);
+
+        self::assertStringContainsString('URLs relacionadas que pedían las comprobaciones (máximo 20)', (string) $this->valor("SELECT mensaje FROM fases_analisis WHERE analisis_id = ? AND fase = 'descubrimiento'", [$id]));
+        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url = 'https://ejemplo.es/otra'", [$id]), 'Los enlaces no se siguen');
     }
 
     public function testPaginaQueNoRespondeDaAnalisisParcial(): void
