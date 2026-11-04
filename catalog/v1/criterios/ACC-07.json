@@ -1,0 +1,119 @@
+{
+  "id": "ACC-07",
+  "bloque": "ACC",
+  "nombre": "Tiempo, movimiento y parpadeo",
+  "que_comprueba": "Límites de tiempo ajustables, pausa de contenido en movimiento y ausencia de destellos peligrosos.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Algunas personas necesitan más tiempo para leer o rellenar. Y las animaciones que no se pueden parar, o que parpadean, pueden marear o provocar crisis.",
+  "modo": "automatico",
+  "esfuerzo": "medio",
+  "mvp": "no",
+  "ref_investigacion": [],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "W3C — WCAG 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [
+    {
+      "criterio": "2.2.1",
+      "nombre": "Tiempo ajustable",
+      "nivel": "A",
+      "en_wcag_2_1": true,
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.2.2",
+      "nombre": "Pausar, detener, ocultar",
+      "nivel": "A",
+      "en_wcag_2_1": true,
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.3.1",
+      "nombre": "Umbral de tres destellos o menos",
+      "nivel": "A",
+      "en_wcag_2_1": true,
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold",
+      "ficha_investigacion": null
+    }
+  ],
+  "subcomprobaciones": [
+    {
+      "id": "ACC-07.tiempo-ajustable",
+      "nombre": "Tiempo ajustable",
+      "que_comprueba": "Los límites de tiempo se pueden ampliar al menos 10 veces, con aviso de 20 s.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.2.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-07.pausar-movimiento",
+      "nombre": "Pausar, detener, ocultar",
+      "que_comprueba": "El contenido que se mueve más de 5 s se puede pausar.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.2.2"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-07.destellos",
+      "nombre": "Destellos",
+      "que_comprueba": "Como máximo 3 destellos por segundo.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.3.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    }
+  ],
+  "umbrales": {
+    "tiempo_ajustable": "ampliable al menos 10 veces; aviso con al menos 20 s",
+    "movimiento": "más de 5 s → mecanismo de pausa",
+    "destellos": "como máximo 3 por segundo"
+  }
+}

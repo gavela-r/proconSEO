@@ -1,0 +1,123 @@
+{
+  "id": "SEO-03",
+  "bloque": "SEO",
+  "nombre": "Title de la página",
+  "que_comprueba": "Presencia del title y que describa el propósito concreto de la página. La longitud es solo un dato auxiliar.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "El title es el texto que sale en azul en Google y en la pestaña del navegador. Sin él, el buscador se inventa uno.",
+  "modo": "hibrido",
+  "esfuerzo": "bajo",
+  "mvp": "parcial",
+  "ref_investigacion": [
+    "O5",
+    "O4"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Enlaces de título",
+      "url": "https://developers.google.com/search/docs/appearance/title-link",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Guía de SEO para principiantes",
+      "url": "https://developers.google.com/search/docs/fundamentals/seo-starter-guide",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-03.title-presente",
+      "nombre": "Title presente",
+      "que_comprueba": "Hay un elemento <title> con texto.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "seo_on_page"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-03.title-unico",
+      "nombre": "Un solo title",
+      "que_comprueba": "La página tiene un único <title>.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "seo_on_page"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-03.title-longitud",
+      "nombre": "Longitud del title (dato auxiliar)",
+      "que_comprueba": "Número de caracteres del title. Es solo informativo: nunca es un problema por sí solo.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-03.title-duplicado",
+      "nombre": "Title repetido en otras páginas",
+      "que_comprueba": "El mismo title aparece en varias páginas analizadas.",
+      "cuando_aplica": "Solo con alcance de sitio completo.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "sitio_completo",
+      "wcag": [],
+      "kit_digital": [
+        "seo_on_page"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-03.title-descriptivo",
+      "nombre": "Title descriptivo",
+      "que_comprueba": "El title describe de forma específica el propósito de la página. Que exista no significa que sea adecuado.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

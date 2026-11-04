@@ -1,0 +1,47 @@
+{
+  "id": "SEO-06",
+  "bloque": "SEO",
+  "nombre": "Intención, suficiencia y valor de la página",
+  "que_comprueba": "Si la página responde a la intención que promete y aporta valor suficiente. Sin mínimos de palabras.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Google premia las páginas que resuelven lo que el usuario busca, no las que tienen más palabras.",
+  "modo": "humano",
+  "esfuerzo": "alto",
+  "mvp": "no",
+  "ref_investigacion": [
+    "O1",
+    "O2",
+    "O3",
+    "C08",
+    "C13"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Contenido útil, fiable y centrado en las personas",
+      "url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-06.intencion-valor",
+      "nombre": "Intención y valor",
+      "que_comprueba": "La página cumple lo que promete y aporta valor suficiente.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

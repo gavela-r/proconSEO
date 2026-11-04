@@ -1,0 +1,115 @@
+{
+  "id": "SEO-14",
+  "bloque": "SEO",
+  "nombre": "Datos estructurados y resultados enriquecidos",
+  "que_comprueba": "Elegibilidad para resultados enriquecidos de Google (reutiliza IA-07) y perfil de producto.",
+  "cuando_aplica": "Si la página tiene datos estructurados, o es una página de producto.",
+  "explicacion_sencilla": "Con los datos estructurados correctos, Google puede mostrar estrellas, precios o disponibilidad directamente en los resultados.",
+  "modo": "automatico",
+  "esfuerzo": "medio",
+  "mvp": "parcial",
+  "ref_investigacion": [
+    "T13"
+  ],
+  "reutiliza": [
+    "IA-07"
+  ],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Introducción a los datos estructurados",
+      "url": "https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Datos estructurados de producto",
+      "url": "https://developers.google.com/search/docs/appearance/structured-data/product",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Proconsi — Kit Digital: Comercio electrónico",
+      "url": "https://www.proconsi.com/kit-digital/comercio-electronico/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-14.elegibilidad-enriquecidos",
+      "nombre": "Elegibilidad para resultados enriquecidos",
+      "que_comprueba": "Tipos con resultado enriquecido en Google y sus propiedades obligatorias.",
+      "cuando_aplica": "Si la página tiene datos estructurados.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": [
+        "IA-07"
+      ]
+    },
+    {
+      "id": "SEO-14.producto-marcado",
+      "nombre": "Marcado de producto",
+      "que_comprueba": "El marcado Product/Offer es válido y tiene las propiedades necesarias.",
+      "cuando_aplica": "Solo en páginas de producto (marcado Product o indicado al lanzar el análisis).",
+      "condicion": "producto",
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "tienda_producto"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-14.producto-precio-coherente",
+      "nombre": "Precio coherente",
+      "que_comprueba": "El precio del marcado coincide con el visible.",
+      "cuando_aplica": "Solo en páginas de producto.",
+      "condicion": "producto",
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "tienda_producto"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-14.producto-disponibilidad",
+      "nombre": "Disponibilidad coherente",
+      "que_comprueba": "La disponibilidad marcada coincide con la visible. Un producto agotado no es un error por sí solo.",
+      "cuando_aplica": "Solo en páginas de producto.",
+      "condicion": "producto",
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "tienda_producto"
+      ],
+      "reutiliza": []
+    }
+  ]
+}

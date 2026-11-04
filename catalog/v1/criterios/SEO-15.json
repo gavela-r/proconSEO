@@ -1,0 +1,106 @@
+{
+  "id": "SEO-15",
+  "bloque": "SEO",
+  "nombre": "Versiones por idioma (hreflang)",
+  "que_comprueba": "Códigos y destinos hreflang, autorreferencia y reciprocidad.",
+  "cuando_aplica": "Solo si la web tiene más de un idioma.",
+  "explicacion_sencilla": "Si la web está en varios idiomas, hreflang le dice a Google qué versión mostrar a cada persona según su idioma.",
+  "modo": "automatico",
+  "esfuerzo": "medio",
+  "mvp": "si",
+  "ref_investigacion": [
+    "T14"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Versiones localizadas de páginas (hreflang)",
+      "url": "https://developers.google.com/search/docs/specialty/international/localized-versions",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Proconsi — Kit Digital: Sitio web",
+      "url": "https://www.proconsi.com/kit-digital/web/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-15.hreflang-codigos",
+      "nombre": "Códigos de idioma válidos",
+      "que_comprueba": "Los códigos hreflang son válidos (ISO 639-1 y, opcionalmente, ISO 3166-1) y x-default si se usa.",
+      "cuando_aplica": "Si la página declara hreflang.",
+      "condicion": "multi_idioma",
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "segundo_idioma"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-15.hreflang-autorreferencia",
+      "nombre": "Autorreferencia",
+      "que_comprueba": "La página se incluye a sí misma en su lista de hreflang.",
+      "cuando_aplica": "Si la página declara hreflang.",
+      "condicion": "multi_idioma",
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "segundo_idioma"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-15.hreflang-destinos",
+      "nombre": "Destinos válidos",
+      "que_comprueba": "Los destinos hreflang responden 200 y son canónicos.",
+      "cuando_aplica": "Si la página declara hreflang; alcance con contexto o sitio completo.",
+      "condicion": "multi_idioma",
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "url_con_contexto",
+      "wcag": [],
+      "kit_digital": [
+        "segundo_idioma"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-15.hreflang-reciprocidad",
+      "nombre": "Reciprocidad",
+      "que_comprueba": "Cada versión enlaza de vuelta a las demás.",
+      "cuando_aplica": "Si la página declara hreflang; alcance con contexto o sitio completo.",
+      "condicion": "multi_idioma",
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "url_con_contexto",
+      "wcag": [],
+      "kit_digital": [
+        "segundo_idioma"
+      ],
+      "reutiliza": []
+    }
+  ]
+}

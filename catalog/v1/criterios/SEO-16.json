@@ -1,0 +1,64 @@
+{
+  "id": "SEO-16",
+  "bloque": "SEO",
+  "nombre": "Paginación, filtros y facetas",
+  "que_comprueba": "Patrones de paginación y navegación por facetas, muestreando sin generar combinaciones masivas.",
+  "cuando_aplica": "Webs con listados paginados o filtros (tiendas, blogs).",
+  "explicacion_sencilla": "En tiendas con muchos filtros pueden generarse miles de direcciones casi iguales. Es poco relevante para las tiendas pequeñas del Kit Digital.",
+  "modo": "automatico",
+  "esfuerzo": "medio",
+  "mvp": "no",
+  "ref_investigacion": [
+    "T16"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Paginación y carga incremental",
+      "url": "https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Navegación por facetas",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/crawling-managing-faceted-navigation",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-16.paginacion",
+      "nombre": "Paginación",
+      "que_comprueba": "Los listados paginados son rastreables y cada página tiene su URL.",
+      "cuando_aplica": "Si hay listados paginados.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "baja_prioridad",
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "sitio_completo",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-16.facetas",
+      "nombre": "Filtros y facetas",
+      "que_comprueba": "Los filtros no generan combinaciones masivas de URLs indexables.",
+      "cuando_aplica": "Si hay filtros.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "baja_prioridad",
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "sitio_completo",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

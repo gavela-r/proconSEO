@@ -1,0 +1,70 @@
+{
+  "id": "SEO-10",
+  "bloque": "SEO",
+  "nombre": "Móvil: viewport y equivalencia de contenido",
+  "que_comprueba": "Meta viewport y equivalencia de contenido y señales entre móvil y ordenador.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Google mira primero la versión para móvil. Si la web no se adapta o en móvil falta contenido, se resiente.",
+  "modo": "automatico",
+  "esfuerzo": "medio",
+  "mvp": "parcial",
+  "ref_investigacion": [
+    "T10"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Indexación centrada en dispositivos móviles",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/mobile/mobile-sites-mobile-first-indexing",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Proconsi — Kit Digital: Sitio web",
+      "url": "https://www.proconsi.com/kit-digital/web/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-10.viewport",
+      "nombre": "Meta viewport",
+      "que_comprueba": "Hay una meta viewport válida (width=device-width).",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "responsive"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-10.equivalencia-movil",
+      "nombre": "Equivalencia móvil",
+      "que_comprueba": "El contenido y las señales en móvil son los mismos que en ordenador.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "responsive"
+      ],
+      "reutiliza": []
+    }
+  ],
+  "notas": "La especificación marca SEO-10 como «No (navegador)», pero SEO-10.viewport es «Sí» (sección 6.7). Por eso el criterio queda «parcial»."
+}
