@@ -1,0 +1,105 @@
+{
+  "id": "SEO-05",
+  "bloque": "seo",
+  "nombre": "Encabezados H1–H6 y estructura",
+  "que_comprueba": "Presencia de H1 y estructura de encabezados. Varios H1 o saltos de nivel no son errores automáticos.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Los encabezados son como el índice de un libro: ayudan a Google y a las personas a entender cómo está organizada la página.",
+  "modo": "hibrido",
+  "esfuerzo": "bajo",
+  "mvp": "parcial",
+  "ref_investigacion": [
+    "O5"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Guía de SEO para principiantes",
+      "url": "https://developers.google.com/search/docs/fundamentals/seo-starter-guide",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "W3C — WCAG 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-05.h1-presente",
+      "nombre": "H1 presente",
+      "que_comprueba": "La página tiene al menos un H1 con texto.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "seo_on_page"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-05.estructura-encabezados",
+      "nombre": "Estructura de encabezados",
+      "que_comprueba": "Orden y niveles de los encabezados. Varios H1 o saltos de nivel se informan, no son errores automáticos.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "seo_on_page"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-05.encabezados-vacios",
+      "nombre": "Encabezados vacíos",
+      "que_comprueba": "Encabezados sin texto ni nombre accesible.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "seo_on_page"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-05.encabezados-descriptivos",
+      "nombre": "Encabezados descriptivos",
+      "que_comprueba": "Los encabezados describen el contenido de su sección.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

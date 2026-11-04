@@ -1,0 +1,121 @@
+{
+  "id": "SEO-02",
+  "bloque": "seo",
+  "nombre": "Redirecciones, URL final, canonical y variantes",
+  "que_comprueba": "URL solicitada frente a URL final, cadenas y bucles de redirección, coherencia del canonical y variantes de la misma URL (http/https, www, barra final).",
+  "cuando_aplica": "Siempre.",
+  "explicacion_sencilla": "Cuando una dirección salta a otra, y esa a otra más, los buscadores pierden tiempo y a veces se rinden. También conviene que todas las variantes lleven a una sola versión.",
+  "modo": "automatico",
+  "esfuerzo": "bajo",
+  "mvp": "si",
+  "ref_investigacion": [
+    "T4",
+    "T6",
+    "T7"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Redirecciones y la Búsqueda de Google",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/301-redirects",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Consolidar URLs duplicadas (canonical)",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-02.url-final",
+      "nombre": "URL solicitada y URL final",
+      "que_comprueba": "Si la URL final coincide con la solicitada y, si no, por qué.",
+      "cuando_aplica": "Siempre.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "cabeceras"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-02.cadena-redirecciones",
+      "nombre": "Cadena de redirecciones",
+      "que_comprueba": "Número de saltos y tipo de cada uno (301, 302, 307, 308, meta refresh).",
+      "cuando_aplica": "Si hay redirecciones.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "cabeceras",
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-02.bucle-redirecciones",
+      "nombre": "Bucle de redirecciones",
+      "que_comprueba": "Redirecciones que vuelven a una URL ya visitada o superan el límite (10).",
+      "cuando_aplica": "Si hay redirecciones.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "cabeceras"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-02.canonical-coherente",
+      "nombre": "Canonical coherente",
+      "que_comprueba": "El canonical apunta a una URL que responde 200, es indexable y no redirige.",
+      "cuando_aplica": "Si hay canonical y el alcance permite consultarlo.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina",
+        "otras_urls"
+      ],
+      "alcance_minimo": "url_contexto",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": [
+        "IA-08"
+      ]
+    },
+    {
+      "id": "SEO-02.variantes-host",
+      "nombre": "Variantes de la URL",
+      "que_comprueba": "http/https, con y sin www y con y sin barra final llevan a una sola versión preferida.",
+      "cuando_aplica": "Alcance con contexto o sitio completo.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "url_contexto",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

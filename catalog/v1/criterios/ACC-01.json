@@ -1,0 +1,144 @@
+{
+  "id": "ACC-01",
+  "bloque": "acc",
+  "nombre": "Contenido no textual",
+  "que_comprueba": "Que imágenes y otros elementos no textuales tengan una alternativa en texto. La presencia del alt se comprueba automáticamente; su adecuación la valora una persona.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Las personas ciegas usan programas que leen la pantalla en voz alta. Si una imagen no tiene descripción, para ellas no existe.",
+  "modo": "hibrido",
+  "esfuerzo": "bajo",
+  "mvp": "parcial",
+  "ref_investigacion": [],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "W3C — WCAG 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "W3C — ACT Rules",
+      "url": "https://www.w3.org/WAI/standards-guidelines/act/rules/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [
+    {
+      "criterio": "1.1.1",
+      "nombre": "Contenido no textual",
+      "nivel": "A",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-content",
+      "ficha_investigacion": null
+    }
+  ],
+  "subcomprobaciones": [
+    {
+      "id": "ACC-01.img-alt-presente",
+      "nombre": "Imágenes con atributo alt",
+      "que_comprueba": "Toda <img> tiene atributo alt (vacío solo si es decorativa).",
+      "cuando_aplica": "Si la página tiene imágenes.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "1.1.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-01.img-enlace-sin-nombre",
+      "nombre": "Imagen como único contenido de un enlace o botón",
+      "que_comprueba": "Enlaces y botones cuyo único contenido es una imagen con alt vacío o ausente.",
+      "cuando_aplica": "Si hay enlaces o botones con imagen.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "1.1.1",
+        "2.4.4"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-01.input-image-alt",
+      "nombre": "Botones de imagen con alt",
+      "que_comprueba": "<input type=\"image\"> tiene alt.",
+      "cuando_aplica": "Si hay botones de imagen.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "1.1.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-01.svg-area-nombre",
+      "nombre": "SVG y áreas de mapa con nombre",
+      "que_comprueba": "<svg role=\"img\"> y <area> tienen nombre accesible.",
+      "cuando_aplica": "Si hay SVG con rol img o mapas de imagen.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "1.1.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-01.alt-adecuado",
+      "nombre": "Texto alternativo adecuado",
+      "que_comprueba": "El texto alternativo describe la función o el contenido de la imagen. La herramienta lista las imágenes para revisión humana.",
+      "cuando_aplica": "Si hay imágenes con alt no vacío.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina",
+        "revision_humana"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "1.1.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    }
+  ]
+}

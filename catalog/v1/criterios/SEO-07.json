@@ -1,0 +1,102 @@
+{
+  "id": "SEO-07",
+  "bloque": "seo",
+  "nombre": "Enlazado interno",
+  "que_comprueba": "Enlaces rastreables, enlaces internos rotos y textos de enlace ambiguos. Incluye el mínimo de páginas del Kit Digital.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Los enlaces son los caminos por los que Google recorre la web. Si están rotos o no se pueden seguir, hay páginas que nunca encontrará.",
+  "modo": "automatico",
+  "esfuerzo": "medio",
+  "mvp": "si",
+  "ref_investigacion": [
+    "O9",
+    "T5",
+    "T15"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Enlaces rastreables",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/links-crawlable",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Proconsi — Kit Digital: Sitio web",
+      "url": "https://www.proconsi.com/kit-digital/web/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-07.enlaces-rastreables",
+      "nombre": "Enlaces rastreables",
+      "que_comprueba": "Los enlaces usan <a href> con una URL real, no solo javascript: u onclick.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-07.enlaces-rotos",
+      "nombre": "Enlaces internos rotos",
+      "que_comprueba": "Enlaces internos que devuelven 4xx o 5xx.",
+      "cuando_aplica": "Alcance con contexto o sitio completo.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "url_contexto",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-07.textos-ambiguos",
+      "nombre": "Textos de enlace ambiguos",
+      "que_comprueba": "Enlaces con textos genéricos como «pincha aquí» o «leer más» sin contexto.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-07.paginas-minimas",
+      "nombre": "Al menos 3 páginas",
+      "que_comprueba": "La web tiene al menos 3 páginas internas enlazadas y accesibles.",
+      "cuando_aplica": "Proyectos Kit Digital, con alcance con contexto o sitio completo.",
+      "condicion": "kit_digital",
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "url_contexto",
+      "wcag": [],
+      "kit_digital": [
+        "paginas_minimas"
+      ],
+      "reutiliza": []
+    }
+  ]
+}

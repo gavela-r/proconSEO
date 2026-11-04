@@ -1,0 +1,219 @@
+{
+  "id": "ACC-03",
+  "bloque": "acc",
+  "nombre": "Estructura, relaciones y orden",
+  "que_comprueba": "Que la estructura visual esté en el código (encabezados, listas, tablas, regiones), que la página tenga título y que el orden tenga sentido. Las etiquetas de formulario se comprueban en ACC-09. Incluye la detección de la declaración de accesibilidad.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Lo que se ve como un título, una lista o una tabla tiene que estar marcado como tal en el código para que un lector de pantalla lo anuncie igual.",
+  "modo": "hibrido",
+  "esfuerzo": "medio",
+  "mvp": "parcial",
+  "ref_investigacion": [],
+  "reutiliza": [
+    "ACC-09"
+  ],
+  "fuentes": [
+    {
+      "nombre": "W3C — WCAG 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Real Decreto 1112/2018 — Accesibilidad de sitios web del sector público (declaración de accesibilidad)",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2018-12699",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [
+    {
+      "criterio": "1.3.1",
+      "nombre": "Información y relaciones",
+      "nivel": "A",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "1.3.2",
+      "nombre": "Secuencia significativa",
+      "nivel": "A",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/meaningful-sequence",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "1.3.3",
+      "nombre": "Características sensoriales",
+      "nivel": "A",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/sensory-characteristics",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.4.2",
+      "nombre": "Página titulada",
+      "nivel": "A",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/page-titled",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.4.6",
+      "nombre": "Encabezados y etiquetas",
+      "nivel": "AA",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/headings-and-labels",
+      "ficha_investigacion": null
+    }
+  ],
+  "subcomprobaciones": [
+    {
+      "id": "ACC-03.title-pagina",
+      "nombre": "Página con título",
+      "que_comprueba": "La página tiene un <title> no vacío. Su adecuación la valora una persona.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.4.2"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": [
+        "SEO-03"
+      ]
+    },
+    {
+      "id": "ACC-03.estructura-semantica",
+      "nombre": "Estructura semántica",
+      "que_comprueba": "Encabezados marcados con h1–h6, listas con ul/ol y regiones principales (main, nav).",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "1.3.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-03.tablas-encabezados",
+      "nombre": "Tablas de datos con encabezados",
+      "que_comprueba": "Las tablas de datos tienen celdas de encabezado (th o scope) y, si procede, caption.",
+      "cuando_aplica": "Si hay tablas de datos.",
+      "condicion": "tabla",
+      "modo": "hibrido",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "1.3.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-03.orden-significativo",
+      "nombre": "Orden significativo",
+      "que_comprueba": "El orden del código conserva el sentido de la lectura.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "humano",
+      "necesita": [
+        "pagina",
+        "revision_humana"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "1.3.2"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-03.caracteristicas-sensoriales",
+      "nombre": "Características sensoriales",
+      "que_comprueba": "Las instrucciones no dependen solo de forma, color, tamaño, posición o sonido.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "humano",
+      "necesita": [
+        "pagina",
+        "revision_humana"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "1.3.3"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-03.encabezados-etiquetas-descriptivos",
+      "nombre": "Encabezados y etiquetas descriptivos",
+      "que_comprueba": "Encabezados y etiquetas describen su tema o propósito.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.4.6"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-03.declaracion-accesibilidad",
+      "nombre": "Declaración de accesibilidad",
+      "que_comprueba": "La web enlaza una página de declaración de accesibilidad. Si no la tiene: «Decisión a revisar» (obligatoria en el sector público, recomendable en el resto). No es un criterio WCAG.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

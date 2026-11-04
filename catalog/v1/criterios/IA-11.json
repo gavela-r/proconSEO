@@ -1,0 +1,44 @@
+{
+  "id": "IA-11",
+  "bloque": "ia",
+  "nombre": "Acciones esenciales identificables",
+  "que_comprueba": "En páginas funcionales (comprar, contactar, reservar…), que las acciones esenciales sean identificables por nombre, rol y estado. Reutiliza ACC-12.",
+  "cuando_aplica": "Páginas con acciones principales (formularios, botones de compra, contacto o reserva).",
+  "explicacion_sencilla": "Los asistentes con IA y las personas que usan lector de pantalla necesitan saber qué hace cada botón. Un botón sin nombre es un botón invisible para ellos.",
+  "modo": "automatico",
+  "esfuerzo": "medio",
+  "mvp": "parcial",
+  "ref_investigacion": [],
+  "reutiliza": [
+    "ACC-12"
+  ],
+  "fuentes": [
+    {
+      "nombre": "W3C — WCAG 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "IA-11.acciones-nombre-rol",
+      "nombre": "Nombre y rol de las acciones principales",
+      "que_comprueba": "Botones, enlaces y controles de las acciones principales tienen nombre accesible y rol.",
+      "cuando_aplica": "Si la página tiene acciones principales.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": [
+        "ACC-12"
+      ]
+    }
+  ]
+}

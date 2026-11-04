@@ -1,0 +1,49 @@
+{
+  "id": "IA-04",
+  "bloque": "ia",
+  "nombre": "Coherencia entre title, H1, introducción y contenido",
+  "que_comprueba": "Que el título, el encabezado principal, la introducción y el resto de encabezados traten del mismo tema que el contenido.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Si el título promete una cosa y el texto habla de otra, los buscadores y las IA entienden peor de qué trata la página.",
+  "modo": "humano",
+  "esfuerzo": "medio",
+  "mvp": "no",
+  "ref_investigacion": [
+    "C05",
+    "C07"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Contenido útil, fiable y centrado en las personas",
+      "url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Enlaces de título",
+      "url": "https://developers.google.com/search/docs/appearance/title-link",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "IA-04.coherencia-tema",
+      "nombre": "Coherencia temática",
+      "que_comprueba": "Title, H1, introducción y encabezados son coherentes con el contenido.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

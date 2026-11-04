@@ -1,0 +1,61 @@
+{
+  "id": "SEO-09",
+  "bloque": "seo",
+  "nombre": "Contenido en HTML inicial, DOM o tras interacción",
+  "que_comprueba": "Si el contenido está en el HTML inicial, aparece al ejecutar JavaScript o solo tras una interacción (clic, scroll).",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Parte del contenido de algunas webs solo aparece cuando se ejecutan programas o se pulsa algo. Google no siempre lo ve.",
+  "modo": "automatico",
+  "esfuerzo": "medio",
+  "mvp": "no",
+  "ref_investigacion": [
+    "T9"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Conceptos básicos de JavaScript para SEO",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-09.contenido-dom",
+      "nombre": "Contenido en el DOM renderizado",
+      "que_comprueba": "Diferencia entre el HTML inicial y el DOM tras ejecutar JavaScript.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-09.contenido-tras-interaccion",
+      "nombre": "Contenido tras interacción",
+      "que_comprueba": "Contenido que solo aparece tras clic o scroll.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "id": "IA-01",
+  "bloque": "ia",
+  "nombre": "Permiso de rastreo en robots.txt para buscadores y asistentes con IA",
+  "que_comprueba": "Si el robots.txt permite rastrear la URL a Googlebot, bingbot, OAI-SearchBot, Claude-SearchBot y PerplexityBot, aplicando el protocolo completo (grupos, comodines, empates y códigos 4xx/429/5xx). Se informa aparte de GPTBot, ClaudeBot y Google-Extended, que se usan para entrenar modelos y no para buscar.",
+  "cuando_aplica": "Siempre. Si no se puede obtener robots.txt, lo que depende de él queda «No verificable».",
+  "explicacion_sencilla": "El fichero robots.txt dice a cada robot qué puede leer de la web. Si bloquea a los robots de Google o de los buscadores con IA, la web no podrá aparecer en sus respuestas.",
+  "modo": "automatico",
+  "esfuerzo": "bajo",
+  "mvp": "si",
+  "ref_investigacion": [
+    "C02"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "RFC 9309 — Robots Exclusion Protocol",
+      "url": "https://www.rfc-editor.org/rfc/rfc9309",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Especificación de robots.txt",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/robots/robots_txt",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Rastreadores de Google",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Bing Webmaster Tools — Rastreadores de Bing",
+      "url": "https://www.bing.com/webmasters/help/which-crawlers-does-bing-use-8c184ec0",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "OpenAI — Rastreadores de OpenAI",
+      "url": "https://platform.openai.com/docs/bots",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Anthropic — Rastreadores de Anthropic",
+      "url": "https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Perplexity — Rastreadores de Perplexity",
+      "url": "https://docs.perplexity.ai/guides/bots",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "IA-01.robots-recuperado",
+      "nombre": "robots.txt recuperado",
+      "que_comprueba": "Se ha podido obtener /robots.txt y se registra su respuesta: 200 se interpreta; 4xx equivale a «sin restricciones»; 429 y 5xx se tratan como restricción temporal sin inventar la caché del buscador.",
+      "cuando_aplica": "Siempre.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "robots_txt"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-01.robots-sintaxis",
+      "nombre": "Sintaxis de robots.txt",
+      "que_comprueba": "Grupos de user-agent, reglas allow y disallow, comodines * y $, líneas no válidas y tamaño máximo (500 KB).",
+      "cuando_aplica": "Si robots.txt respondió 200.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "robots_txt"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-01.permiso-buscadores",
+      "nombre": "Permiso para Googlebot y bingbot",
+      "que_comprueba": "Si Googlebot y bingbot pueden rastrear la URL analizada. Gana la regla más específica; en empate, allow.",
+      "cuando_aplica": "Si robots.txt se ha podido interpretar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "robots_txt"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "indexacion"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-01.permiso-buscadores-ia",
+      "nombre": "Permiso para buscadores con IA",
+      "que_comprueba": "Si OAI-SearchBot, Claude-SearchBot y PerplexityBot pueden rastrear la URL analizada.",
+      "cuando_aplica": "Si robots.txt se ha podido interpretar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "robots_txt"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-01.agentes-entrenamiento",
+      "nombre": "Agentes de entrenamiento",
+      "que_comprueba": "Estado de GPTBot, ClaudeBot y Google-Extended, informado por separado. Bloquearlos es una decisión legítima y no impide aparecer en búsquedas.",
+      "cuando_aplica": "Si robots.txt se ha podido interpretar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "robots_txt"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-01.llms-txt",
+      "nombre": "llms.txt (informativo)",
+      "que_comprueba": "Si existe /llms.txt. Solo se informa; no se valora ni a favor ni en contra.",
+      "cuando_aplica": "Alcance con contexto o sitio completo.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "url_contexto",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

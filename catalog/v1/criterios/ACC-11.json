@@ -1,0 +1,142 @@
+{
+  "id": "ACC-11",
+  "bloque": "acc",
+  "nombre": "Consistencia entre páginas",
+  "que_comprueba": "Ayuda en el mismo sitio, varias formas de llegar a cada página, navegación e identificación coherentes entre páginas.",
+  "cuando_aplica": "Requiere comparar varias páginas del sitio.",
+  "explicacion_sencilla": "Si el menú o el botón de ayuda cambian de sitio en cada página, la web se vuelve difícil de usar, sobre todo para personas con discapacidad cognitiva.",
+  "modo": "hibrido",
+  "esfuerzo": "medio",
+  "mvp": "no",
+  "ref_investigacion": [],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "W3C — WCAG 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [
+    {
+      "criterio": "3.2.6",
+      "nombre": "Ayuda coherente",
+      "nivel": "A",
+      "version_wcag": "2.2",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-help",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.4.5",
+      "nombre": "Múltiples vías",
+      "nivel": "AA",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "3.2.3",
+      "nombre": "Navegación coherente",
+      "nivel": "AA",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-navigation",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "3.2.4",
+      "nombre": "Identificación coherente",
+      "nivel": "AA",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-identification",
+      "ficha_investigacion": null
+    }
+  ],
+  "subcomprobaciones": [
+    {
+      "id": "ACC-11.ayuda-coherente",
+      "nombre": "Ayuda coherente",
+      "que_comprueba": "Los mecanismos de ayuda están en el mismo lugar relativo en todas las páginas.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "otras_urls",
+        "navegador"
+      ],
+      "alcance_minimo": "sitio_completo",
+      "wcag": [
+        "3.2.6"
+      ],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-11.multiples-vias",
+      "nombre": "Múltiples vías",
+      "que_comprueba": "Hay más de una forma de llegar a cada página (menú, buscador, mapa del sitio).",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "humano",
+      "necesita": [
+        "otras_urls",
+        "revision_humana"
+      ],
+      "alcance_minimo": "sitio_completo",
+      "wcag": [
+        "2.4.5"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-11.navegacion-coherente",
+      "nombre": "Navegación coherente",
+      "que_comprueba": "Los menús repetidos aparecen en el mismo orden.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "otras_urls",
+        "navegador"
+      ],
+      "alcance_minimo": "sitio_completo",
+      "wcag": [
+        "3.2.3"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-11.identificacion-coherente",
+      "nombre": "Identificación coherente",
+      "que_comprueba": "Los componentes con la misma función se identifican igual.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "humano",
+      "necesita": [
+        "otras_urls",
+        "revision_humana"
+      ],
+      "alcance_minimo": "sitio_completo",
+      "wcag": [
+        "3.2.4"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    }
+  ]
+}

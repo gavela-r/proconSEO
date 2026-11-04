@@ -1,0 +1,99 @@
+{
+  "id": "IA-08",
+  "bloque": "ia",
+  "nombre": "Canonical, sitemap y enlazado interno",
+  "que_comprueba": "Que la URL declare su versión canónica, aparezca en un sitemap y reciba enlaces internos, dentro del alcance analizado.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "La URL canónica es la dirección «oficial» de una página. Si además está en el mapa del sitio y otras páginas la enlazan, los buscadores la encuentran y la consideran importante.",
+  "modo": "automatico",
+  "esfuerzo": "medio",
+  "mvp": "si",
+  "ref_investigacion": [
+    "C03"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Consolidar URLs duplicadas (canonical)",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Sitemaps.org — Protocolo de sitemaps",
+      "url": "https://www.sitemaps.org/protocol.html",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "IA-08.canonical-declarado",
+      "nombre": "Canonical declarado",
+      "que_comprueba": "Hay un único canonical, con URL absoluta y dentro del ámbito.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-08.presencia-sitemap",
+      "nombre": "Presencia en el sitemap",
+      "que_comprueba": "La URL aparece en un sitemap declarado en robots.txt o en /sitemap.xml.",
+      "cuando_aplica": "Alcance con contexto o sitio completo.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "robots_txt",
+        "sitemap"
+      ],
+      "alcance_minimo": "url_contexto",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-08.enlazado-interno",
+      "nombre": "Enlaces internos hacia la URL",
+      "que_comprueba": "La URL recibe enlaces desde otras páginas analizadas del mismo sitio.",
+      "cuando_aplica": "Solo con alcance de sitio completo.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "sitio_completo",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-08.datos-negocio-coherentes",
+      "nombre": "Datos de negocio coherentes",
+      "que_comprueba": "Nombre, dirección, teléfono y horarios coinciden entre las páginas analizadas.",
+      "cuando_aplica": "Webs con atención local, con alcance con contexto o sitio completo.",
+      "condicion": "atencion_local",
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "url_contexto",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

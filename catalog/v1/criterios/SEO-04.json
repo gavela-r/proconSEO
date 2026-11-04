@@ -1,0 +1,100 @@
+{
+  "id": "SEO-04",
+  "bloque": "seo",
+  "nombre": "Meta description",
+  "que_comprueba": "Presencia, marcado correcto y coherencia de la meta description. No hay longitud fija.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "La meta description es el resumen que Google puede mostrar debajo del título. Un buen resumen anima a hacer clic.",
+  "modo": "hibrido",
+  "esfuerzo": "bajo",
+  "mvp": "parcial",
+  "ref_investigacion": [
+    "O6"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Fragmentos y meta description",
+      "url": "https://developers.google.com/search/docs/appearance/snippet",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-04.description-presente",
+      "nombre": "Meta description presente",
+      "que_comprueba": "Hay una <meta name=\"description\"> con texto.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "seo_on_page"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-04.description-unica",
+      "nombre": "Una sola meta description",
+      "que_comprueba": "La página tiene una única meta description.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "seo_on_page"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-04.description-duplicada",
+      "nombre": "Description repetida en otras páginas",
+      "que_comprueba": "La misma description aparece en varias páginas analizadas.",
+      "cuando_aplica": "Solo con alcance de sitio completo.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "sitio_completo",
+      "wcag": [],
+      "kit_digital": [
+        "seo_on_page"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-04.description-coherente",
+      "nombre": "Description coherente",
+      "que_comprueba": "La description resume de verdad el contenido de la página.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

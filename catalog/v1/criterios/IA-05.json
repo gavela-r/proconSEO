@@ -1,0 +1,63 @@
+{
+  "id": "IA-05",
+  "bloque": "ia",
+  "nombre": "Autoría, responsable y respaldo de las afirmaciones",
+  "que_comprueba": "Si se identifica quién escribe o responde del contenido y si las afirmaciones relevantes están respaldadas. No se concluye falsedad ni falta de experiencia.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Las IA y los buscadores confían más en páginas que dicen quién está detrás y en qué se basan sus datos.",
+  "modo": "humano",
+  "esfuerzo": "medio",
+  "mvp": "no",
+  "ref_investigacion": [
+    "C09",
+    "C10",
+    "C12"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Contenido útil, fiable y centrado en las personas",
+      "url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "IA-05.autoria-responsable",
+      "nombre": "Autoría o responsable identificable",
+      "que_comprueba": "Hay un autor, empresa o responsable identificable del contenido.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-05.respaldo-afirmaciones",
+      "nombre": "Respaldo de afirmaciones",
+      "que_comprueba": "Las afirmaciones relevantes citan fuentes, datos o pruebas.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

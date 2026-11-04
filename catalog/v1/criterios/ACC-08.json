@@ -1,0 +1,203 @@
+{
+  "id": "ACC-08",
+  "bloque": "acc",
+  "nombre": "Entrada y objetivos táctiles",
+  "que_comprueba": "Gestos, cancelación del puntero, etiqueta en el nombre, activación por movimiento, arrastre y tamaño mínimo de los objetivos táctiles.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Los botones demasiado pequeños o las acciones que solo funcionan arrastrando dificultan el uso a personas con temblores o poca precisión.",
+  "modo": "hibrido",
+  "esfuerzo": "medio",
+  "mvp": "no",
+  "ref_investigacion": [],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "W3C — WCAG 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [
+    {
+      "criterio": "2.5.1",
+      "nombre": "Gestos del puntero",
+      "nivel": "A",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/pointer-gestures",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.5.2",
+      "nombre": "Cancelación del puntero",
+      "nivel": "A",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/pointer-cancellation",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.5.3",
+      "nombre": "Etiqueta en el nombre",
+      "nivel": "A",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/label-in-name",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.5.4",
+      "nombre": "Activación mediante movimiento",
+      "nivel": "A",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/motion-actuation",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.5.7",
+      "nombre": "Movimientos de arrastre",
+      "nivel": "AA",
+      "version_wcag": "2.2",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "2.5.8",
+      "nombre": "Tamaño del objetivo (mínimo)",
+      "nivel": "AA",
+      "version_wcag": "2.2",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum",
+      "ficha_investigacion": null
+    }
+  ],
+  "subcomprobaciones": [
+    {
+      "id": "ACC-08.gestos-puntero",
+      "nombre": "Gestos del puntero",
+      "que_comprueba": "Lo que exige gestos complejos también se puede hacer con un solo toque.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.5.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-08.cancelacion-puntero",
+      "nombre": "Cancelación del puntero",
+      "que_comprueba": "Las acciones se ejecutan al soltar y se pueden cancelar.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.5.2"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-08.etiqueta-en-nombre",
+      "nombre": "Etiqueta en el nombre",
+      "que_comprueba": "El nombre accesible contiene el texto visible del control.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.5.3"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-08.activacion-movimiento",
+      "nombre": "Activación por movimiento",
+      "que_comprueba": "Lo que se activa moviendo el dispositivo tiene alternativa y se puede desactivar.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "humano",
+      "necesita": [
+        "pagina",
+        "revision_humana"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.5.4"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-08.arrastre",
+      "nombre": "Movimientos de arrastre",
+      "que_comprueba": "Lo que se hace arrastrando también se puede hacer sin arrastrar.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.5.7"
+      ],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-08.tamano-objetivo",
+      "nombre": "Tamaño del objetivo",
+      "que_comprueba": "Objetivos táctiles de al menos 24 × 24 px CSS o con una excepción justificada.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.5.8"
+      ],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ],
+  "umbrales": {
+    "tamano_objetivo": "24 × 24 px CSS"
+  }
+}

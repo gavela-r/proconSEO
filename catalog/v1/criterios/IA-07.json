@@ -1,0 +1,121 @@
+{
+  "id": "IA-07",
+  "bloque": "ia",
+  "nombre": "Datos estructurados",
+  "que_comprueba": "JSON-LD, Microdata y RDFa: sintaxis, tipos de schema.org y coherencia con lo visible. Su ausencia no es un problema.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Los datos estructurados son una ficha oculta que describe la página (empresa, producto, dirección…) para que las máquinas la entiendan sin adivinar.",
+  "modo": "hibrido",
+  "esfuerzo": "medio",
+  "mvp": "parcial",
+  "ref_investigacion": [
+    "C16"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Introducción a los datos estructurados",
+      "url": "https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Schema.org",
+      "url": "https://schema.org/",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Datos estructurados de negocio local",
+      "url": "https://developers.google.com/search/docs/appearance/structured-data/local-business",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "IA-07.jsonld-sintaxis",
+      "nombre": "Sintaxis JSON-LD",
+      "que_comprueba": "Los bloques JSON-LD se pueden leer sin errores.",
+      "cuando_aplica": "Si la página contiene JSON-LD.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-07.microdata-rdfa",
+      "nombre": "Microdata y RDFa detectados",
+      "que_comprueba": "Se detecta marcado Microdata o RDFa y sus tipos.",
+      "cuando_aplica": "Si la página contiene Microdata o RDFa.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-07.tipos-schema",
+      "nombre": "Tipos y propiedades de schema.org",
+      "que_comprueba": "Los tipos y propiedades usados existen en schema.org.",
+      "cuando_aplica": "Si la página contiene datos estructurados.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-07.coherencia-visible",
+      "nombre": "Coherencia con lo visible",
+      "que_comprueba": "Lo que dicen los datos estructurados coincide con lo que ve el usuario.",
+      "cuando_aplica": "Si la página contiene datos estructurados.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-07.negocio-local",
+      "nombre": "Marcado de negocio local",
+      "que_comprueba": "Marcado LocalBusiness o su tipo específico (GasStation, MedicalClinic…) válido y coherente con lo visible.",
+      "cuando_aplica": "Webs con atención local (gasolineras, clínicas, tiendas físicas…), por el sector del proyecto o por señales de la página.",
+      "condicion": "atencion_local",
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

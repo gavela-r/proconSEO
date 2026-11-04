@@ -1,0 +1,82 @@
+{
+  "id": "SEO-08",
+  "bloque": "seo",
+  "nombre": "Duplicidad y variantes",
+  "que_comprueba": "Contenido duplicado y variantes de URL. Solo es problema si hay una contradicción técnica observable.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Si la misma página existe en varias direcciones, Google tiene que adivinar cuál mostrar. Eso solo es un problema si las señales se contradicen.",
+  "modo": "automatico",
+  "esfuerzo": "medio",
+  "mvp": "parcial",
+  "ref_investigacion": [
+    "T6"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Consolidar URLs duplicadas (canonical)",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-08.contradiccion-tecnica",
+      "nombre": "Contradicción entre señales",
+      "que_comprueba": "canonical, hreflang, sitemap y redirecciones señalan URLs distintas para la misma página.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina",
+        "cabeceras"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": [
+        "SEO-02",
+        "SEO-15",
+        "IA-08"
+      ]
+    },
+    {
+      "id": "SEO-08.parametros-variantes",
+      "nombre": "Variantes con parámetros",
+      "que_comprueba": "URLs con parámetros que sirven el mismo contenido sin canonical.",
+      "cuando_aplica": "Solo con alcance de sitio completo.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "otras_urls"
+      ],
+      "alcance_minimo": "sitio_completo",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-08.contenido-duplicado",
+      "nombre": "Contenido duplicado",
+      "que_comprueba": "Páginas distintas con contenido sustancialmente igual.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "otras_urls",
+        "ia"
+      ],
+      "alcance_minimo": "sitio_completo",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "id": "IA-02",
+  "bloque": "ia",
+  "nombre": "Directivas de indexación y de fragmentos",
+  "que_comprueba": "noindex, nosnippet, max-snippet, max-image-preview, data-nosnippet y X-Robots-Tag, por plataforma (genérico, googlebot, bingbot…) y por alcance. Rastrear, indexar y mostrar fragmentos son cosas distintas.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Además de robots.txt, cada página puede pedir que no se la guarde en el buscador o que no se muestre ningún trozo de su texto. Si se hace sin querer, la página desaparece de Google y de las respuestas de IA.",
+  "modo": "automatico",
+  "esfuerzo": "bajo",
+  "mvp": "si",
+  "ref_investigacion": [
+    "C02"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Meta robots, data-nosnippet y X-Robots-Tag",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Funciones de IA y tu sitio web",
+      "url": "https://developers.google.com/search/docs/appearance/ai-features",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "IA-02.meta-robots",
+      "nombre": "Meta robots",
+      "que_comprueba": "Etiquetas <meta name=\"robots\"> y específicas de cada robot con noindex o none.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "indexacion"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-02.x-robots-tag",
+      "nombre": "Cabecera X-Robots-Tag",
+      "que_comprueba": "Cabecera HTTP X-Robots-Tag, incluida la que va dirigida a un robot concreto.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "cabeceras"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "indexacion"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-02.fragmentos",
+      "nombre": "Restricción de fragmentos",
+      "que_comprueba": "nosnippet, max-snippet, max-image-preview y data-nosnippet, que limitan lo que se puede mostrar o citar de la página.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina",
+        "cabeceras"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-02.coherencia-directivas",
+      "nombre": "Coherencia entre directivas",
+      "que_comprueba": "Contradicciones entre meta y cabecera, o un noindex en una URL bloqueada por robots.txt (el buscador no llega a ver el noindex).",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina",
+        "cabeceras",
+        "robots_txt"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": [
+        "IA-01"
+      ]
+    }
+  ],
+  "notas": "Un noindex sin objetivo declarado es «Decisión a revisar», no «Problema». La excepción del noindex olvidado en webs Kit Digital está en SEO-01.noindex-desarrollo."
+}

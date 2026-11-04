@@ -1,0 +1,101 @@
+{
+  "id": "IA-10",
+  "bloque": "ia",
+  "nombre": "Contexto textual de imágenes y vídeos",
+  "que_comprueba": "Que imágenes y vídeos necesarios para entender la página tengan contexto en texto, y que la información esencial esté disponible como texto.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Las máquinas leen texto mucho mejor que imágenes. Si un horario o una tarifa solo está en una foto o un PDF, puede que nadie lo encuentre.",
+  "modo": "hibrido",
+  "esfuerzo": "medio",
+  "mvp": "parcial",
+  "ref_investigacion": [
+    "C04"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Imágenes en la Búsqueda de Google",
+      "url": "https://developers.google.com/search/docs/appearance/google-images",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Vídeos en la Búsqueda de Google",
+      "url": "https://developers.google.com/search/docs/appearance/video",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "IA-10.contexto-imagenes",
+      "nombre": "Contexto de las imágenes",
+      "que_comprueba": "Imágenes de contenido con texto alternativo, pie (figcaption) o texto cercano que las explique.",
+      "cuando_aplica": "Si la página tiene imágenes de contenido.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": [
+        "ACC-01"
+      ]
+    },
+    {
+      "id": "IA-10.contexto-video",
+      "nombre": "Contexto de los vídeos",
+      "que_comprueba": "Vídeos con título, descripción o transcripción en la página.",
+      "cuando_aplica": "Solo si la página tiene vídeo.",
+      "condicion": "video",
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-10.info-esencial-texto",
+      "nombre": "Información esencial como texto",
+      "que_comprueba": "La información esencial no está solo dentro de imágenes.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-10.horarios-texto",
+      "nombre": "Horarios y tarifas como texto",
+      "que_comprueba": "Horarios y tarifas disponibles como texto, no solo en imagen o PDF.",
+      "cuando_aplica": "Proyectos del sector transporte o páginas con horarios o tarifas.",
+      "condicion": "sector_transporte",
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

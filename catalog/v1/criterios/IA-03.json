@@ -1,0 +1,101 @@
+{
+  "id": "IA-03",
+  "bloque": "ia",
+  "nombre": "Respuesta utilizable y contenido principal recuperable",
+  "que_comprueba": "Que la URL devuelva una respuesta útil: código HTTP, redirecciones, bloqueos (403, 429, CAPTCHA) y si el contenido principal está en el HTML inicial o solo aparece tras ejecutar JavaScript.",
+  "cuando_aplica": "Siempre.",
+  "explicacion_sencilla": "Para que un buscador o una IA use la página, primero tiene que poder leerla. Si la web bloquea a los robots o el texto solo aparece después de cargar programas, puede que no lo vean.",
+  "modo": "automatico",
+  "esfuerzo": "medio",
+  "mvp": "parcial",
+  "ref_investigacion": [
+    "C01"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Códigos de estado HTTP y errores de red",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/http-network-errors",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Conceptos básicos de JavaScript para SEO",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "IA-03.respuesta-http",
+      "nombre": "Respuesta HTTP utilizable",
+      "que_comprueba": "La respuesta final es 200 y el tipo de contenido real coincide con el declarado (HTML).",
+      "cuando_aplica": "Siempre.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina",
+        "cabeceras"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-03.bloqueo-acceso",
+      "nombre": "Bloqueo de acceso",
+      "que_comprueba": "Respuestas 403 o 429, CAPTCHA o muros anti-robots detectados en la respuesta.",
+      "cuando_aplica": "Siempre.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina",
+        "cabeceras"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-03.contenido-html-inicial",
+      "nombre": "Contenido en el HTML inicial",
+      "que_comprueba": "Si el texto principal está en el HTML inicial. Si apenas hay texto y hay señales de aplicación JavaScript, se declara la limitación sin afirmar que falta contenido.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-03.contenido-renderizado",
+      "nombre": "HTML inicial frente a página renderizada",
+      "que_comprueba": "Comparación del HTML inicial con el DOM tras ejecutar JavaScript.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

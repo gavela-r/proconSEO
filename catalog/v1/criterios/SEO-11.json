@@ -1,0 +1,147 @@
+{
+  "id": "SEO-11",
+  "bloque": "seo",
+  "nombre": "Core Web Vitals",
+  "que_comprueba": "LCP, INP y CLS en el percentil 75, separando móvil y ordenador, y sin mezclar datos de campo (visitas reales, 28 días) con datos de laboratorio (simulación).",
+  "cuando_aplica": "Siempre que la API de PageSpeed Insights esté configurada y responda.",
+  "explicacion_sencilla": "Mide si la página carga rápido, responde rápido al tocarla y no da saltos mientras se carga. Los datos vienen de Google PageSpeed Insights.",
+  "modo": "automatico",
+  "esfuerzo": "alto",
+  "mvp": "psi",
+  "ref_investigacion": [
+    "V1",
+    "V2",
+    "V3",
+    "V4",
+    "C17"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "web.dev — Core Web Vitals",
+      "url": "https://web.dev/articles/vitals",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google PageSpeed Insights API v5",
+      "url": "https://developers.google.com/speed/docs/insights/v5/about",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-11.lcp-campo",
+      "nombre": "LCP (datos de campo)",
+      "que_comprueba": "Tiempo de aparición del contenido principal en visitas reales, por dispositivo.",
+      "cuando_aplica": "Si PageSpeed Insights tiene datos de campo de la URL o del origen (se indica cuál).",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "psi",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "psi"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "responsive"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-11.inp-campo",
+      "nombre": "INP (datos de campo)",
+      "que_comprueba": "Tiempo de respuesta a la interacción en visitas reales, por dispositivo. La ausencia de datos no demuestra lentitud.",
+      "cuando_aplica": "Solo con datos de campo.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "psi",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "psi"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "responsive"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-11.cls-campo",
+      "nombre": "CLS (datos de campo)",
+      "que_comprueba": "Estabilidad visual en visitas reales, por dispositivo.",
+      "cuando_aplica": "Si hay datos de campo.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "psi",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "psi"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "responsive"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-11.lcp-laboratorio",
+      "nombre": "LCP (laboratorio)",
+      "que_comprueba": "LCP medido en la simulación de PageSpeed Insights, por dispositivo.",
+      "cuando_aplica": "Si PageSpeed Insights responde.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "psi",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "psi"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "responsive"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-11.cls-laboratorio",
+      "nombre": "CLS (laboratorio)",
+      "que_comprueba": "CLS medido en la simulación de PageSpeed Insights, por dispositivo.",
+      "cuando_aplica": "Si PageSpeed Insights responde.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "psi",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "psi"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "responsive"
+      ],
+      "reutiliza": []
+    }
+  ],
+  "umbrales": {
+    "percentil": 75,
+    "LCP": {
+      "unidad": "s",
+      "bueno_hasta": 2.5,
+      "mejorable_hasta": 4.0
+    },
+    "INP": {
+      "unidad": "ms",
+      "bueno_hasta": 200,
+      "mejorable_hasta": 500
+    },
+    "CLS": {
+      "unidad": "",
+      "bueno_hasta": 0.1,
+      "mejorable_hasta": 0.25
+    }
+  }
+}

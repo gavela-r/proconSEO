@@ -1,0 +1,84 @@
+{
+  "version": "1.0.0",
+  "fecha": "2026-11-04",
+  "especificacion": "1.2",
+  "descripcion": "Catálogo de criterios de proconSEO: 11 de búsqueda con IA, 16 de SEO y 12 de accesibilidad (WCAG 2.2 A y AA). Un fichero por criterio en criterios/.",
+  "pendiente": [
+    "Verificar cada fuente oficial y anotar su fecha en fecha_verificacion antes de implementar la regla (RNF-05).",
+    "Completar ficha_investigacion (Fichas 1 a 55 de la Investigación ejecutiva) en cada criterio WCAG."
+  ],
+  "valores": {
+    "bloque": {
+      "ia": "Búsqueda con IA",
+      "seo": "SEO",
+      "acc": "Accesibilidad"
+    },
+    "modo": {
+      "automatico": "Lo comprueba el código sin intervención humana",
+      "hibrido": "El código detecta y una persona confirma",
+      "humano": "Requiere el juicio de una persona (o de IA en una fase futura)"
+    },
+    "esfuerzo": {
+      "bajo": "Cambiar un texto, un atributo o una configuración puntual",
+      "medio": "Modificar una plantilla o coordinar varias páginas",
+      "alto": "Rehacer una sección, el diseño o crear contenido nuevo"
+    },
+    "mvp": {
+      "si": "Se implementa en la primera versión",
+      "parcial": "Solo lo comprobable sin navegador propio ni IA",
+      "psi": "Se obtiene de la API de Google PageSpeed Insights",
+      "no": "Aparece como «No implementada» con su motivo"
+    },
+    "motivo_no_mvp": {
+      "navegador": "Requiere un navegador aislado (fase futura)",
+      "ia": "Requiere IA semántica (fase futura)",
+      "humano": "Requiere revisión humana sin apoyo automático en esta versión",
+      "baja_prioridad": "Poco relevante para las webs de Proconsi; se deja para más adelante"
+    },
+    "necesita": {
+      "pagina": "El HTML de la página analizada",
+      "cabeceras": "Las cabeceras y el código de la respuesta HTTP",
+      "robots_txt": "El fichero /robots.txt",
+      "sitemap": "Uno o varios sitemaps XML",
+      "otras_urls": "Otras URLs del sitio (pedidas a ProveedorRecursos)",
+      "psi": "La respuesta de Google PageSpeed Insights",
+      "navegador": "Un navegador aislado (fase futura)",
+      "ia": "Un modelo de IA (fase futura)",
+      "revision_humana": "Una persona que revise el resultado"
+    },
+    "alcance_minimo": {
+      "url_individual": "URL individual",
+      "url_contexto": "URL con contexto",
+      "sitio_completo": "Sitio completo"
+    },
+    "condicion": {
+      "video": "La página contiene vídeo",
+      "multimedia": "La página contiene audio o vídeo",
+      "producto": "Página de producto (marcado Product o indicado al lanzar el análisis)",
+      "formulario": "La página contiene formularios",
+      "tabla": "La página contiene tablas de datos",
+      "multi_idioma": "La web tiene más de un idioma",
+      "kit_digital": "Proyecto de tipo Web Kit Digital o Tienda Kit Digital",
+      "atencion_local": "Negocio con atención local (por sector o por señales de la página)",
+      "sector_hidrocarburos": "Proyecto del sector hidrocarburos o página con precios de carburante",
+      "sector_transporte": "Proyecto del sector transporte o página con horarios, tarifas o billetes",
+      "chatbot": "La página tiene un widget de chatbot"
+    },
+    "kit_digital": {
+      "indexacion": "Indexación correcta",
+      "seo_on_page": "SEO on-page",
+      "paginas_minimas": "Al menos 3 páginas",
+      "responsive": "Responsive",
+      "wcag_2_1_aa": "Accesibilidad WCAG 2.1 AA",
+      "segundo_idioma": "Segundo idioma (si se contrató)",
+      "dominio_https": "Dominio y HTTPS",
+      "tienda_producto": "Tienda: catálogo y producto"
+    },
+    "gravedad_si_problema": {
+      "critico": "Impide el acceso, la indexación o una función esencial",
+      "alto": "Barrera importante, aunque la página siga siendo usable",
+      "medio": "Afecta a una parte concreta de la página o del sitio",
+      "bajo": "Detalle con un efecto pequeño"
+    }
+  }
+}

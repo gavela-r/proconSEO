@@ -1,0 +1,81 @@
+{
+  "id": "IA-06",
+  "bloque": "ia",
+  "nombre": "Coherencia temporal",
+  "que_comprueba": "Fechas, precios, versiones y expresiones como «este año» coherentes entre sí y con la fecha del análisis. Una fecha antigua no es un problema por sí sola.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Si una página muestra precios u ofertas caducadas, una IA puede repetir información que ya no es cierta.",
+  "modo": "humano",
+  "esfuerzo": "bajo",
+  "mvp": "no",
+  "ref_investigacion": [
+    "C11"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Contenido útil, fiable y centrado en las personas",
+      "url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "IA-06.coherencia-temporal",
+      "nombre": "Coherencia de fechas y vigencia",
+      "que_comprueba": "Fechas, versiones y referencias temporales no se contradicen.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-06.producto-vigencia",
+      "nombre": "Vigencia de precios y ofertas de producto",
+      "que_comprueba": "Precios, ofertas y condiciones del producto no están vencidos ni se contradicen.",
+      "cuando_aplica": "Solo en páginas de producto (marcado Product o indicado al lanzar el análisis).",
+      "condicion": "producto",
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "tienda_producto"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "IA-06.precios-carburante",
+      "nombre": "Fecha de los precios de carburante",
+      "que_comprueba": "Si se publican precios de carburante, tienen fecha y no se contradicen.",
+      "cuando_aplica": "Proyectos del sector hidrocarburos o páginas con precios de carburante.",
+      "condicion": "sector_hidrocarburos",
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

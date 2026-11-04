@@ -1,0 +1,45 @@
+{
+  "id": "IA-09",
+  "bloque": "ia",
+  "nombre": "Valor y especificidad del contenido",
+  "que_comprueba": "Si el contenido aporta datos, casos, metodología y ejemplos adecuados a su propósito.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Las IA citan con más frecuencia páginas que aportan información concreta y propia, no textos genéricos.",
+  "modo": "humano",
+  "esfuerzo": "alto",
+  "mvp": "no",
+  "ref_investigacion": [
+    "C06",
+    "C08",
+    "C09"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Contenido útil, fiable y centrado en las personas",
+      "url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "IA-09.valor-especificidad",
+      "nombre": "Valor y especificidad",
+      "que_comprueba": "El contenido aporta información concreta y verificable acorde con su propósito.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "humano",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}

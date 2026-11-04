@@ -1,0 +1,187 @@
+{
+  "id": "ACC-10",
+  "bloque": "acc",
+  "nombre": "Idioma y predictibilidad",
+  "que_comprueba": "Idioma de la página y de sus partes, y que nada cambie de forma inesperada al recibir el foco o al introducir datos.",
+  "cuando_aplica": "Siempre que la página se haya podido descargar.",
+  "explicacion_sencilla": "Si la página no indica su idioma, el lector de pantalla puede leer un texto en español con pronunciación inglesa, y no se entiende nada.",
+  "modo": "hibrido",
+  "esfuerzo": "bajo",
+  "mvp": "parcial",
+  "ref_investigacion": [],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "W3C — WCAG 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [
+    {
+      "criterio": "3.1.1",
+      "nombre": "Idioma de la página",
+      "nivel": "A",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/language-of-page",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "3.2.1",
+      "nombre": "Al recibir el foco",
+      "nivel": "A",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/on-focus",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "3.2.2",
+      "nombre": "Al recibir entradas",
+      "nivel": "A",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/on-input",
+      "ficha_investigacion": null
+    },
+    {
+      "criterio": "3.1.2",
+      "nombre": "Idioma de las partes",
+      "nivel": "AA",
+      "version_wcag": "2.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/language-of-parts",
+      "ficha_investigacion": null
+    }
+  ],
+  "subcomprobaciones": [
+    {
+      "id": "ACC-10.lang-presente",
+      "nombre": "Idioma de la página declarado",
+      "que_comprueba": "El elemento <html> tiene atributo lang.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "3.1.1"
+      ],
+      "kit_digital": [
+        "segundo_idioma",
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-10.lang-valido",
+      "nombre": "Código de idioma válido",
+      "que_comprueba": "El valor de lang es un código de idioma válido (BCP 47).",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "3.1.1"
+      ],
+      "kit_digital": [
+        "segundo_idioma",
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-10.lang-coincide",
+      "nombre": "Idioma declarado coincide con el contenido",
+      "que_comprueba": "El idioma declarado coincide con el del texto principal.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "ia",
+      "necesita": [
+        "pagina",
+        "ia"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "3.1.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-10.idioma-partes",
+      "nombre": "Idioma de las partes",
+      "que_comprueba": "Los atributos lang de fragmentos en otro idioma son válidos. Detectar fragmentos sin marcar requiere revisión.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "hibrido",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "3.1.2"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-10.al-recibir-foco",
+      "nombre": "Al recibir el foco",
+      "que_comprueba": "Recibir el foco no provoca cambios de contexto.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "3.2.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-10.al-recibir-entradas",
+      "nombre": "Al recibir entradas",
+      "que_comprueba": "Cambiar un valor no provoca cambios de contexto sin aviso.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "no",
+      "motivo_no_mvp": "navegador",
+      "necesita": [
+        "pagina",
+        "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "3.2.2"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    }
+  ]
+}

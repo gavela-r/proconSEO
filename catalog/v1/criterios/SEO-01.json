@@ -1,0 +1,189 @@
+{
+  "id": "SEO-01",
+  "bloque": "seo",
+  "nombre": "Estado técnico, rastreabilidad e indexabilidad",
+  "que_comprueba": "Código HTTP, HTTPS y certificado básico, permiso de rastreo, indexabilidad y errores servidos con HTTP 200 (posible soft 404). Incluye el noindex de desarrollo olvidado y la detección de CMS.",
+  "cuando_aplica": "Siempre.",
+  "explicacion_sencilla": "Es lo primero: si la página da error, no usa conexión segura o le dice a Google que no la guarde, todo lo demás da igual.",
+  "modo": "automatico",
+  "esfuerzo": "medio",
+  "mvp": "si",
+  "ref_investigacion": [
+    "T1",
+    "T2",
+    "T3",
+    "T8",
+    "T11"
+  ],
+  "reutiliza": [],
+  "fuentes": [
+    {
+      "nombre": "Google Search Central — Códigos de estado HTTP y errores de red",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/http-network-errors",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Search Essentials",
+      "url": "https://developers.google.com/search/docs/essentials",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Google Search Central — Meta robots, data-nosnippet y X-Robots-Tag",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "WordPress — Ajustes de lectura (visibilidad en buscadores)",
+      "url": "https://wordpress.org/documentation/article/settings-reading-screen/",
+      "fecha_verificacion": null
+    },
+    {
+      "nombre": "Proconsi — Kit Digital: Sitio web",
+      "url": "https://www.proconsi.com/kit-digital/web/",
+      "fecha_verificacion": null
+    }
+  ],
+  "wcag": [],
+  "subcomprobaciones": [
+    {
+      "id": "SEO-01.estado-http",
+      "nombre": "Código de estado HTTP",
+      "que_comprueba": "Código HTTP final de la URL (2xx, 3xx, 4xx o 5xx).",
+      "cuando_aplica": "Siempre.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "cabeceras"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-01.https",
+      "nombre": "HTTPS y certificado",
+      "que_comprueba": "La página se sirve por HTTPS con certificado válido y la versión HTTP redirige a HTTPS.",
+      "cuando_aplica": "Siempre.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "cabeceras",
+        "otras_urls"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "dominio_https"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-01.rastreable",
+      "nombre": "Rastreable por Googlebot",
+      "que_comprueba": "robots.txt permite a Googlebot rastrear la URL.",
+      "cuando_aplica": "Siempre.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "robots_txt"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "indexacion"
+      ],
+      "reutiliza": [
+        "IA-01"
+      ]
+    },
+    {
+      "id": "SEO-01.indexable",
+      "nombre": "Indexable",
+      "que_comprueba": "No hay noindex en meta robots ni en X-Robots-Tag.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina",
+        "cabeceras"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "indexacion"
+      ],
+      "reutiliza": [
+        "IA-02"
+      ]
+    },
+    {
+      "id": "SEO-01.soft-404",
+      "nombre": "Posible soft 404",
+      "que_comprueba": "Página que responde 200 pero cuyo contenido indica error o página inexistente.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    },
+    {
+      "id": "SEO-01.noindex-desarrollo",
+      "nombre": "noindex de desarrollo olvidado",
+      "que_comprueba": "noindex, o robots.txt que bloquea todo, que suele quedarse puesto al publicar la web (en WordPress: «Disuadir a los motores de búsqueda»). Sin objetivo «no indexar» declarado es problema crítico; con ese objetivo declarado, es correcto.",
+      "cuando_aplica": "Proyectos de tipo Web Kit Digital o Tienda Kit Digital.",
+      "condicion": "kit_digital",
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina",
+        "cabeceras",
+        "robots_txt"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [
+        "indexacion"
+      ],
+      "reutiliza": [
+        "IA-01",
+        "IA-02"
+      ],
+      "gravedad_si_problema": "critico"
+    },
+    {
+      "id": "SEO-01.cms-detectado",
+      "nombre": "CMS detectado (informativo)",
+      "que_comprueba": "Detecta WordPress, WooCommerce o PrestaShop por señales públicas (meta generator, rutas típicas). Solo sirve para dar instrucciones de corrección concretas.",
+      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina",
+        "cabeceras"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [],
+      "kit_digital": [],
+      "reutiliza": []
+    }
+  ]
+}
