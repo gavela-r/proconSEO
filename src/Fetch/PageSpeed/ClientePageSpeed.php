@@ -163,7 +163,7 @@ final class ClientePageSpeed
             $p75 = $fuente['metrics'][$metrica]['percentile'] ?? null;
             if (is_int($p75) || is_float($p75)) {
                 // Google da el CLS multiplicado por 100 (p. ej., 5 = 0,05).
-                $campo[$clave] = $clave === 'cls' ? $p75 / 100 : (float) $p75;
+                $campo[$clave] = $clave === 'cls' ? (float) $p75 / 100.0 : (float) $p75;
             }
         }
 
