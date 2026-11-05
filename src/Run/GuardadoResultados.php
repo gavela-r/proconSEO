@@ -97,9 +97,9 @@ final class GuardadoResultados
             $insertarResultado = $this->bd->prepare(
                 'INSERT INTO resultados (analisis_id, id_comprobacion, id_criterio, bloque, estado, ejecucion, cobertura, tipo_conclusion, modo,
                     recurso_id, url_recurso, elemento, valor_observado, consecuencia, correccion, correccion_cms, explicacion_sencilla, limitacion,
-                    requiere_revision_humana, motivo_revision, wcag_criterio, wcag_nombre, wcag_nivel, wcag_version, gravedad, esfuerzo,
+                    requiere_revision_humana, motivo_revision, wcag_criterio, wcag_nombre, wcag_nivel, wcag_version, normativa, gravedad, esfuerzo,
                     grupo_causa_id, bloquea_dependientes, fuente, version_regla)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
             );
             $enlazar = $this->bd->prepare('INSERT IGNORE INTO resultado_evidencia (resultado_id, evidencia_id) VALUES (?, ?)');
             $t = static fn (?string $v): ?string => $v === null ? null : $s->texto($v);
@@ -111,7 +111,7 @@ final class GuardadoResultados
                     $r->urlRecurso === null ? null : ($idsRecursos[$r->urlRecurso] ?? null), $s->url($r->urlRecurso),
                     $t($r->elemento), $t($r->valorObservado), $t($r->consecuencia), $t($r->correccion), $t($r->correccionCms),
                     $s->texto($r->explicacionSencilla), $t($r->limitacion), (int) $r->requiereRevisionHumana, $t($r->motivoRevision),
-                    $r->wcagCriterio, $r->wcagNombre, $r->wcagNivel, $r->wcagVersion, $r->gravedad?->value, $r->esfuerzo?->value,
+                    $r->wcagCriterio, $r->wcagNombre, $r->wcagNivel, $r->wcagVersion, $t($r->normativa), $r->gravedad?->value, $r->esfuerzo?->value,
                     $r->codigoGrupoCausa === null ? null : ($grupos[$r->codigoGrupoCausa] ?? null), (int) $r->bloqueaDependientes,
                     $r->fuente, $r->versionRegla,
                 ]);
