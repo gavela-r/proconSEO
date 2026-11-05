@@ -1,5 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="6.20.8@75d7ca00182ca690b273dcd8d172e8efa17d1f90">
+  <file src="src/Engine/Comprobaciones/AccesibilidadAria.php">
+    <InvalidArgument>
+      <code><![CDATA[[self::class, 'etiqueta']]]></code>
+    </InvalidArgument>
+    <ParamNameMismatch>
+      <code><![CDATA[$e]]></code>
+    </ParamNameMismatch>
+  </file>
+  <file src="src/Engine/Comprobaciones/AccesibilidadEstructura.php">
+    <ParamNameMismatch>
+      <code><![CDATA[$e]]></code>
+    </ParamNameMismatch>
+  </file>
+  <file src="src/Engine/Comprobaciones/AccesibilidadFormularios.php">
+    <InvalidArgument>
+      <code><![CDATA[[self::class, 'describir']]]></code>
+      <code><![CDATA[[self::class, 'describir']]]></code>
+      <code><![CDATA[[self::class, 'describir']]]></code>
+    </InvalidArgument>
+    <ParamNameMismatch>
+      <code><![CDATA[$e]]></code>
+    </ParamNameMismatch>
+  </file>
+  <file src="src/Engine/Comprobaciones/AccesibilidadImagenes.php">
+    <ParamNameMismatch>
+      <code><![CDATA[$e]]></code>
+    </ParamNameMismatch>
+  </file>
+  <file src="src/Engine/Comprobaciones/Acciones.php">
+    <ParamNameMismatch>
+      <code><![CDATA[$e]]></code>
+    </ParamNameMismatch>
+  </file>
+  <file src="src/Engine/Comprobaciones/CanonicalSitemap.php">
+    <ParamNameMismatch>
+      <code><![CDATA[$e]]></code>
+    </ParamNameMismatch>
+  </file>
+  <file src="src/Engine/Comprobaciones/DatosEstructurados.php">
+    <ParamNameMismatch>
+      <code><![CDATA[$e]]></code>
+    </ParamNameMismatch>
+    <RedundantCondition>
+      <code><![CDATA[is_array($datos)]]></code>
+    </RedundantCondition>
+  </file>
   <file src="src/Engine/Comprobaciones/DirectivasIndexacion.php">
     <InvalidOperand>
       <code><![CDATA[$permiso['linea']]]></code>
@@ -7,6 +53,14 @@
     <ParamNameMismatch>
       <code><![CDATA[$e]]></code>
     </ParamNameMismatch>
+  </file>
+  <file src="src/Engine/Comprobaciones/Enlazado.php">
+    <ParamNameMismatch>
+      <code><![CDATA[$e]]></code>
+    </ParamNameMismatch>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$el->textContent]]></code>
+    </UndefinedPropertyFetch>
   </file>
   <file src="src/Engine/Comprobaciones/EstadoTecnico.php">
     <InvalidOperand>
@@ -16,6 +70,21 @@
       <code><![CDATA[$p['linea']]]></code>
       <code><![CDATA[$p['linea']]]></code>
     </InvalidOperand>
+    <ParamNameMismatch>
+      <code><![CDATA[$e]]></code>
+    </ParamNameMismatch>
+  </file>
+  <file src="src/Engine/Comprobaciones/Idiomas.php">
+    <ParamNameMismatch>
+      <code><![CDATA[$e]]></code>
+    </ParamNameMismatch>
+  </file>
+  <file src="src/Engine/Comprobaciones/Metadatos.php">
+    <ParamNameMismatch>
+      <code><![CDATA[$e]]></code>
+    </ParamNameMismatch>
+  </file>
+  <file src="src/Engine/Comprobaciones/Multimedia.php">
     <ParamNameMismatch>
       <code><![CDATA[$e]]></code>
     </ParamNameMismatch>
