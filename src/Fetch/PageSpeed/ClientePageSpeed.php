@@ -64,19 +64,40 @@ final class ClientePageSpeed
 
     public function informe(string $url, string $dispositivo): InformePageSpeed
     {
+        return $this->informes($url, [$dispositivo])[0];
+    }
+
+    /**
+     * Los informes de varios dispositivos, pedidos a Google a la vez: tarda lo que el más lento,
+     * no la suma (unos 25 s en lugar de 50 s para móvil y ordenador).
+     *
+     * @param list<string> $dispositivos InformePageSpeed::MOVIL / ORDENADOR
+     * @return list<InformePageSpeed> En el mismo orden
+     */
+    public function informes(string $url, array $dispositivos): array
+    {
         if (!$this->configurado()) {
-            return InformePageSpeed::sinDatos($dispositivo, $url, 'No está configurada la clave de Google PageSpeed Insights (PAGESPEED_API_KEY), así que no se ha podido medir.');
+            return array_map(static fn (string $d): InformePageSpeed => InformePageSpeed::sinDatos($d, $url,
+                'No está configurada la clave de Google PageSpeed Insights (PAGESPEED_API_KEY), así que no se ha podido medir.'), $dispositivos);
         }
 
         try {
-            $respuesta = $this->transporte->enviar(new PeticionHttp($this->destino($url, $dispositivo), self::MAX_BYTES, self::SEGUNDOS_CONEXION, self::SEGUNDOS_TOTAL, $this->userAgent));
+            $peticiones = array_map(fn (string $d): PeticionHttp => new PeticionHttp(
+                $this->destino($url, $d), self::MAX_BYTES, self::SEGUNDOS_CONEXION, self::SEGUNDOS_TOTAL, $this->userAgent,
+            ), $dispositivos);
+            $respuestas = $this->transporte->enviarVarias($peticiones);
         } catch (DestinoRechazado) {
-            return InformePageSpeed::sinDatos($dispositivo, $url, 'No se pudo conectar de forma segura con Google PageSpeed Insights.');
+            return array_map(static fn (string $d): InformePageSpeed => InformePageSpeed::sinDatos($d, $url, 'No se pudo conectar de forma segura con Google PageSpeed Insights.'), $dispositivos);
         } catch (Throwable) {
-            return InformePageSpeed::sinDatos($dispositivo, $url, 'Error inesperado al consultar Google PageSpeed Insights.');
+            return array_map(static fn (string $d): InformePageSpeed => InformePageSpeed::sinDatos($d, $url, 'Error inesperado al consultar Google PageSpeed Insights.'), $dispositivos);
         }
 
-        return $this->interpretar($respuesta, $url, $dispositivo);
+        $informes = [];
+        foreach ($dispositivos as $i => $dispositivo) {
+            $informes[] = $this->interpretar($respuestas[$i], $url, $dispositivo);
+        }
+
+        return $informes;
     }
 
     private function destino(string $url, string $dispositivo): DestinoValidado

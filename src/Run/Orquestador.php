@@ -209,18 +209,16 @@ final class Orquestador
             return [];
         }
         $llamadas = max(0, min(2, (int) ($perfil['apis']['pagespeed_llamadas_por_url']['valor'] ?? 2)));
-        $informes = [];
-        foreach (array_slice([InformePageSpeed::MOVIL => 'móvil', InformePageSpeed::ORDENADOR => 'ordenador'], 0, $llamadas, true) as $dispositivo => $nombre) {
-            if ($progreso->estaCancelado()) {
-                break;
-            }
-            if ($this->pageSpeed->configurado()) {
-                $this->repositorio->actualizarFase($id, Fase::Recuperacion, EstadoFase::EnCurso, count($informes), $llamadas, "Midiendo la velocidad en {$nombre} con Google PageSpeed (puede tardar un minuto)");
-            }
-            $informes[] = $this->pageSpeed->informe($pagina->urlFinal, $dispositivo);
+        $dispositivos = array_slice([InformePageSpeed::MOVIL, InformePageSpeed::ORDENADOR], 0, $llamadas);
+        if ($dispositivos === [] || $progreso->estaCancelado()) {
+            return [];
+        }
+        if ($this->pageSpeed->configurado()) {
+            $this->repositorio->actualizarFase($id, Fase::Recuperacion, EstadoFase::EnCurso, 0, 1, 'Midiendo la velocidad con Google PageSpeed (puede tardar medio minuto)');
         }
 
-        return $informes;
+        // Móvil y ordenador a la vez: es un servicio externo, no el sitio analizado.
+        return $this->pageSpeed->informes($pagina->urlFinal, $dispositivos);
     }
 
     private function empezar(int $id, Fase $fase): void
