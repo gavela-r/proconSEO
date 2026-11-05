@@ -160,6 +160,13 @@ final class OrquestadorTest extends TestCase
         self::assertStringContainsString('robots.txt', (string) $this->valor("SELECT motivo FROM recursos WHERE analisis_id = ? AND url LIKE '%privado%' AND resultado = 'fuera_de_ambito'", [$id]),
             'Pero queda apuntado en la lista de recursos con el motivo, si alguna comprobación lo pidió');
         self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url LIKE '%otra.es%'", [$id]));
+
+        // Las tres páginas se llaman «T»: al terminar el recorrido se comparan entre sí, una sola vez.
+        self::assertSame(1, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND id_comprobacion = 'SEO-03.title-duplicado'", [$id]), 'Una sola fila para todo el sitio');
+        self::assertSame('mejorable', $this->valor("SELECT estado FROM resultados WHERE analisis_id = ? AND id_comprobacion = 'SEO-03.title-duplicado'", [$id]));
+        self::assertStringContainsString('https://ejemplo.es/servicios', (string) $this->valor("SELECT contenido FROM evidencias WHERE analisis_id = ? AND codigo LIKE 'S-%'", [$id]));
+        // La misma causa en varias páginas es un solo grupo.
+        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM grupos_causa WHERE analisis_id = ? AND REGEXP_LIKE(codigo, '^P[0-9]+-', 'c')", [$id]));
     }
 
     public function testUrlConContextoNoRecorreElSitio(): void
