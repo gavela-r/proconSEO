@@ -58,8 +58,9 @@ final class AgrupadorCausasTest extends TestCase
     {
         $grupos = self::grupos(Ejecucion::de('cumple'));
 
-        // Solo queda el límite del alcance (URL individual), que no es una incidencia de la web.
-        self::assertSame([Causas::ALCANCE_INSUFICIENTE], array_keys($grupos));
+        // Solo quedan límites del análisis, que no son incidencias de la web: el alcance (URL
+        // individual) y que el ejemplo no trae datos de PageSpeed.
+        self::assertEqualsCanonicalizing([Causas::ALCANCE_INSUFICIENTE, Causas::PAGESPEED_SIN_DATOS], array_keys($grupos));
     }
 
     public function testSiNoSePuedeRecuperarLaPaginaTodoLoQueDependeDeEllaVaJunto(): void

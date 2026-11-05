@@ -288,7 +288,7 @@ final class Entorno
     }
 
     /** Guarda una evidencia mínima y devuelve su código (E-001…). */
-    public function evidencia(TipoEvidencia $tipo, string $contenido, ?string $url = null): string
+    public function evidencia(TipoEvidencia $tipo, string $contenido, ?string $url = null, ?DateTimeImmutable $capturadoEn = null): string
     {
         $codigo = sprintf('E-%03d', count($this->evidencias) + 1);
         $this->evidencias[] = new BorradorEvidencia(
@@ -296,7 +296,7 @@ final class Entorno
             tipo: $tipo,
             contenido: $contenido,
             urlRecurso: $url ?? $this->url(),
-            capturadoEn: $this->pagina()->descargadoEn ?? new DateTimeImmutable(),
+            capturadoEn: $capturadoEn ?? $this->pagina()->descargadoEn ?? new DateTimeImmutable(),
         );
         return $codigo;
     }
