@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace ProconSEO\Engine;
 
 use ProconSEO\Engine\Catalogo\CatalogoJson;
+use ProconSEO\Engine\Comprobaciones\AccesibilidadAria;
+use ProconSEO\Engine\Comprobaciones\AccesibilidadEstructura;
+use ProconSEO\Engine\Comprobaciones\AccesibilidadFormularios;
+use ProconSEO\Engine\Comprobaciones\AccesibilidadImagenes;
 use ProconSEO\Engine\Comprobaciones\Acciones;
 use ProconSEO\Engine\Comprobaciones\CanonicalSitemap;
 use ProconSEO\Engine\Comprobaciones\DatosEstructurados;
@@ -86,6 +90,10 @@ final class Motor implements MotorAnalisis
             new CanonicalSitemap(),
             new Idiomas(),
             new Acciones(),
+            new AccesibilidadImagenes(),
+            new AccesibilidadEstructura(),
+            new AccesibilidadFormularios(),
+            new AccesibilidadAria(),
         ]);
     }
 
