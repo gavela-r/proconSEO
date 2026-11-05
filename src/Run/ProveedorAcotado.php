@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ProconSEO\Run;
 
 use ProconSEO\Engine\Extraccion\Robots\ReglasRobots;
+use ProconSEO\Fetch\ClienteHttpSeguro;
 use ProconSEO\Shared\Contract\ProveedorRecursos;
 use ProconSEO\Shared\Contract\RecursoDescargado;
 use ProconSEO\Shared\Enum\ResultadoDescarga;
@@ -47,6 +48,10 @@ final class ProveedorAcotado implements ProveedorRecursos
         private readonly ?int $maxNuevasPorPagina = null,
         private readonly string $alcance = '',
     ) {
+        if ($proveedor instanceof ClienteHttpSeguro) {
+            // Las redirecciones que acaban en algo ya descargado no lo vuelven a pedir.
+            $proveedor->usarMemoria($this->enMemoria(...));
+        }
     }
 
     public function obtener(string $url, string $motivo, ?string $idComprobacion = null): RecursoDescargado
@@ -65,13 +70,27 @@ final class ProveedorAcotado implements ProveedorRecursos
         $this->totalNuevas++;
 
         $recurso = $this->proveedor->obtener($url, $motivo, $idComprobacion);
+        $this->guardar($url, $recurso);
+
+        return $recurso;
+    }
+
+    private function guardar(string $url, RecursoDescargado $recurso): void
+    {
         if (self::esHtml($recurso)) {
             $this->recordarHtml($url, $recurso);
         } else {
             $this->permanentes[$url] = $recurso;
         }
 
-        return $recurso;
+        // Si llegó tras redirigir, la URL final ya está descargada: se recuerda también como si
+        // se hubiera pedido directamente (sin las redirecciones, que no son suyas).
+        $final = $recurso->urlFinal;
+        if ($final !== $url && $recurso->redirecciones !== [] && $recurso->esCorrecto() && $this->enMemoria($final) === null) {
+            $this->guardar($final, new RecursoDescargado($final, $final, $recurso->resultado, $recurso->estadoHttp, [],
+                $recurso->cabeceras, $recurso->tipoContenido, $recurso->cuerpo, $recurso->truncado, $recurso->bytes,
+                $recurso->tlsVerificado, $recurso->motivo, $recurso->descargadoEn));
+        }
     }
 
     /**
@@ -96,6 +115,34 @@ final class ProveedorAcotado implements ProveedorRecursos
     {
         $this->nuevas = 0;
         $this->recordarHtml($pagina->urlSolicitada, $pagina);
+    }
+
+    /**
+     * Descarga a la vez lo que las comprobaciones van a pedir enseguida (los enlaces internos y
+     * las variantes de la página), para que luego lo encuentren en memoria. Solo es una forma de
+     * ir más rápido: pasa por el mismo cliente seguro, no pide lo que robots.txt prohíbe ni lo ya
+     * descargado, y no cuenta en el tope porque son URLs que el motor iba a pedir igualmente.
+     *
+     * @param list<array{0: string, 1: string, 2: ?string}> $peticiones URL, motivo y comprobación
+     */
+    public function adelantar(array $peticiones): void
+    {
+        if (!$this->proveedor instanceof ClienteHttpSeguro) {
+            return;
+        }
+        $faltan = [];
+        foreach ($peticiones as $p) {
+            if (!isset($faltan[$p[0]]) && $this->enMemoria($p[0]) === null && !$this->prohibidaPorRobots($p[0])) {
+                $faltan[$p[0]] = $p;
+            }
+        }
+        if ($faltan === []) {
+            return;
+        }
+        $faltan = array_values($faltan);
+        foreach ($this->proveedor->obtenerVarias($faltan) as $i => $recurso) {
+            $this->guardar($faltan[$i][0], $recurso);
+        }
     }
 
     /** Lo ya descargado para esa URL, sin pedir nada ni contar en el tope. */
