@@ -28,6 +28,8 @@ final class BorradorResultado
      * @param string       $idCriterio      Criterio padre, p. ej. "SEO-03"
      * @param list<string> $codigosEvidencia Códigos de BorradorEvidencia que lo sustentan
      * @param string|null  $wcagVersion     "2.1" si el criterio está en WCAG 2.1, "2.2" si es nuevo en 2.2
+     * @param string|null  $normativa       Norma de la que sale si no es un criterio WCAG (p. ej. «Real Decreto 1112/2018»).
+     *                                     Un resultado de accesibilidad implementado lleva WCAG o normativa.
      */
     public function __construct(
         public readonly string $idComprobacion,
@@ -59,6 +61,7 @@ final class BorradorResultado
         public readonly bool $bloqueaDependientes = false,
         public readonly ?string $fuente = null,
         public readonly array $codigosEvidencia = [],
+        public readonly ?string $normativa = null,
     ) {
         $this->validar();
     }
@@ -82,8 +85,8 @@ final class BorradorResultado
             throw new InvalidArgumentException("{$this->idComprobacion}: la revisión humana necesita un motivo.");
         }
 
-        if ($this->bloque === Bloque::Acc && $this->cobertura !== Cobertura::NoImplementada && $this->wcagCriterio === null) {
-            throw new InvalidArgumentException("{$this->idComprobacion}: los resultados de accesibilidad indican el criterio WCAG.");
+        if ($this->bloque === Bloque::Acc && $this->cobertura !== Cobertura::NoImplementada && $this->wcagCriterio === null && $this->normativa === null) {
+            throw new InvalidArgumentException("{$this->idComprobacion}: los resultados de accesibilidad indican el criterio WCAG o la normativa de la que salen.");
         }
 
         if ($this->wcagVersion !== null && !in_array($this->wcagVersion, ['2.1', '2.2'], true)) {

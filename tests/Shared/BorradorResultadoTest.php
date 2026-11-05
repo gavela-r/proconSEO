@@ -93,4 +93,38 @@ final class BorradorResultadoTest extends TestCase
         self::assertTrue($e->truncado);
         self::assertSame(BorradorEvidencia::MAXIMO_CARACTERES, mb_strlen($e->contenido));
     }
+
+    public function testAccesibilidadSinWcagNiNormativaNoEsValida(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->crear(['idComprobacion' => 'ACC-03.x', 'idCriterio' => 'ACC-03', 'bloque' => Bloque::Acc, 'estado' => EstadoResultado::Correcto]);
+    }
+
+    public function testAccesibilidadConWcagEsValida(): void
+    {
+        $r = $this->crear(['idComprobacion' => 'ACC-01.x', 'idCriterio' => 'ACC-01', 'bloque' => Bloque::Acc, 'estado' => EstadoResultado::Correcto, 'wcagCriterio' => '1.1.1']);
+
+        self::assertNull($r->normativa);
+    }
+
+    public function testAccesibilidadQueSaleDeUnaLeyIndicaLaNormativa(): void
+    {
+        $r = $this->crear([
+            'idComprobacion' => 'ACC-03.declaracion-accesibilidad', 'idCriterio' => 'ACC-03', 'bloque' => Bloque::Acc,
+            'estado' => EstadoResultado::DecisionRevisar, 'normativa' => 'Real Decreto 1112/2018',
+        ]);
+
+        self::assertSame('Real Decreto 1112/2018', $r->normativa);
+        self::assertNull($r->wcagCriterio);
+    }
+
+    public function testLoNoImplementadoDeAccesibilidadNoNecesitaWcag(): void
+    {
+        $r = $this->crear([
+            'idComprobacion' => 'ACC-03.x', 'idCriterio' => 'ACC-03', 'bloque' => Bloque::Acc,
+            'estado' => EstadoResultado::NoVerificable, 'ejecucion' => Ejecucion::NoEjecutada, 'cobertura' => Cobertura::NoImplementada,
+        ]);
+
+        self::assertNull($r->wcagCriterio);
+    }
 }
