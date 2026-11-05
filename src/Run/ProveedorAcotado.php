@@ -19,15 +19,21 @@ use ProconSEO\Shared\Enum\ResultadoDescarga;
  * - no pide nada que el robots.txt del sitio prohíba a nuestro user-agent: se devuelve
  *   «fuera de ámbito» con el motivo, sin conectarse.
  *
- * En el sitio completo, al pasar a otra página se olvidan las páginas HTML de la anterior
- * (no cabría todo el sitio en memoria); robots.txt, sitemaps y demás se conservan.
+ * En el sitio completo las páginas HTML también se recuerdan: el menú de cada página enlaza a
+ * las mismas, y sin memoria se volverían a pedir en todas. Para no llenar la memoria, se guardan
+ * como mucho MAX_BYTES_HTML; pasado eso se olvidan las más antiguas. robots.txt, sitemaps y
+ * demás se conservan siempre.
  */
 final class ProveedorAcotado implements ProveedorRecursos
 {
     /** @var array<string, RecursoDescargado> Se conservan todo el análisis */
     private array $permanentes = [];
-    /** @var array<string, RecursoDescargado> Páginas HTML de la página que se está analizando */
-    private array $temporales = [];
+    /** Lo más que ocupan las páginas HTML recordadas (64 MB). */
+    public const MAX_BYTES_HTML = 64 * 1024 * 1024;
+
+    /** @var array<string, RecursoDescargado> Páginas HTML recordadas, de la más antigua a la más reciente */
+    private array $html = [];
+    private int $bytesHtml = 0;
     private int $nuevas = 0;
     private int $totalNuevas = 0;
     /** @var array<string, array{recurso: RecursoDescargado, motivo: string, comprobacion: ?string}> */
@@ -45,7 +51,7 @@ final class ProveedorAcotado implements ProveedorRecursos
 
     public function obtener(string $url, string $motivo, ?string $idComprobacion = null): RecursoDescargado
     {
-        $guardado = $this->permanentes[$url] ?? $this->temporales[$url] ?? null;
+        $guardado = $this->enMemoria($url);
         if ($guardado !== null) {
             return $guardado;
         }
@@ -60,7 +66,7 @@ final class ProveedorAcotado implements ProveedorRecursos
 
         $recurso = $this->proveedor->obtener($url, $motivo, $idComprobacion);
         if (self::esHtml($recurso)) {
-            $this->temporales[$url] = $recurso;
+            $this->recordarHtml($url, $recurso);
         } else {
             $this->permanentes[$url] = $recurso;
         }
@@ -85,11 +91,32 @@ final class ProveedorAcotado implements ProveedorRecursos
         $this->permanentes[$recurso->urlSolicitada] ??= $recurso;
     }
 
-    /** Empieza otra página del sitio: tope a cero y fuera las páginas HTML de la anterior. */
+    /** Empieza otra página del sitio: el tope de URLs extra vuelve a cero. */
     public function nuevaPagina(RecursoDescargado $pagina): void
     {
         $this->nuevas = 0;
-        $this->temporales = [$pagina->urlSolicitada => $pagina];
+        $this->recordarHtml($pagina->urlSolicitada, $pagina);
+    }
+
+    /** Lo ya descargado para esa URL, sin pedir nada ni contar en el tope. */
+    public function enMemoria(string $url): ?RecursoDescargado
+    {
+        return $this->permanentes[$url] ?? $this->html[$url] ?? null;
+    }
+
+    private function recordarHtml(string $url, RecursoDescargado $recurso): void
+    {
+        if (isset($this->html[$url])) {
+            $this->bytesHtml -= strlen($this->html[$url]->cuerpo);
+            unset($this->html[$url]);
+        }
+        $this->html[$url] = $recurso;
+        $this->bytesHtml += strlen($recurso->cuerpo);
+        while ($this->bytesHtml > self::MAX_BYTES_HTML && count($this->html) > 1) {
+            $antigua = array_key_first($this->html);
+            $this->bytesHtml -= strlen($this->html[$antigua]->cuerpo);
+            unset($this->html[$antigua]);
+        }
     }
 
     /**

@@ -16,6 +16,7 @@ use ProconSEO\Shared\Contract\ConsolidadorSitio;
 use ProconSEO\Shared\Contract\ContextoAnalisis;
 use ProconSEO\Shared\Contract\InformePageSpeed;
 use ProconSEO\Shared\Contract\MotorAnalisis;
+use ProconSEO\Shared\Contract\ProveedorRecursos;
 use ProconSEO\Shared\Contract\RecursoDescargado;
 use ProconSEO\Shared\Contract\SalidaMotor;
 use ProconSEO\Shared\Contract\SenalSeguridad;
@@ -343,7 +344,18 @@ final class Orquestador
             return [[], false, 'no se pudo leer robots.txt y no se recorrió el sitio.'];
         }
 
-        $rastreador = new Rastreador($cliente, $proveedor, $ambito->hosts(), $limitesRastreo, $reglas, self::AGENTE,
+        // Lo que ya descargaron las comprobaciones (por ejemplo, al revisar los enlaces del menú) no se vuelve a pedir.
+        $paginas = new class ($proveedor, $cliente) implements ProveedorRecursos {
+            public function __construct(private readonly ProveedorAcotado $memoria, private readonly ProveedorRecursos $cliente)
+            {
+            }
+
+            public function obtener(string $url, string $motivo, ?string $idComprobacion = null): RecursoDescargado
+            {
+                return $this->memoria->enMemoria($url) ?? $this->cliente->obtener($url, $motivo, $idComprobacion);
+            }
+        };
+        $rastreador = new Rastreador($paginas, $proveedor, $ambito->hosts(), $limitesRastreo, $reglas, self::AGENTE,
             $limites->maxBytesHtml, $limites->maxBytesSitemap);
         $progresoPagina = new ProgresoPorPagina($progreso, $limitesRastreo->maxPaginas);
         $progresoPagina->siguiente(); // la primera página ya está analizada
