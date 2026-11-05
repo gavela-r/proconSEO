@@ -37,6 +37,7 @@ use ProconSEO\Shared\Contract\ResumenPagina;
 use ProconSEO\Shared\Contract\SalidaMotor;
 use ProconSEO\Shared\Contract\SenalSeguridad;
 use ProconSEO\Shared\Contract\TokenCancelacion;
+use ProconSEO\Shared\Enum\Alcance;
 use ProconSEO\Shared\Enum\Cobertura;
 use ProconSEO\Shared\Enum\DecisionCierre;
 use ProconSEO\Shared\Enum\Fase;
@@ -177,7 +178,10 @@ final class Motor implements MotorAnalisis, ConsolidadorSitio
         $progreso->fase(Fase::Comprobaciones, $total, $total);
 
         $progreso->fase(Fase::Consolidacion, 0, 1, 'Agrupando resultados por causa');
-        [$resultados, $grupos] = (new AgrupadorCausas())->agrupar($resultados, $entorno->paginaDisponible());
+        // En el sitio completo, una causa que sale una vez en esta página puede repetirse en otras:
+        // se conserva para que la Parte 1 la junte con las demás en un solo grupo (RF-24).
+        $minimo = $contexto->alcance === Alcance::SitioCompleto ? 1 : AgrupadorCausas::MINIMO;
+        [$resultados, $grupos] = (new AgrupadorCausas())->agrupar($resultados, $entorno->paginaDisponible(), $minimo);
         $senales = $this->senales($entorno);
         $progreso->fase(Fase::Consolidacion, 1, 1);
 
