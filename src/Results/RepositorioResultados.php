@@ -111,7 +111,8 @@ final class RepositorioResultados
         }
 
         $evidencias = $this->bd->prepare(
-            'SELECT e.revision_id, e.codigo, e.tipo, e.contenido, e.tipo_mime, e.capturado_en
+            'SELECT e.id, e.revision_id, e.codigo, e.tipo, e.contenido, e.tipo_mime, e.capturado_en,
+                    e.ruta_fichero IS NOT NULL AS tiene_fichero
              FROM evidencias e JOIN revisiones v ON v.id = e.revision_id
              WHERE v.resultado_id = ? ORDER BY e.codigo'
         );

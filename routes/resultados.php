@@ -92,6 +92,7 @@ return static function (Router $r): void {
             'analisis' => $repositorio->analisis((int) $resultado['analisis_id']),
             'evidencias' => $repositorio->evidencias((int) $resultado['id']),
             'revisiones' => $repositorio->revisiones((int) $resultado['id']),
+            'revisado' => $p->entrada('revisado') === '1',
         ]));
     });
 };

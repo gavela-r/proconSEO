@@ -38,6 +38,9 @@ $esfuerzo = Esfuerzo::tryFrom((string) $r['esfuerzo']);
     <?php if ($r['revision_pendiente'] && $r['motivo_revision'] !== null): ?>
         <p><strong>Qué hay que revisar:</strong> <?= e($r['motivo_revision']) ?></p>
     <?php endif; ?>
+    <?php if ($r['revision_pendiente']): ?>
+        <p><a class="boton boton--pequeno" href="/resultados/<?= e($r['id']) ?>/revisar">Revisar ahora<span class="solo-lectores">: <?= e($r['titulo']) ?></span></a></p>
+    <?php endif; ?>
     <div class="resultado__meta">
         <?php if ($r['titulo'] !== $r['id_comprobacion']): ?>
             <span class="codigo"><?= e($r['id_comprobacion']) ?></span>
