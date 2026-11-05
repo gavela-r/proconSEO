@@ -23,6 +23,7 @@ use ProconSEO\Engine\Comprobaciones\Redirecciones;
 use ProconSEO\Engine\Comprobaciones\RespuestaUtilizable;
 use ProconSEO\Shared\Contract\BorradorResultado;
 use ProconSEO\Shared\Contract\ContextoAnalisis;
+use ProconSEO\Shared\Contract\FichaComprobacion;
 use ProconSEO\Shared\Contract\InformadorProgreso;
 use ProconSEO\Shared\Contract\MotorAnalisis;
 use ProconSEO\Shared\Contract\ProveedorRecursos;
@@ -46,7 +47,8 @@ use Throwable;
  */
 final class Motor implements MotorAnalisis
 {
-    private const MOTIVOS = [
+    /** Por qué una subcomprobación no está implementada, según motivo_no_mvp del catálogo. */
+    public const MOTIVOS = [
         'navegador' => 'Requiere un navegador aislado, previsto para una fase futura.',
         'ia' => 'Requiere IA semántica, prevista para una fase futura.',
         'humano' => 'Requiere revisión humana; esta versión no la automatiza.',
@@ -97,6 +99,11 @@ final class Motor implements MotorAnalisis
         ]);
     }
 
+    public static function motivoNoImplementada(FichaComprobacion $ficha): string
+    {
+        return self::MOTIVOS[$ficha->extra['motivo_no_mvp'] ?? ''] ?? 'Esta comprobación todavía no está implementada.';
+    }
+
     public function catalogo(): CatalogoJson
     {
         return $this->catalogo;
@@ -128,7 +135,7 @@ final class Motor implements MotorAnalisis
             $comprobacion = $this->porId[$ficha->id] ?? null;
 
             if ($comprobacion === null) {
-                $motivo = self::MOTIVOS[$ficha->extra['motivo_no_mvp'] ?? ''] ?? 'Esta comprobación todavía no está implementada.';
+                $motivo = self::motivoNoImplementada($ficha);
                 $resultados[] = BorradorResultado::noImplementada($ficha->id, $ficha->idCriterio, $ficha->bloque, $motivo, $this->catalogo->version());
                 continue;
             }

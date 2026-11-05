@@ -1,0 +1,80 @@
+/* Página «Catálogo y cobertura» (Parte 2). Usa las variables de base.css. */
+
+.catalogo__version { color: var(--texto-suave); }
+
+.catalogo__resumen td,
+.catalogo__resumen thead th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+.catalogo__resumen tbody th,
+.catalogo__resumen tfoot th { text-align: left; }
+.catalogo__resumen tfoot { font-weight: 600; }
+.catalogo__resumen caption { text-align: left; color: var(--texto-suave); padding-bottom: .5rem; }
+
+.catalogo__filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espacio);
+    align-items: flex-end;
+    padding: var(--espacio);
+    background: var(--superficie);
+    border-radius: var(--radio);
+}
+.catalogo__filtros > div { display: flex; flex-direction: column; min-width: 12rem; }
+.catalogo__botones { flex-direction: row !important; gap: .5rem; min-width: 0 !important; }
+
+.criterio { margin-top: 2.5rem; scroll-margin-top: 1rem; }
+.criterio h3 { display: flex; flex-wrap: wrap; gap: .5rem; align-items: baseline; }
+.criterio__id { font-family: ui-monospace, monospace; }
+.criterio__bloque {
+    font-size: .8rem;
+    font-weight: 400;
+    padding: .1rem .5rem;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    color: var(--texto-suave);
+}
+.criterio__datos { display: flex; flex-wrap: wrap; gap: .25rem 2rem; margin: .5rem 0 1rem; }
+.criterio__datos dt { font-weight: 600; font-size: .85rem; color: var(--texto-suave); }
+.criterio__datos dd { margin: 0; }
+
+.catalogo__tabla th[scope="row"] { font-weight: 400; min-width: 12rem; }
+.catalogo__tabla code { font-weight: 600; }
+.catalogo__tabla tr { scroll-margin-top: 1rem; }
+.catalogo__tabla tr:target { outline: 3px solid var(--foco); }
+.catalogo__detalles { margin: 0; padding-left: 1rem; font-size: .9rem; }
+
+/* La cobertura siempre lleva su texto: el color solo acompaña (WCAG 1.4.1). */
+.cobertura {
+    display: inline-block;
+    padding: .1rem .5rem;
+    border: 1px solid currentColor;
+    border-radius: var(--radio);
+    font-size: .85rem;
+    white-space: nowrap;
+}
+.cobertura--implementada { color: var(--estado-correcto); }
+.cobertura--parcialmente_implementada { color: var(--estado-mejorable); }
+.cobertura--no_implementada { color: var(--estado-no-verificable); border-style: dashed; }
+
+.visualmente-oculto {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0);
+    white-space: nowrap; border: 0;
+}
+
+/* En pantallas estrechas, cada subcomprobación es una ficha en vez de una fila. */
+@media (max-width: 40rem) {
+    .catalogo__tabla thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .catalogo__tabla, .catalogo__tabla tbody, .catalogo__tabla tr, .catalogo__tabla th, .catalogo__tabla td { display: block; width: 100%; }
+    .catalogo__tabla tr { border-top: 1px solid var(--borde); padding: .75rem 0; }
+    .catalogo__tabla th, .catalogo__tabla td { border: 0; padding: .25rem 0; min-width: 0 !important; }
+    .catalogo__tabla td::before {
+        content: attr(data-etiqueta);
+        display: block;
+        font-size: .8rem;
+        font-weight: 600;
+        color: var(--texto-suave);
+    }
+    .catalogo__tabla code { overflow-wrap: anywhere; }
+}
