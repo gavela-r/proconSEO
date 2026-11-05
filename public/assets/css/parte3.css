@@ -174,3 +174,7 @@ details.plegable[open] > summary { margin-bottom: .5rem; }
 
 /* Separación del aviso de datos de prueba */
 .aviso--prueba { margin: 0 0 1rem; }
+
+/* Paneles apilados en la columna lateral del detalle */
+.panel--separado { margin-top: 1rem; }
+.historial p { margin: .35rem 0; }
