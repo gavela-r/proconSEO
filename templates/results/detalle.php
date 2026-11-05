@@ -62,6 +62,9 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
         <span class="chip">Revisión humana pendiente</span>
     <?php endif; ?>
 </div>
+<?php if ($revisado ?? false): ?>
+    <p class="aviso aviso--info" role="status"><strong>Revisión guardada.</strong> El resultado original se conserva y la revisión aparece en el historial.</p>
+<?php endif; ?>
 <h1><?= e($titulo) ?></h1>
 <p class="explicacion"><?= e($r['explicacion_sencilla']) ?></p>
 
@@ -159,14 +162,20 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
                             <p><strong>Justificación:</strong> <?= e($v['justificacion']) ?></p>
                             <?php foreach ($v['evidencias'] as $ev): ?>
                                 <div class="evidencia">
-                                    <div class="evidencia__cabecera"><strong><?= e($ev['codigo']) ?></strong><span>Evidencia añadida por el revisor</span></div>
+                                    <div class="evidencia__cabecera"><strong><?= e($ev['codigo']) ?></strong><span><?= ($ev['tiene_fichero'] ?? false) ? 'Captura añadida por el revisor' : 'Evidencia añadida por el revisor' ?></span></div>
                                     <?php if ($ev['contenido'] !== null): ?><pre><code><?= e($ev['contenido']) ?></code></pre><?php endif; ?>
+                                    <?php if ($ev['tiene_fichero'] ?? false): ?>
+                                        <a href="/evidencias/<?= e($ev['id']) ?>/captura" class="captura">
+                                            <img src="/evidencias/<?= e($ev['id']) ?>/captura" alt="Captura <?= e($ev['codigo']) ?> añadida por <?= e($v['revisor']) ?>" loading="lazy">
+                                        </a>
+                                    <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>
                         </li>
                     <?php endforeach; ?>
                 </ol>
             <?php endif; ?>
+            <p><a class="boton" href="/resultados/<?= e($r['id']) ?>/revisar">Revisar este resultado</a></p>
             <p class="ayuda">El resultado original nunca se modifica: cada revisión se guarda aparte, con su autor y su justificación.</p>
         </section>
 

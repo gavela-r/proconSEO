@@ -178,3 +178,7 @@ details.plegable[open] > summary { margin-bottom: .5rem; }
 /* Paneles apilados en la columna lateral del detalle */
 .panel--separado { margin-top: 1rem; }
 .historial p { margin: .35rem 0; }
+
+/* Capturas añadidas por los revisores */
+.captura { display: inline-block; margin-top: .5rem; }
+.captura img { display: block; max-width: 100%; height: auto; max-height: 20rem; border: 1px solid var(--borde); border-radius: var(--radio); }
