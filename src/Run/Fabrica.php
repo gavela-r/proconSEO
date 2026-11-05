@@ -10,6 +10,7 @@ use ProconSEO\Fetch\Ambito;
 use ProconSEO\Fetch\ClienteHttpSeguro;
 use ProconSEO\Fetch\Http\TransporteCurl;
 use ProconSEO\Fetch\LimitesDescarga;
+use ProconSEO\Fetch\PageSpeed\ClientePageSpeed;
 use ProconSEO\Fetch\ResolvedorDnsSistema;
 use ProconSEO\Fetch\ValidadorDestino;
 use ProconSEO\Fetch\ValidadorUrl;
@@ -94,6 +95,16 @@ final class Fabrica
                 $ambito,
                 $limites,
             ),
+            $this->pageSpeed(),
         );
+    }
+
+    /** Cliente de Google PageSpeed Insights; sin PAGESPEED_API_KEY no llama y lo dice en cada informe. */
+    public function pageSpeed(): ClientePageSpeed
+    {
+        $perfil = $this->repositorio()->perfilVigente();
+        $limites = $perfil === null ? new LimitesDescarga() : LimitesDescarga::desdePerfil($perfil['parametros']);
+
+        return new ClientePageSpeed(new TransporteCurl(), $this->validador(), Config::obtener('PAGESPEED_API_KEY'), $limites->userAgent);
     }
 }

@@ -12,6 +12,7 @@ use ProconSEO\Fetch\Ambito;
 use ProconSEO\Fetch\ClienteHttpSeguro;
 use ProconSEO\Fetch\Http\RespuestaHttp;
 use ProconSEO\Fetch\LimitesDescarga;
+use ProconSEO\Fetch\PageSpeed\ClientePageSpeed;
 use ProconSEO\Fetch\ValidadorDestino;
 use ProconSEO\Fetch\ValidadorUrl;
 use ProconSEO\Run\GuardadoResultados;
@@ -25,6 +26,7 @@ use ProconSEO\Shared\BaseDatos;
 use ProconSEO\Shared\Config;
 use ProconSEO\Shared\Contract\ContextoAnalisis;
 use ProconSEO\Shared\Contract\InformadorProgreso;
+use ProconSEO\Shared\Contract\InformePageSpeed;
 use ProconSEO\Shared\Contract\MotorAnalisis;
 use ProconSEO\Shared\Contract\ProveedorRecursos;
 use ProconSEO\Shared\Contract\SalidaMotor;
@@ -83,7 +85,7 @@ final class OrquestadorTest extends TestCase
         return new LanzadorAnalisis(new RepositorioAnalisis($this->bd), $this->validador(), CatalogoJson::v1(), new Interruptor($this->bd, $auditoria), $auditoria);
     }
 
-    private function orquestador(?MotorAnalisis $motor = null): Orquestador
+    private function orquestador(?MotorAnalisis $motor = null, ?ClientePageSpeed $pageSpeed = null): Orquestador
     {
         $reloj = new RelojFalso();
 
@@ -93,6 +95,7 @@ final class OrquestadorTest extends TestCase
             $motor ?? new MotorProvisional(CatalogoJson::v1()),
             $this->validador(),
             fn (Ambito $a, LimitesDescarga $l): ClienteHttpSeguro => new ClienteHttpSeguro($this->transporte, $this->validador(), $a, $l, $reloj),
+            $pageSpeed,
         );
     }
 
@@ -171,6 +174,51 @@ final class OrquestadorTest extends TestCase
         // Una comprobación puede consultar el enlace (p. ej., para ver si está roto), pero no se analiza como página.
         self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND url_recurso = 'https://ejemplo.es/otra'", [$id]), 'Los enlaces no se analizan como páginas');
         self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url = 'https://ejemplo.es/otra' AND justificado_por IS NULL", [$id]), 'Solo lo pide una comprobación, nunca el rastreo');
+    }
+
+    public function testLaPaginaAnalizadaLlevaSusInformesDePageSpeed(): void
+    {
+        $this->transporte->porUrl = [
+            'https://ejemplo.es/robots.txt' => new RespuestaHttp(200, [], ''),
+            'https://ejemplo.es/' => new RespuestaHttp(200, ['content-type' => 'text/html'], '<html></html>'),
+        ];
+        $google = new TransporteFalso();
+        $google->responder(new RespuestaHttp(200, [], (string) json_encode(['lighthouseResult' => ['audits' => ['largest-contentful-paint' => ['numericValue' => 2000]]]])));
+        $google->responder(new RespuestaHttp(429, [], '{}'));
+        $this->dns->tabla['www.googleapis.com'] = ['142.250.184.10'];
+        $pageSpeed = new ClientePageSpeed($google, $this->validador(), 'clave-de-prueba', 'proconSEO/1.0');
+
+        // Motor que solo guarda el contexto que recibe.
+        $motor = new class () implements MotorAnalisis {
+            public ?ContextoAnalisis $contexto = null;
+
+            public function ejecutar(ContextoAnalisis $c, ProveedorRecursos $p, InformadorProgreso $i, TokenCancelacion $t): SalidaMotor
+            {
+                $this->contexto = $c;
+
+                return new SalidaMotor();
+            }
+        };
+
+        $this->orquestador($motor, $pageSpeed)->ejecutar($this->lanzar());
+
+        self::assertCount(2, $google->peticiones, 'Móvil y ordenador');
+        self::assertSame(2000.0, $motor->contexto?->pageSpeed(InformePageSpeed::MOVIL)?->laboratorio['lcp_ms']);
+        self::assertStringContainsString('cuota', (string) $motor->contexto?->pageSpeed(InformePageSpeed::ORDENADOR)?->error);
+    }
+
+    public function testSiLaPaginaNoSeDescargaNoSeLlamaAPageSpeed(): void
+    {
+        $this->transporte->porUrl = [
+            'https://ejemplo.es/robots.txt' => new RespuestaHttp(200, [], ''),
+            'https://ejemplo.es/' => new RespuestaHttp(404),
+        ];
+        $google = new TransporteFalso();
+        $this->dns->tabla['www.googleapis.com'] = ['142.250.184.10'];
+
+        $this->orquestador(null, new ClientePageSpeed($google, $this->validador(), 'clave', 'proconSEO/1.0'))->ejecutar($this->lanzar());
+
+        self::assertCount(0, $google->peticiones);
     }
 
     public function testPaginaQueNoRespondeDaAnalisisParcial(): void
