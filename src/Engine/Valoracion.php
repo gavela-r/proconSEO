@@ -227,6 +227,7 @@ final class Valoracion
             codigoGrupoCausa: $this->causa,
             fuente: $this->fuente,
             codigosEvidencia: array_values(array_unique($this->evidencias)),
+            normativa: isset($this->ficha->extra['normativa']) ? (string) $this->ficha->extra['normativa'] : null,
         );
     }
 

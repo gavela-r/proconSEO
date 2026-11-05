@@ -138,6 +138,7 @@ final class CatalogoJson implements Catalogo
                 'reutiliza' => $sub['reutiliza'],
                 'wcag' => array_map(static fn (string $c): array => $wcag[$c], $sub['wcag']),
                 'gravedad_si_problema' => $sub['gravedad_si_problema'] ?? null,
+                'normativa' => $sub['normativa'] ?? null,
             ],
         );
     }
