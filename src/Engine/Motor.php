@@ -5,7 +5,18 @@ declare(strict_types=1);
 namespace ProconSEO\Engine;
 
 use ProconSEO\Engine\Catalogo\CatalogoJson;
+use ProconSEO\Engine\Comprobaciones\AccesibilidadAria;
+use ProconSEO\Engine\Comprobaciones\AccesibilidadEstructura;
+use ProconSEO\Engine\Comprobaciones\AccesibilidadFormularios;
+use ProconSEO\Engine\Comprobaciones\AccesibilidadImagenes;
+use ProconSEO\Engine\Comprobaciones\Acciones;
+use ProconSEO\Engine\Comprobaciones\CanonicalSitemap;
+use ProconSEO\Engine\Comprobaciones\DatosEstructurados;
 use ProconSEO\Engine\Comprobaciones\DirectivasIndexacion;
+use ProconSEO\Engine\Comprobaciones\Enlazado;
+use ProconSEO\Engine\Comprobaciones\Idiomas;
+use ProconSEO\Engine\Comprobaciones\Metadatos;
+use ProconSEO\Engine\Comprobaciones\Multimedia;
 use ProconSEO\Engine\Comprobaciones\EstadoTecnico;
 use ProconSEO\Engine\Comprobaciones\PermisoRobots;
 use ProconSEO\Engine\Comprobaciones\Redirecciones;
@@ -72,6 +83,17 @@ final class Motor implements MotorAnalisis
             new RespuestaUtilizable(),
             new EstadoTecnico(),
             new Redirecciones(),
+            new Metadatos(),
+            new Enlazado(),
+            new Multimedia(),
+            new DatosEstructurados(),
+            new CanonicalSitemap(),
+            new Idiomas(),
+            new Acciones(),
+            new AccesibilidadImagenes(),
+            new AccesibilidadEstructura(),
+            new AccesibilidadFormularios(),
+            new AccesibilidadAria(),
         ]);
     }
 

@@ -513,7 +513,7 @@ final class AnalizadorHtml
      * Nombre accesible aproximado (sin CSS ni navegador): aria-labelledby, aria-label,
      * contenido (texto y alt de imágenes), alt y title. Suficiente para detectar nombres vacíos.
      */
-    private function nombreAccesible(DOMXPath $xp, DOMElement $e): string
+    public function nombreAccesible(DOMXPath $xp, DOMElement $e): string
     {
         $ids = trim($e->getAttribute('aria-labelledby'));
         if ($ids !== '') {
