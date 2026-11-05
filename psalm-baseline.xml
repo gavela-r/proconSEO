@@ -123,8 +123,8 @@
       <code><![CDATA[match ($robots['estado']) {
             self::ROBOTS_LEIDO => $robots['reglas']?->evaluar($agente, $this->url()) ?? throw new RuntimeException('Sin reglas'),
             self::ROBOTS_SIN_RESTRICCIONES => ['permitido' => true, 'regla' => null, 'linea' => null],
-            self::ROBOTS_TEMPORAL => throw new NoVerificable('robots.txt dio un error temporal (' . self::describirDescarga($robots['recurso']) . '): mientras dure, los buscadores pueden dejar de rastrear el sitio.'),
-            default => throw new NoVerificable('No se pudo consultar robots.txt: ' . self::describirDescarga($robots['recurso']) . '.'),
+            self::ROBOTS_TEMPORAL => throw new NoVerificable('robots.txt dio un error temporal (' . self::describirDescarga($robots['recurso']) . '): mientras dure, los buscadores pueden dejar de rastrear el sitio.', Causas::ROBOTS_ERROR_TEMPORAL),
+            default => throw new NoVerificable('No se pudo consultar robots.txt: ' . self::describirDescarga($robots['recurso']) . '.', Causas::ROBOTS_NO_CONSULTABLE),
         }]]></code>
     </InvalidReturnStatement>
     <InvalidReturnType>
@@ -149,6 +149,11 @@
     <InvalidArgument>
       <code><![CDATA[$b]]></code>
     </InvalidArgument>
+  </file>
+  <file src="src/Engine/Seguridad/DetectorInstrucciones.php">
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$script->textContent]]></code>
+    </UndefinedPropertyFetch>
   </file>
   <file src="src/Fetch/ClienteHttpSeguro.php">
     <InvalidOperand>
