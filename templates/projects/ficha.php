@@ -122,7 +122,7 @@ $totalFases = count(Fase::cases());
                         <?php endif; ?>
                     </td>
                     <td data-etiqueta="Acciones">
-                        <a class="boton boton--pequeno<?= $activo ? '' : ' boton--secundario' ?>" href="/analisis/<?= e($a['id']) ?>/progreso"><?= $activo ? 'Ver progreso' : 'Ver detalles' ?></a>
+                        <a class="boton boton--pequeno<?= $activo ? '' : ' boton--secundario' ?>" href="/analisis/<?= e($a['id']) ?><?= $activo ? '/progreso' : '' ?>"><?= $activo ? 'Ver progreso' : 'Ver resultados' ?></a>
                     </td>
                 </tr>
             <?php endforeach; ?>
