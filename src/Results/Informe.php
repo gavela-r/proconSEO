@@ -32,6 +32,18 @@ final class Informe
     /** @var array<string, array{recuento: array<string, int>, total: int, no_implementadas: int, pendientes: int}> */
     public readonly array $resumen;
 
+    public readonly FiltroResultados $filtro;
+
+    /** Resultados del análisis y, de ellos, los que pasan los filtros. */
+    public readonly int $total;
+    public readonly int $mostrados;
+
+    /** @var list<string> criterios presentes en el análisis, para el filtro */
+    public readonly array $criterios;
+
+    /** @var list<string> páginas o recursos presentes en el análisis, para el filtro */
+    public readonly array $urls;
+
     /** @var list<array<string, mixed>> recursos que no se pudieron descargar */
     public readonly array $recursosBloqueados;
 
@@ -72,11 +84,18 @@ final class Informe
      * @param list<array<string, mixed>> $recursos
      * @param list<array<string, mixed>> $fases
      */
-    public function __construct(array $resultados, array $recursos, array $fases, ?Catalogo $catalogo = null)
+    public function __construct(array $resultados, array $recursos, array $fases, ?Catalogo $catalogo = null, ?FiltroResultados $filtro = null)
     {
-        $resultados = array_map(static fn (array $r): array => self::conTitulo($r, $catalogo), $resultados);
+        $todos = array_map(static fn (array $r): array => self::conTitulo($r, $catalogo), $resultados);
+        $this->filtro = $filtro ?? FiltroResultados::ninguno();
+        $this->total = count($todos);
+        $this->criterios = self::valoresUnicos($todos, 'id_criterio');
+        $this->urls = self::valoresUnicos($todos, 'url_recurso');
 
-        $this->resumen = self::resumir($resultados);
+        // El resumen es la foto completa del análisis; los filtros solo afectan a las listas.
+        $this->resumen = self::resumir($todos);
+        $resultados = $this->filtro->aplicar($todos);
+        $this->mostrados = count($resultados);
         $fallidos = array_filter($recursos, static fn (array $r): bool => $r['resultado'] !== ResultadoDescarga::Correcto->value);
         $this->recursosBloqueados = array_values(array_filter($fallidos, static fn (array $r): bool => !self::noExiste($r)));
         $this->recursosNoEncontrados = array_values(array_filter($fallidos, self::noExiste(...)));
@@ -228,10 +247,39 @@ final class Informe
         return array_sum(array_map(static fn (array $e): int => count($e['resultados']), $entradas));
     }
 
+    /**
+     * Añade a cada resultado su nombre y el de su criterio, sacados del catálogo.
+     *
+     * @param list<array<string, mixed>> $resultados
+     * @return list<array<string, mixed>>
+     */
+    public static function conTitulos(array $resultados, ?Catalogo $catalogo): array
+    {
+        return array_map(static fn (array $r): array => self::conTitulo($r, $catalogo), $resultados);
+    }
+
+    /** @return list<string> */
+    private static function valoresUnicos(array $resultados, string $campo): array
+    {
+        $valores = array_values(array_unique(array_filter(array_column($resultados, $campo), static fn (mixed $v): bool => is_string($v) && $v !== '')));
+        sort($valores, SORT_NATURAL);
+
+        return $valores;
+    }
+
     /** Añade el nombre de la comprobación y del criterio desde el catálogo; si no está, se usa el identificador. */
     private static function conTitulo(array $r, ?Catalogo $catalogo): array
     {
         $ficha = $catalogo?->obtener((string) $r['id_comprobacion']);
+
+        // Si el resultado no trae la referencia WCAG (p. ej. una comprobación no implementada),
+        // se completa con la de su ficha del catálogo, que es un dato fijo de la comprobación.
+        if ($ficha !== null && ($r['wcag_criterio'] ?? null) === null && $ficha->wcagCriterio !== null) {
+            $r['wcag_criterio'] = $ficha->wcagCriterio;
+            $r['wcag_nombre'] = $ficha->wcagNombre;
+            $r['wcag_nivel'] = $ficha->wcagNivel;
+            $r['wcag_version'] = $ficha->wcagVersion;
+        }
 
         return $r + [
             'titulo' => $ficha?->nombre ?? (string) $r['id_comprobacion'],

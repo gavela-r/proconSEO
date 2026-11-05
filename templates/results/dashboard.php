@@ -6,6 +6,7 @@
  * @var array<string, mixed> $analisis
  * @var \ProconSEO\Results\Informe $informe
  * @var list<array<string, mixed>> $eventos
+ * @var bool $conKitDigital
  */
 
 use ProconSEO\Projects\Formato;
@@ -21,11 +22,14 @@ use ProconSEO\Shared\Enum\ResultadoDescarga;
 use ProconSEO\Shared\Vista;
 
 $id = (int) $analisis['id'];
+$conKitDigital ??= false;
 $estado = EstadoAnalisis::tryFrom((string) $analisis['estado']);
 $enMarcha = in_array($estado, [EstadoAnalisis::EnCola, EstadoAnalisis::EnCurso, EstadoAnalisis::Cancelando], true);
 $alcance = Alcance::tryFrom((string) $analisis['alcance']);
-$url = $analisis['url_final'] ?? $analisis['url_normalizada'] ?? $analisis['url_introducida'];
-$esPrueba = $analisis['es_dato_prueba'] || $analisis['proyecto_es_dato_prueba'];
+$filtro = $informe->filtro;
+$filtrando = $filtro->activo();
+/** Enlace al dashboard con estos filtros (y nada más). */
+$enlace = static fn (array $filtros): string => '/analisis/' . $id . ($filtros === [] ? '' : '?' . http_build_query($filtros)) . '#resultados';
 $preguntas = [
     'ia' => '¿Pueden los buscadores con IA encontrar la web y usarla como fuente?',
     'seo' => '¿Pueden Google y Bing encontrar, indexar y entender la web?',
@@ -40,31 +44,8 @@ $ordenEstados = [
 ];
 $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? "1 {$uno}" : "{$n} {$varios}";
 ?>
-<?php if ($esPrueba): ?>
-    <?= Vista::render('layout/aviso_prueba', [], false) ?>
-<?php endif; ?>
-
-<nav class="migas" aria-label="Estás en">
-    <ol>
-        <li><a href="/proyectos">Proyectos</a></li>
-        <li><a href="/proyectos/<?= e($analisis['proyecto_id']) ?>"><?= e($analisis['proyecto_nombre']) ?></a></li>
-        <li aria-current="page">Análisis del <?= e(Formato::fecha((string) $analisis['creado_en'])) ?></li>
-    </ol>
-</nav>
-
 <!-- 1. Identificación del análisis y perfil -->
-<div class="cabecera-pagina">
-    <div>
-        <h1>Resultados del análisis</h1>
-        <p><span class="codigo"><?= e($url) ?></span> · <?= e(Formato::fecha((string) $analisis['creado_en'])) ?> · <?= e($estado?->etiqueta() ?? $analisis['estado']) ?></p>
-    </div>
-</div>
-
-<?php if ($enMarcha): ?>
-    <p class="aviso aviso--info" role="status">El análisis todavía no ha terminado: estos resultados pueden cambiar. <a href="/analisis/<?= e($id) ?>/progreso">Ver el progreso</a>.</p>
-<?php elseif ($analisis['motivo_cierre'] !== null): ?>
-    <p class="aviso" role="note"><strong><?= e($estado?->etiqueta() ?? '') ?>.</strong> <?= e($analisis['motivo_cierre']) ?></p>
-<?php endif; ?>
+<?= Vista::render('results/_cabecera_analisis', ['analisis' => $analisis, 'vista' => 'todos', 'conKitDigital' => $conKitDigital], false) ?>
 
 <details class="plegable">
     <summary>Cómo se hizo este análisis</summary>
@@ -120,8 +101,15 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
                     <?php foreach ($ordenEstados as $e): ?>
                         <?php $n = $datos['recuento'][$e->value] ?? 0; ?>
                         <li>
-                            <span class="estado estado--<?= e($e->value) ?>"><?= e($e->etiqueta()) ?></span>
-                            <span class="numero<?= $n === 0 ? ' cero' : '' ?>"><?= e($n) ?></span>
+                            <?php if ($n > 0): ?>
+                                <a href="<?= e($enlace(['bloque' => $bloque, 'estado' => $e->value])) ?>">
+                                    <span class="estado estado--<?= e($e->value) ?>"><?= e($e->etiqueta()) ?></span>
+                                    <span class="numero"><?= e($n) ?><span class="solo-lectores"> · ver estos resultados</span></span>
+                                </a>
+                            <?php else: ?>
+                                <span class="estado estado--<?= e($e->value) ?>"><?= e($e->etiqueta()) ?></span>
+                                <span class="numero cero">0</span>
+                            <?php endif; ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>
@@ -134,6 +122,66 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
         <?php endforeach; ?>
     </div>
 </section>
+
+<!-- Filtros y búsqueda por texto (RF-23). Sin JavaScript: es un formulario GET normal. -->
+<form class="filtros" id="resultados" role="search" action="/analisis/<?= e($id) ?>#resultados" method="get" aria-label="Filtrar resultados">
+    <div class="filtros__texto">
+        <label for="f-q">Buscar en los resultados</label>
+        <input id="f-q" name="q" type="search" maxlength="<?= e(\ProconSEO\Results\FiltroResultados::MAX_TEXTO) ?>" placeholder="Texto, código (SEO-03) o elemento" value="<?= e($filtro->texto) ?>">
+    </div>
+    <div>
+        <label for="f-bloque">Bloque</label>
+        <select id="f-bloque" name="bloque">
+            <option value="">Todos</option>
+            <?php foreach (Bloque::cases() as $b): ?>
+                <option value="<?= e($b->value) ?>"<?= $filtro->bloque === $b ? ' selected' : '' ?>><?= e($b->etiqueta()) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div>
+        <label for="f-estado">Estado</label>
+        <select id="f-estado" name="estado">
+            <option value="">Todos</option>
+            <?php foreach ($ordenEstados as $e): ?>
+                <option value="<?= e($e->value) ?>"<?= $filtro->estado === $e ? ' selected' : '' ?>><?= e($e->etiqueta()) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div>
+        <label for="f-criterio">Criterio</label>
+        <select id="f-criterio" name="criterio">
+            <option value="">Todos</option>
+            <?php foreach ($informe->criterios as $c): ?>
+                <option value="<?= e($c) ?>"<?= $filtro->criterio === $c ? ' selected' : '' ?>><?= e($c) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <?php if (count($informe->urls) > 1): ?>
+        <div>
+            <label for="f-url">Página o recurso</label>
+            <select id="f-url" name="url">
+                <option value="">Todas</option>
+                <?php foreach ($informe->urls as $u): ?>
+                    <option value="<?= e($u) ?>"<?= $filtro->url === $u ? ' selected' : '' ?>><?= e($u) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    <?php endif; ?>
+    <label class="opcion"><input type="checkbox" name="pendiente" value="1"<?= $filtro->pendiente ? ' checked' : '' ?>><span>Solo con revisión pendiente</span></label>
+    <div class="filtros__botones">
+        <button class="boton" type="submit">Filtrar</button>
+        <?php if ($filtrando): ?>
+            <a class="boton boton--secundario" href="<?= e($enlace([])) ?>">Quitar filtros</a>
+        <?php endif; ?>
+    </div>
+</form>
+
+<?php if ($filtrando): ?>
+    <p class="aviso aviso--info" role="status">
+        Se muestran <strong><?= e($informe->mostrados) ?> de <?= e($informe->total) ?></strong> resultados con estos filtros. El resumen de arriba sigue contando todos.
+        <a href="<?= e($enlace([])) ?>">Quitar filtros</a>
+    </p>
+<?php endif; ?>
 
 <!-- 3. Bloqueos de acceso, recuperación o indexación -->
 <section class="seccion" aria-labelledby="t-bloqueos">
@@ -162,7 +210,7 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
             <?php endforeach; ?>
         </ul>
     <?php elseif ($informe->recursosBloqueados === []): ?>
-        <p class="vacio">Entre los resultados obtenidos no hay ningún bloqueo de acceso ni de indexación.</p>
+        <p class="vacio"><?= $filtrando ? 'Ningún bloqueo coincide con los filtros.' : 'Entre los resultados obtenidos no hay ningún bloqueo de acceso ni de indexación.' ?></p>
     <?php endif; ?>
 </section>
 
@@ -171,7 +219,7 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
     <h2 id="t-incidencias">2. Qué hay que corregir <span class="contador"><?= $informe->incidencias === [] ? 'nada más' : 'de lo más importante a lo menos' ?></span></h2>
     <p class="seccion__ayuda">Problemas, decisiones que hay que confirmar con el cliente y mejoras. Si una misma causa afecta a varios bloques, aparece una sola vez con todos sus efectos.</p>
     <?php if ($informe->incidencias === []): ?>
-        <p class="vacio"><?= $numeroIncidencias === 0 ? 'No hay incidencias.' : 'No hay más incidencias aparte de los bloqueos.' ?></p>
+        <p class="vacio"><?= $filtrando ? 'Ninguna incidencia coincide con los filtros.' : ($numeroIncidencias === 0 ? 'No hay incidencias.' : 'No hay más incidencias aparte de los bloqueos.') ?></p>
     <?php else: ?>
         <ul class="resultados">
             <?php foreach ($informe->incidencias as $entrada): ?>
@@ -207,7 +255,7 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
     </h2>
     <p class="seccion__ayuda">«No verificable» no significa que esté mal ni que esté bien: la herramienta no tiene pruebas suficientes y lo dice.</p>
     <?php if ($informe->noVerificables === []): ?>
-        <p class="vacio">Ningún resultado de este análisis ha quedado como no verificable.</p>
+        <p class="vacio"><?= $filtrando ? 'Ningún no verificable coincide con los filtros.' : 'Ningún resultado de este análisis ha quedado como no verificable.' ?></p>
     <?php else: ?>
         <ul class="resultados">
             <?php foreach ($informe->noVerificables as $r): ?>

@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace ProconSEO\Tests\Results;
 
 use PHPUnit\Framework\TestCase;
+use ProconSEO\Engine\Catalogo\CatalogoJson;
+use ProconSEO\Results\CompromisosKitDigital;
 use ProconSEO\Results\Etiquetas;
+use ProconSEO\Results\FiltroResultados;
 use ProconSEO\Results\Informe;
 use ProconSEO\Shared\Vista;
 
@@ -123,12 +126,72 @@ final class PlantillasResultadosTest extends TestCase
         self::assertSame('47 KB', Etiquetas::bytes(48211));
     }
 
-    private function dashboard(array $resultados, array $recursos = [], array $eventos = [], array $analisis = []): string
+    public function testFiltrosEscapadosYConservados(): void
+    {
+        $filtro = FiltroResultados::desdeConsulta(['q' => self::MALICIOSO, 'bloque' => 'seo', 'pendiente' => '1']);
+        $html = $this->dashboard([Filas::resultado(['id_criterio' => 'SEO-03'])], filtro: $filtro);
+
+        $this->assertSinHtmlInyectado($html);
+        self::assertMatchesRegularExpression('/value="seo" selected/', $html);
+        self::assertStringContainsString('name="pendiente" value="1" checked', $html);
+        self::assertStringContainsString('Se muestran <strong>0 de 1</strong>', $html);
+        self::assertStringContainsString('Quitar filtros', $html);
+        self::assertStringContainsString('Ninguna incidencia coincide con los filtros', $html);
+    }
+
+    public function testLosRecuentosDelResumenEnlazanAlFiltro(): void
+    {
+        $html = $this->dashboard([Filas::resultado(['bloque' => 'acc', 'estado' => 'problema', 'gravedad' => 'alto'])]);
+
+        self::assertStringContainsString('href="/analisis/1?bloque=acc&amp;estado=problema#resultados"', $html);
+    }
+
+    public function testPestanaKitDigitalSoloEnProyectosKitDigital(): void
+    {
+        self::assertStringContainsString('/analisis/1/kit-digital', $this->dashboard([Filas::resultado()], conKit: true));
+        self::assertStringNotContainsString('/analisis/1/kit-digital', $this->dashboard([Filas::resultado()]));
+    }
+
+    public function testVistaKitDigital(): void
+    {
+        $catalogo = CatalogoJson::v1();
+        $resultados = Informe::conTitulos([
+            Filas::resultado(['id_comprobacion' => 'SEO-01.noindex-desarrollo', 'estado' => 'problema', 'gravedad' => 'critico', 'explicacion_sencilla' => self::MALICIOSO]),
+            Filas::resultado(['id_comprobacion' => 'ACC-08.tamano-objetivo', 'bloque' => 'acc', 'estado' => 'no_verificable', 'cobertura' => 'no_implementada']),
+        ], $catalogo);
+
+        $html = Vista::render('results/kit_digital', [
+            'analisis' => Filas::analisis(['proyecto_nombre' => self::MALICIOSO]),
+            'compromisos' => CompromisosKitDigital::agrupar($resultados, $catalogo, 'web_kit_digital'),
+            'hayResultados' => true,
+        ], false);
+
+        $this->assertSinHtmlInyectado($html);
+        self::assertStringContainsString('1 compromiso con problemas críticos', $html);
+        self::assertStringContainsString('Criterios nuevos de WCAG 2.2, fuera del compromiso 2.1', $html);
+        self::assertStringContainsString('WCAG 2.5.8 · AA · nuevo en 2.2', $html);
+        self::assertStringContainsString('Solo para proyectos «Tienda Kit Digital»', $html);
+        self::assertStringContainsString('no se puede decir si se cumple', $html, 'Un compromiso sin resultados no se da por cumplido');
+        self::assertStringContainsString('aria-current="page">Compromisos Kit Digital', $html);
+        self::assertDoesNotMatchRegularExpression('/\d+\s*%|puntuaci|aprobado:/iu', strip_tags($html));
+    }
+
+    public function testVistaKitDigitalSinCatalogoNiResultados(): void
+    {
+        $sinCatalogo = Vista::render('results/kit_digital', ['analisis' => Filas::analisis(), 'compromisos' => null, 'hayResultados' => true], false);
+        $sinResultados = Vista::render('results/kit_digital', ['analisis' => Filas::analisis(), 'compromisos' => [], 'hayResultados' => false], false);
+
+        self::assertStringContainsString('No se ha podido cargar el catálogo', $sinCatalogo);
+        self::assertStringContainsString('no se puede decir si la web cumple', $sinResultados);
+    }
+
+    private function dashboard(array $resultados, array $recursos = [], array $eventos = [], array $analisis = [], ?FiltroResultados $filtro = null, bool $conKit = false): string
     {
         return Vista::render('results/dashboard', [
             'analisis' => Filas::analisis($analisis),
-            'informe' => new Informe($resultados, $recursos, []),
+            'informe' => new Informe($resultados, $recursos, [], null, $filtro),
             'eventos' => $eventos,
+            'conKitDigital' => $conKit,
         ], false);
     }
 
