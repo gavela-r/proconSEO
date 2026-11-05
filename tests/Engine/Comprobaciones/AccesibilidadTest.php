@@ -57,6 +57,12 @@ final class AccesibilidadTest extends TestCase
     {
         $r = Ejecucion::de('no-cumple')->resultado($id);
         self::assertSame(Bloque::Acc, $r->bloque);
+        if ($r->wcagCriterio === null) {
+            // Sale de una ley y no de WCAG (p. ej. la declaración de accesibilidad).
+            self::assertNotNull($r->normativa, $id);
+            self::assertNotNull($r->modo, $id);
+            return;
+        }
         self::assertMatchesRegularExpression('/^\d\.\d\.\d+$/', (string) $r->wcagCriterio, $id);
         self::assertContains($r->wcagVersion, ['2.1', '2.2'], $id);
         self::assertContains($r->wcagNivel, ['A', 'AA'], $id);
@@ -318,5 +324,54 @@ final class AccesibilidadTest extends TestCase
             }
         }
         return implode("\n", $textos);
+    }
+
+    // ------------------------------------------------- ACC-03 declaración
+
+    public function testDeclaracionDeAccesibilidadEnlazada(): void
+    {
+        $r = self::ejecutar('<main><p>Hola</p></main><footer><a href="/declaracion-accesibilidad">Declaración de accesibilidad</a></footer>')
+            ->resultado('ACC-03.declaracion-accesibilidad');
+
+        self::assertSame('correcto', $r->estado->value);
+        self::assertSame('Real Decreto 1112/2018', $r->normativa);
+        self::assertNull($r->wcagCriterio);
+        self::assertStringNotContainsString('conviene confirmar', (string) $r->limitacion);
+    }
+
+    public function testDeclaracionEnOtrosIdiomasYPorLaDireccion(): void
+    {
+        foreach ([
+            '<a href="/ca/accessibilitat">Declaració d\'accessibilitat</a>',
+            '<a href="/eu/irisgarritasuna">Irisgarritasun adierazpena</a>',
+            '<a href="/en/accessibility-statement">Accessibility statement</a>',
+            '<a href="/declaracion-de-accesibilidad/">Más información</a>',
+        ] as $enlace) {
+            self::assertSame('correcto', self::ejecutar('<footer>' . $enlace . '</footer>')->estado('ACC-03.declaracion-accesibilidad'), $enlace);
+        }
+    }
+
+    public function testUnEnlaceDeAccesibilidadQueNoEsDeclaracionSeAvisa(): void
+    {
+        $r = self::ejecutar('<nav><a href="/servicios/accesibilidad-web">Accesibilidad web</a></nav>')->resultado('ACC-03.declaracion-accesibilidad');
+
+        self::assertSame('correcto', $r->estado->value);
+        self::assertStringContainsString('conviene confirmar', (string) $r->limitacion);
+    }
+
+    public function testSinDeclaracionHayQueDecidirlo(): void
+    {
+        $r = self::ejecutar('<main><p>Hola</p><a href="#accesibilidad">Ir</a><a href="javascript:accesibilidad()">Accesibilidad</a></main>')
+            ->resultado('ACC-03.declaracion-accesibilidad');
+
+        self::assertSame('decision_revisar', $r->estado->value);
+        self::assertNull($r->gravedad);
+        self::assertSame('Real Decreto 1112/2018', $r->normativa);
+        self::assertStringContainsString('sector público', (string) $r->limitacion);
+    }
+
+    public function testDeclaracionConPaginaBloqueada(): void
+    {
+        self::assertSame('no_verificable', Ejecucion::de('bloqueada-403')->estado('ACC-03.declaracion-accesibilidad'));
     }
 }

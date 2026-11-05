@@ -38,5 +38,6 @@ Cada análisis guarda la versión del catálogo que usó (RF-61). **Un fichero d
 | `wcag` | Criterios WCAG que cubre (solo ACC y alguna de IA/SEO relacionada) |
 | `kit_digital` | Compromisos Kit Digital en los que aparece (vista RF-07) |
 | `gravedad_si_problema` | Solo cuando la especificación fija la gravedad (p. ej. `SEO-01.noindex-desarrollo` → `critico`) |
+| `normativa` | Solo cuando la subcomprobación sale de una ley y no de WCAG (p. ej. `ACC-03.declaracion-accesibilidad` → `Real Decreto 1112/2018`) |
 
 Toda subcomprobación devuelve un resultado; las no implementadas, con cobertura `no_implementada`.
