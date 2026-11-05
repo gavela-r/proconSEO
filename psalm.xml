@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+    SEG-16: análisis estático. En CI se ejecuta con taint analysis, que sigue los datos
+    que llegan de fuera (formularios, web analizada) y avisa si acaban sin limpiar en SQL o HTML.
+-->
+<psalm
+    errorLevel="4"
+    resolveFromConfigFile="true"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="false"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    errorBaseline="psalm-baseline.xml"
+>
+    <projectFiles>
+        <directory name="src"/>
+        <directory name="routes"/>
+        <directory name="templates"/>
+        <directory name="bin"/>
+        <directory name="public"/>
+        <ignoreFiles>
+            <directory name="vendor"/>
+        </ignoreFiles>
+    </projectFiles>
+    <!-- Sin esto Psalm no conoce las reglas de PDO y no detecta inyección SQL. -->
+    <enableExtensions>
+        <extension name="pdo"/>
+    </enableExtensions>
+    <issueHandlers>
+        <!-- Solo estilo: pedir #[\Override] en cada método de una interfaz. -->
+        <MissingOverrideAttribute errorLevel="suppress"/>
+        <!-- Las plantillas reciben sus variables de Vista::render; Psalm no puede verlas. -->
+        <UndefinedGlobalVariable>
+            <errorLevel type="suppress">
+                <directory name="templates"/>
+            </errorLevel>
+        </UndefinedGlobalVariable>
+    </issueHandlers>
+    <!--
+        psalm-baseline.xml: avisos que ya había en el código al activar Psalm. No bloquean,
+        pero cualquier aviso NUEVO sí. Si arreglas uno, regenera la lista con
+        «composer psalm-base» (ver composer.json).
+    -->
+</psalm>

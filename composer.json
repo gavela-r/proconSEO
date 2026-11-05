@@ -13,7 +13,8 @@
         "ext-pdo_mysql": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^11.5"
+        "phpunit/phpunit": "^11.5",
+        "vimeo/psalm": "^6"
     },
     "autoload": {
         "psr-4": {
@@ -35,7 +36,9 @@
         "servidor": "@php -S localhost:8090 -t public",
         "worker": "@php bin/worker.php",
         "interruptor": "@php bin/interruptor.php",
-        "auditoria": "@php bin/auditoria.php"
+        "auditoria": "@php bin/auditoria.php",
+        "psalm": "psalm --no-progress && psalm --taint-analysis --ignore-baseline --no-progress",
+        "psalm-base": "psalm --no-progress --set-baseline=psalm-baseline.xml"
     },
     "config": {
         "sort-packages": true
