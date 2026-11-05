@@ -11,6 +11,8 @@ use ProconSEO\Engine\Comprobaciones\AccesibilidadFormularios;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadImagenes;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadMeta;
 use ProconSEO\Engine\Comprobaciones\Acciones;
+use ProconSEO\Engine\Comprobaciones\ComprobacionesSitio;
+use ProconSEO\Engine\Comprobaciones\DirectivasIndexacion as Directivas;
 use ProconSEO\Engine\Comprobaciones\CanonicalSitemap;
 use ProconSEO\Engine\Comprobaciones\DatosEstructurados;
 use ProconSEO\Engine\Comprobaciones\DirectivasIndexacion;
@@ -25,11 +27,13 @@ use ProconSEO\Engine\Comprobaciones\Redirecciones;
 use ProconSEO\Engine\Comprobaciones\RespuestaUtilizable;
 use ProconSEO\Engine\Seguridad\DetectorInstrucciones;
 use ProconSEO\Shared\Contract\BorradorResultado;
+use ProconSEO\Shared\Contract\ConsolidadorSitio;
 use ProconSEO\Shared\Contract\ContextoAnalisis;
 use ProconSEO\Shared\Contract\FichaComprobacion;
 use ProconSEO\Shared\Contract\InformadorProgreso;
 use ProconSEO\Shared\Contract\MotorAnalisis;
 use ProconSEO\Shared\Contract\ProveedorRecursos;
+use ProconSEO\Shared\Contract\ResumenPagina;
 use ProconSEO\Shared\Contract\SalidaMotor;
 use ProconSEO\Shared\Contract\SenalSeguridad;
 use ProconSEO\Shared\Contract\TokenCancelacion;
@@ -53,7 +57,7 @@ use Throwable;
  * No hace red (pide a ProveedorRecursos), no escribe en la base de datos y el contenido de la
  * web nunca cambia qué se comprueba ni cómo se valora.
  */
-final class Motor implements MotorAnalisis
+final class Motor implements MotorAnalisis, ConsolidadorSitio
 {
     /** Por qué una subcomprobación no está implementada, según motivo_no_mvp del catálogo. */
     public const MOTIVOS = [
@@ -68,11 +72,17 @@ final class Motor implements MotorAnalisis
 
     private readonly CatalogoJson $catalogo;
 
+    /** Las que comparan páginas (ConsolidadorSitio); null si este motor no las tiene. */
+    private ?ComprobacionesSitio $sitio = null;
+
     /** @param list<Comprobacion> $comprobaciones */
     public function __construct(array $comprobaciones, ?string $directorioCatalogo = null)
     {
         $coberturas = [];
         foreach ($comprobaciones as $c) {
+            if ($c instanceof ComprobacionesSitio) {
+                $this->sitio = $c;
+            }
             foreach ($c->subcomprobaciones() as $id => $cobertura) {
                 if (isset($this->porId[$id])) {
                     throw new RuntimeException("$id lo evalúan dos comprobaciones.");
@@ -106,6 +116,7 @@ final class Motor implements MotorAnalisis
             new AccesibilidadAria(),
             new AccesibilidadMeta(),
             new PageSpeed(),
+            new ComprobacionesSitio(),
         ]);
     }
 
@@ -170,7 +181,74 @@ final class Motor implements MotorAnalisis
         $senales = $this->senales($entorno);
         $progreso->fase(Fase::Consolidacion, 1, 1);
 
-        return new SalidaMotor($resultados, $entorno->evidencias(), $grupos, $senales);
+        return new SalidaMotor($resultados, $entorno->evidencias(), $grupos, $senales, $this->resumen($entorno));
+    }
+
+    /** Lo que ConsolidadorSitio necesita de esta página; null si no se pudo leer. */
+    private function resumen(Entorno $entorno): ?ResumenPagina
+    {
+        if (!$entorno->paginaDisponible()) {
+            return null;
+        }
+        try {
+            $doc = $entorno->documento();
+            $corto = static fn (array $textos, int $largo): array => array_map(static fn (string $t): string => mb_substr($t, 0, $largo), array_slice($textos, 0, 5));
+            return new ResumenPagina(
+                url: $entorno->url(),
+                estadoHttp: $entorno->pagina()->estadoHttp,
+                indexable: Directivas::fuentesNoindex($entorno) === [],
+                titulos: $corto($doc->titulos, 300),
+                descripciones: $corto($doc->metasPorNombre('description'), 500),
+                canonical: $doc->canonicos[0] ?? null,
+                enlacesInternos: array_slice($entorno->enlacesInternos(), 0, ResumenPagina::MAXIMO_ENLACES),
+            );
+        } catch (Throwable) {
+            // Sin resumen, la página no entra en las comparaciones del sitio; no rompe el análisis.
+            return null;
+        }
+    }
+
+    public function subcomprobacionesDeSitio(): array
+    {
+        return $this->sitio === null ? [] : array_keys($this->sitio->subcomprobaciones());
+    }
+
+    /**
+     * Al terminar el sitio completo: valora las subcomprobaciones que comparan páginas, una vez
+     * para todo el análisis y en el orden del catálogo.
+     */
+    public function consolidarSitio(
+        ContextoAnalisis $contexto,
+        array $resumenes,
+        InformadorProgreso $progreso,
+        TokenCancelacion $cancelacion,
+    ): SalidaMotor {
+        $entorno = new Entorno($contexto, new ProveedorConMemoria(new ProveedorVacio()), $this->catalogo);
+        $ids = $this->subcomprobacionesDeSitio();
+        $resumenes = array_values(array_filter($resumenes, static fn (mixed $r): bool => $r instanceof ResumenPagina));
+
+        $progreso->fase(Fase::Consolidacion, 0, 1, 'Comparando las páginas del sitio');
+        $resultados = [];
+        foreach ($this->catalogo->todas() as $ficha) {
+            if (!in_array($ficha->id, $ids, true) || $this->sitio === null) {
+                continue;
+            }
+            if ($cancelacion->estaCancelado()) {
+                $resultados[] = $entorno->resultado($ficha->id)->noEjecutada('El análisis se canceló antes de comparar las páginas.');
+                continue;
+            }
+            try {
+                $resultados[] = $this->sitio->consolidar($ficha->id, $resumenes, $entorno);
+            } catch (NoVerificable $e) {
+                $resultados[] = $entorno->resultado($ficha->id)->causa($e->causa)->noEjecutada($e->getMessage());
+            } catch (Throwable $e) {
+                $resultados[] = $entorno->resultado($ficha->id)->noEjecutada('Error interno al ejecutar la comprobación (' . $e::class . ').');
+            }
+        }
+        [$resultados, $grupos] = (new AgrupadorCausas())->agrupar($resultados, true);
+        $progreso->fase(Fase::Consolidacion, 1, 1);
+
+        return new SalidaMotor($resultados, $entorno->evidencias(), $grupos);
     }
 
     /**
