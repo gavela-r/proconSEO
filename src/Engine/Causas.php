@@ -39,6 +39,7 @@ final class Causas
     public const CONTROLES_SIN_NOMBRE = 'controles-sin-nombre';
     public const DATOS_ESTRUCTURADOS_INVALIDOS = 'datos-estructurados-invalidos';
     public const CANONICAL = 'canonical';
+    public const PAGESPEED_SIN_DATOS = 'pagespeed-sin-datos';
 
     /** Qué pasa y qué hacer, en lenguaje sencillo. Se muestra una vez por causa. */
     public const DESCRIPCIONES = [
@@ -58,6 +59,7 @@ final class Causas
         self::CONTROLES_SIN_NOMBRE => 'Hay botones u otros controles sin nombre. Ni un asistente con IA ni un lector de pantalla pueden saber qué hacen. Hay que darles un texto visible o un aria-label con la acción.',
         self::DATOS_ESTRUCTURADOS_INVALIDOS => 'Los datos estructurados (JSON-LD) tienen errores de sintaxis, así que buscadores y asistentes con IA los ignoran. Hay que corregir el JSON-LD.',
         self::CANONICAL => 'La URL canónica falta o no coincide con la página. Hay que declarar en cada página un canonical a su propia URL definitiva.',
+        self::PAGESPEED_SIN_DATOS => 'No hay datos de Google PageSpeed Insights para esta página (no se pidieron o Google no los devolvió), así que no se pueden valorar la velocidad ni el contraste del texto. No dice nada malo de la web.',
     ];
 
     private const INCIDENCIAS = [EstadoResultado::Problema, EstadoResultado::Mejorable, EstadoResultado::DecisionRevisar];

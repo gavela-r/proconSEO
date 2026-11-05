@@ -17,6 +17,7 @@ use ProconSEO\Engine\Comprobaciones\Enlazado;
 use ProconSEO\Engine\Comprobaciones\Idiomas;
 use ProconSEO\Engine\Comprobaciones\Metadatos;
 use ProconSEO\Engine\Comprobaciones\Multimedia;
+use ProconSEO\Engine\Comprobaciones\PageSpeed;
 use ProconSEO\Engine\Comprobaciones\EstadoTecnico;
 use ProconSEO\Engine\Comprobaciones\PermisoRobots;
 use ProconSEO\Engine\Comprobaciones\Redirecciones;
@@ -100,6 +101,7 @@ final class Motor implements MotorAnalisis
             new AccesibilidadEstructura(),
             new AccesibilidadFormularios(),
             new AccesibilidadAria(),
+            new PageSpeed(),
         ]);
     }
 
