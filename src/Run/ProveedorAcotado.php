@@ -30,6 +30,8 @@ final class ProveedorAcotado implements ProveedorRecursos
     private array $temporales = [];
     private int $nuevas = 0;
     private int $totalNuevas = 0;
+    /** @var array<string, array{recurso: RecursoDescargado, motivo: string, comprobacion: ?string}> */
+    private array $bloqueadas = [];
     private ?ReglasRobots $robots = null;
     private string $origenRobots = '';
     private string $agente = '';
@@ -48,12 +50,10 @@ final class ProveedorAcotado implements ProveedorRecursos
             return $guardado;
         }
         if ($this->prohibidaPorRobots($url)) {
-            return new RecursoDescargado($url, $url, ResultadoDescarga::FueraDeAmbito,
-                motivo: "El robots.txt del sitio no permite a {$this->agente} consultar esta URL.");
+            return $this->bloquear($url, $motivo, $idComprobacion, "El robots.txt del sitio no permite a {$this->agente} consultar esta URL.");
         }
         if ($this->maxNuevasPorPagina !== null && $this->nuevas >= $this->maxNuevasPorPagina) {
-            return new RecursoDescargado($url, $url, ResultadoDescarga::FueraDeAmbito,
-                motivo: "Se ha llegado al máximo de {$this->maxNuevasPorPagina} URLs extra por página del alcance «{$this->alcance}».");
+            return $this->bloquear($url, $motivo, $idComprobacion, "Se ha llegado al máximo de {$this->maxNuevasPorPagina} URLs extra por página del alcance «{$this->alcance}».");
         }
         $this->nuevas++;
         $this->totalNuevas++;
@@ -90,6 +90,25 @@ final class ProveedorAcotado implements ProveedorRecursos
     {
         $this->nuevas = 0;
         $this->temporales = [$pagina->urlSolicitada => $pagina];
+    }
+
+    /**
+     * Lo que se pidió y no se consultó (robots.txt o tope), con el mismo formato que el registro
+     * del cliente HTTP, para guardarlo en la lista de recursos del análisis (Anexo A.2).
+     *
+     * @return list<array{recurso: RecursoDescargado, motivo: string, comprobacion: ?string}>
+     */
+    public function bloqueadas(): array
+    {
+        return array_values($this->bloqueadas);
+    }
+
+    private function bloquear(string $url, string $motivo, ?string $idComprobacion, string $porQue): RecursoDescargado
+    {
+        $recurso = new RecursoDescargado($url, $url, ResultadoDescarga::FueraDeAmbito, motivo: $porQue);
+        $this->bloqueadas[$url] ??= ['recurso' => $recurso, 'motivo' => $motivo, 'comprobacion' => $idComprobacion];
+
+        return $recurso;
     }
 
     /** URLs extra pedidas en todo el análisis. */

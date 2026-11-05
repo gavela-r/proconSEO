@@ -156,7 +156,9 @@ final class OrquestadorTest extends TestCase
         self::assertSame($noImplementadas, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND cobertura = 'no_implementada'", [$id]), 'Lo no implementado aparece una sola vez, no por página');
         // Ni el rastreo ni las comprobaciones (p. ej., la de enlaces rotos) piden lo que robots.txt prohíbe.
         self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND url_recurso LIKE '%privado%'", [$id]), 'No se analiza lo que robots.txt prohíbe');
-        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url LIKE '%privado%'", [$id]), 'Nadie lo pide');
+        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url LIKE '%privado%' AND resultado <> 'fuera_de_ambito'", [$id]), 'Nadie lo descarga');
+        self::assertStringContainsString('robots.txt', (string) $this->valor("SELECT motivo FROM recursos WHERE analisis_id = ? AND url LIKE '%privado%' AND resultado = 'fuera_de_ambito'", [$id]),
+            'Pero queda apuntado en la lista de recursos con el motivo, si alguna comprobación lo pidió');
         self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url LIKE '%otra.es%'", [$id]));
     }
 

@@ -62,6 +62,11 @@ final class ProveedorAcotadoTest extends TestCase
         self::assertStringContainsString('robots.txt', (string) $bloqueada->motivo);
         self::assertSame(['https://ejemplo.es/publico', 'https://ejemplo.es/robots.txt', 'http://ejemplo.es/privado/a', 'https://otra.ejemplo.es/privado/a'], $falso->pedidas,
             'Solo se bloquea en el origen de ese robots.txt; otros orígenes tienen el suyo');
+
+        $bloqueadas = $proveedor->bloqueadas();
+        self::assertCount(1, $bloqueadas, 'Lo bloqueado queda apuntado para la lista de recursos');
+        self::assertSame('https://ejemplo.es/privado/a', $bloqueadas[0]['recurso']->urlSolicitada);
+        self::assertSame('enlace interno', $bloqueadas[0]['motivo']);
     }
 
     public function testEnCadaPaginaEmpiezaElTopeYSeOlvidaElHtmlDeLaAnterior(): void
