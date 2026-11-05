@@ -151,7 +151,9 @@ final class OrquestadorTest extends TestCase
         }
         $noImplementadas = count(array_filter(Motor::v1()->catalogo()->todas(), static fn ($f): bool => $f->cobertura === \ProconSEO\Shared\Enum\Cobertura::NoImplementada));
         self::assertSame($noImplementadas, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND cobertura = 'no_implementada'", [$id]), 'Lo no implementado aparece una sola vez, no por página');
-        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url LIKE '%privado%'", [$id]), 'No se pide lo que robots.txt prohíbe');
+        // El rastreo no analiza lo que robots.txt prohíbe (la comprobación de enlaces rotos sí puede consultarlo).
+        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND url_recurso LIKE '%privado%'", [$id]), 'No se analiza lo que robots.txt prohíbe');
+        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url LIKE '%privado%' AND justificado_por IS NULL", [$id]), 'El rastreo no lo pide');
         self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url LIKE '%otra.es%'", [$id]));
     }
 
@@ -166,7 +168,9 @@ final class OrquestadorTest extends TestCase
         $this->orquestador(Motor::v1())->ejecutar($id);
 
         self::assertStringContainsString('URLs relacionadas que pedían las comprobaciones (máximo 20)', (string) $this->valor("SELECT mensaje FROM fases_analisis WHERE analisis_id = ? AND fase = 'descubrimiento'", [$id]));
-        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url = 'https://ejemplo.es/otra'", [$id]), 'Los enlaces no se siguen');
+        // Una comprobación puede consultar el enlace (p. ej., para ver si está roto), pero no se analiza como página.
+        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND url_recurso = 'https://ejemplo.es/otra'", [$id]), 'Los enlaces no se analizan como páginas');
+        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url = 'https://ejemplo.es/otra' AND justificado_por IS NULL", [$id]), 'Solo lo pide una comprobación, nunca el rastreo');
     }
 
     public function testPaginaQueNoRespondeDaAnalisisParcial(): void
