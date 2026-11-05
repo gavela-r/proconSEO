@@ -10,8 +10,10 @@ use ProconSEO\Fetch\Ambito;
 use ProconSEO\Fetch\ClienteHttpSeguro;
 use ProconSEO\Fetch\DestinoRechazado;
 use ProconSEO\Fetch\LimitesDescarga;
+use ProconSEO\Fetch\PageSpeed\ClientePageSpeed;
 use ProconSEO\Fetch\ValidadorDestino;
 use ProconSEO\Shared\Contract\ContextoAnalisis;
+use ProconSEO\Shared\Contract\InformePageSpeed;
 use ProconSEO\Shared\Contract\MotorAnalisis;
 use ProconSEO\Shared\Contract\RecursoDescargado;
 use ProconSEO\Shared\Contract\SalidaMotor;
@@ -52,6 +54,7 @@ final class Orquestador
         private readonly MotorAnalisis $motor,
         private readonly ValidadorDestino $validador,
         private readonly Closure $fabricaCliente,
+        private readonly ?ClientePageSpeed $pageSpeed = null,
     ) {
     }
 
@@ -76,6 +79,7 @@ final class Orquestador
             'max_bytes_analisis' => $limites->maxBytesAnalisis,
             'renderizado' => 'no disponible en esta versión',
             'motor' => $this->motor::class,
+            'pagespeed' => $this->pageSpeed?->configurado() ? 'Google PageSpeed Insights' : 'sin clave configurada',
         ]);
 
         try {
@@ -101,6 +105,7 @@ final class Orquestador
             $robots = $cliente->obtener($origen . '/robots.txt', 'robots.txt del origen', 'IA-01');
             $pagina = $cliente->obtener($url, 'página analizada');
             $this->registrarBloqueos($id, $cliente);
+            $informesPageSpeed = $this->pedirPageSpeed($id, $pagina, $this->repositorio->parametrosPerfil((int) $analisis['perfil_id']), $progreso);
             $this->terminar($id, Fase::Recuperacion, $pagina->esCorrecto() ? EstadoFase::Terminada : EstadoFase::Parcial, $this->resumenRecuperacion($pagina));
 
             if ($progreso->estaCancelado()) {
@@ -133,7 +138,7 @@ final class Orquestador
             // F5–F7 — Extracción, comprobaciones y consolidación las hace el motor (Parte 2).
             $this->empezar($id, Fase::Extraccion);
             $proyecto = $this->repositorio->proyecto((int) $analisis['proyecto_id']);
-            $contexto = fn (RecursoDescargado $p): ContextoAnalisis => new ContextoAnalisis(
+            $contexto = fn (RecursoDescargado $p, array $pageSpeed = []): ContextoAnalisis => new ContextoAnalisis(
                 idAnalisis: $id,
                 alcance: $alcance,
                 paginaPrincipal: $p,
@@ -142,8 +147,9 @@ final class Orquestador
                 tipoProyecto: TipoProyecto::tryFrom((string) ($proyecto['tipo'] ?? '')),
                 sector: Sector::tryFrom((string) ($proyecto['sector'] ?? '')),
                 perfil: $perfil,
+                pageSpeed: $pageSpeed,
             );
-            $salidas = [$this->motor->ejecutar($contexto($pagina), $proveedor, $progreso, $progreso)];
+            $salidas = [$this->motor->ejecutar($contexto($pagina, $informesPageSpeed), $proveedor, $progreso, $progreso)];
             $this->registrarBloqueos($id, $cliente);
             $cancelado = $progreso->estaCancelado();
             $limiteAlcanzado = null;
@@ -188,6 +194,33 @@ final class Orquestador
 
             return $this->cerrar($id, EstadoAnalisis::DetenidoError, 'Error inesperado durante el análisis. Se conservan los resultados obtenidos.', $cliente);
         }
+    }
+
+    /**
+     * Mediciones de Google PageSpeed de la página analizada (SEO-11 y ACC-05), móvil y ordenador
+     * según el perfil. Solo de esa página: en el sitio completo serían cientos de llamadas.
+     *
+     * @param array<string, mixed> $perfil
+     * @return list<InformePageSpeed>
+     */
+    private function pedirPageSpeed(int $id, RecursoDescargado $pagina, array $perfil, ProgresoBd $progreso): array
+    {
+        if ($this->pageSpeed === null || !$pagina->esCorrecto()) {
+            return [];
+        }
+        $llamadas = max(0, min(2, (int) ($perfil['apis']['pagespeed_llamadas_por_url']['valor'] ?? 2)));
+        $informes = [];
+        foreach (array_slice([InformePageSpeed::MOVIL => 'móvil', InformePageSpeed::ORDENADOR => 'ordenador'], 0, $llamadas, true) as $dispositivo => $nombre) {
+            if ($progreso->estaCancelado()) {
+                break;
+            }
+            if ($this->pageSpeed->configurado()) {
+                $this->repositorio->actualizarFase($id, Fase::Recuperacion, EstadoFase::EnCurso, count($informes), $llamadas, "Midiendo la velocidad en {$nombre} con Google PageSpeed (puede tardar un minuto)");
+            }
+            $informes[] = $this->pageSpeed->informe($pagina->urlFinal, $dispositivo);
+        }
+
+        return $informes;
     }
 
     private function empezar(int $id, Fase $fase): void
