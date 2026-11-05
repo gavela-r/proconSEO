@@ -151,9 +151,9 @@ final class OrquestadorTest extends TestCase
         }
         $noImplementadas = count(array_filter(Motor::v1()->catalogo()->todas(), static fn ($f): bool => $f->cobertura === \ProconSEO\Shared\Enum\Cobertura::NoImplementada));
         self::assertSame($noImplementadas, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND cobertura = 'no_implementada'", [$id]), 'Lo no implementado aparece una sola vez, no por página');
-        // El rastreo no analiza lo que robots.txt prohíbe (la comprobación de enlaces rotos sí puede consultarlo).
+        // Ni el rastreo ni las comprobaciones (p. ej., la de enlaces rotos) piden lo que robots.txt prohíbe.
         self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND url_recurso LIKE '%privado%'", [$id]), 'No se analiza lo que robots.txt prohíbe');
-        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url LIKE '%privado%' AND justificado_por IS NULL", [$id]), 'El rastreo no lo pide');
+        self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url LIKE '%privado%'", [$id]), 'Nadie lo pide');
         self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM recursos WHERE analisis_id = ? AND url LIKE '%otra.es%'", [$id]));
     }
 

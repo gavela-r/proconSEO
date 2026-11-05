@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ProconSEO\Run;
 
+use ProconSEO\Engine\Extraccion\Robots\ReglasRobots;
 use ProconSEO\Shared\Contract\ProveedorRecursos;
 use ProconSEO\Shared\Contract\RecursoDescargado;
 use ProconSEO\Shared\Enum\ResultadoDescarga;
@@ -14,6 +15,9 @@ use ProconSEO\Shared\Enum\ResultadoDescarga;
  * - pone un tope de URLs nuevas por página analizada (con contexto: 20 además de la página y
  *   robots.txt). Pasado el tope no se descarga nada: se devuelve «fuera de ámbito» con el
  *   motivo, y la comprobación que lo pidió queda no_verificable.
+ *
+ * - no pide nada que el robots.txt del sitio prohíba a nuestro user-agent: se devuelve
+ *   «fuera de ámbito» con el motivo, sin conectarse.
  *
  * En el sitio completo, al pasar a otra página se olvidan las páginas HTML de la anterior
  * (no cabría todo el sitio en memoria); robots.txt, sitemaps y demás se conservan.
@@ -26,6 +30,9 @@ final class ProveedorAcotado implements ProveedorRecursos
     private array $temporales = [];
     private int $nuevas = 0;
     private int $totalNuevas = 0;
+    private ?ReglasRobots $robots = null;
+    private string $origenRobots = '';
+    private string $agente = '';
 
     public function __construct(
         private readonly ProveedorRecursos $proveedor,
@@ -39,6 +46,10 @@ final class ProveedorAcotado implements ProveedorRecursos
         $guardado = $this->permanentes[$url] ?? $this->temporales[$url] ?? null;
         if ($guardado !== null) {
             return $guardado;
+        }
+        if ($this->prohibidaPorRobots($url)) {
+            return new RecursoDescargado($url, $url, ResultadoDescarga::FueraDeAmbito,
+                motivo: "El robots.txt del sitio no permite a {$this->agente} consultar esta URL.");
         }
         if ($this->maxNuevasPorPagina !== null && $this->nuevas >= $this->maxNuevasPorPagina) {
             return new RecursoDescargado($url, $url, ResultadoDescarga::FueraDeAmbito,
@@ -55,6 +66,17 @@ final class ProveedorAcotado implements ProveedorRecursos
         }
 
         return $recurso;
+    }
+
+    /**
+     * Aplica el robots.txt de un origen (esquema, host y puerto, como dice la RFC 9309).
+     * Las URLs de otros orígenes no se ven afectadas: tienen su propio robots.txt.
+     */
+    public function respetarRobots(ReglasRobots $robots, string $origen, string $agente): void
+    {
+        $this->robots = $robots;
+        $this->origenRobots = strtolower($origen);
+        $this->agente = $agente;
     }
 
     /** Registra algo ya descargado (robots.txt, la página inicial) sin contarlo en el tope. */
@@ -74,6 +96,16 @@ final class ProveedorAcotado implements ProveedorRecursos
     public function urlsExtra(): int
     {
         return $this->totalNuevas;
+    }
+
+    private function prohibidaPorRobots(string $url): bool
+    {
+        if ($this->robots === null || str_ends_with(strtolower((string) parse_url($url, PHP_URL_PATH)), '/robots.txt')) {
+            return false;
+        }
+        $origen = strtolower((string) preg_replace('#^([a-z]+://[^/?\#]+).*$#i', '$1', $url));
+
+        return $origen === $this->origenRobots && !$this->robots->permite($this->agente, $url);
     }
 
     private static function esHtml(RecursoDescargado $r): bool
