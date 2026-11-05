@@ -84,7 +84,7 @@ final class Entorno
     public function exigePagina(): void
     {
         if (!$this->paginaDisponible()) {
-            throw new NoVerificable('No se pudo recuperar la página: ' . self::describirDescarga($this->pagina()) . '.');
+            throw new NoVerificable('No se pudo recuperar la página: ' . self::describirDescarga($this->pagina()) . '.', Causas::PAGINA_NO_RECUPERADA);
         }
     }
 
@@ -92,7 +92,7 @@ final class Entorno
     public function exigeRespuesta(): void
     {
         if ($this->pagina()->estadoHttp === null) {
-            throw new NoVerificable('No hubo respuesta del servidor: ' . self::describirDescarga($this->pagina()) . '.');
+            throw new NoVerificable('No hubo respuesta del servidor: ' . self::describirDescarga($this->pagina()) . '.', Causas::PAGINA_NO_RECUPERADA);
         }
     }
 
@@ -108,7 +108,7 @@ final class Entorno
             }
         }
         if ($this->documento === null) {
-            throw new NoVerificable('No se pudo leer el HTML de la página: ' . $this->errorDocumento);
+            throw new NoVerificable('No se pudo leer el HTML de la página: ' . $this->errorDocumento, Causas::HTML_ILEGIBLE);
         }
         return $this->documento;
     }
@@ -138,7 +138,7 @@ final class Entorno
     public function exigeHtmlCompleto(string $queFalta): void
     {
         if ($this->contenidoPuedeDependerDeJs()) {
-            throw new NoVerificable("No se encuentra $queFalta en el HTML inicial, pero la página carga casi todo con JavaScript: sin navegador no se puede afirmar que falte.");
+            throw new NoVerificable("No se encuentra $queFalta en el HTML inicial, pero la página carga casi todo con JavaScript: sin navegador no se puede afirmar que falte.", Causas::CONTENIDO_JAVASCRIPT);
         }
     }
 
@@ -147,7 +147,7 @@ final class Entorno
     {
         $orden = [Alcance::UrlIndividual->value => 0, Alcance::UrlContexto->value => 1, Alcance::SitioCompleto->value => 2];
         if ($orden[$this->contexto->alcance->value] < $orden[$minimo->value]) {
-            throw new NoVerificable("Para $paraQue hace falta el alcance «{$minimo->etiqueta()}»; el análisis es «{$this->contexto->alcance->etiqueta()}».");
+            throw new NoVerificable("Para $paraQue hace falta el alcance «{$minimo->etiqueta()}»; el análisis es «{$this->contexto->alcance->etiqueta()}».", Causas::ALCANCE_INSUFICIENTE);
         }
     }
 
@@ -159,7 +159,7 @@ final class Entorno
     {
         if (!$this->proveedor->tiene($url) && !str_ends_with((string) parse_url($url, PHP_URL_PATH), '/robots.txt')) {
             if ($this->urlsExtra >= $this->limiteUrlsExtra()) {
-                throw new NoVerificable('Se alcanzó el límite de ' . $this->limiteUrlsExtra() . ' URLs adicionales del perfil de ejecución.');
+                throw new NoVerificable('Se alcanzó el límite de ' . $this->limiteUrlsExtra() . ' URLs adicionales del perfil de ejecución.', Causas::LIMITE_URLS);
             }
             $this->urlsExtra++;
         }
@@ -241,6 +241,12 @@ final class Entorno
         return ['estado' => $this->robots[0], 'reglas' => $this->robots[1], 'recurso' => $this->robots[2]];
     }
 
+    /** robots.txt si ya se pidió y respondió 2xx (no lo descarga si no se pidió). */
+    public function robotsLeido(): ?RecursoDescargado
+    {
+        return ($this->robots[0] ?? null) === self::ROBOTS_LEIDO ? $this->robots[2] : null;
+    }
+
     /**
      * Si el robot puede rastrear la URL analizada. Lanza NoVerificable si robots.txt no se pudo
      * consultar o dio un error temporal.
@@ -253,8 +259,8 @@ final class Entorno
         return match ($robots['estado']) {
             self::ROBOTS_LEIDO => $robots['reglas']?->evaluar($agente, $this->url()) ?? throw new RuntimeException('Sin reglas'),
             self::ROBOTS_SIN_RESTRICCIONES => ['permitido' => true, 'regla' => null, 'linea' => null],
-            self::ROBOTS_TEMPORAL => throw new NoVerificable('robots.txt dio un error temporal (' . self::describirDescarga($robots['recurso']) . '): mientras dure, los buscadores pueden dejar de rastrear el sitio.'),
-            default => throw new NoVerificable('No se pudo consultar robots.txt: ' . self::describirDescarga($robots['recurso']) . '.'),
+            self::ROBOTS_TEMPORAL => throw new NoVerificable('robots.txt dio un error temporal (' . self::describirDescarga($robots['recurso']) . '): mientras dure, los buscadores pueden dejar de rastrear el sitio.', Causas::ROBOTS_ERROR_TEMPORAL),
+            default => throw new NoVerificable('No se pudo consultar robots.txt: ' . self::describirDescarga($robots['recurso']) . '.', Causas::ROBOTS_NO_CONSULTABLE),
         };
     }
 

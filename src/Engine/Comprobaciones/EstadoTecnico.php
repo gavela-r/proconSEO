@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ProconSEO\Engine\Comprobaciones;
 
+use ProconSEO\Engine\Causas;
 use ProconSEO\Engine\Cms;
 use ProconSEO\Engine\Comprobacion;
 use ProconSEO\Engine\Entorno;
@@ -291,6 +292,7 @@ final class EstadoTecnico implements Comprobacion
                 'prestashop' => 'Revisar el fichero robots.txt (Parámetros de la tienda > Tráfico y SEO > Generar robots.txt) y el módulo SEO del tema.',
             ])
             ->limitacion($wordpress ? 'WordPress detectado: es la causa más habitual.' : 'Se ha supuesto que no es intencionado porque no hay objetivo «no indexar» declarado.')
+            ->causa(DirectivasIndexacion::fuentesNoindex($e) !== [] ? Causas::DIRECTIVAS_NOINDEX : Causas::ROBOTS_BLOQUEA)
             ->problema(Gravedad::Critico);
     }
 

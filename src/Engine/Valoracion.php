@@ -31,6 +31,7 @@ final class Valoracion
     private ?string $motivoRevision = null;
     private ?string $fuente = null;
     private ?string $url = null;
+    private ?string $causa = null;
     private TipoConclusion $conclusion = TipoConclusion::Hecho;
 
     /** @var array<string, string> */
@@ -116,6 +117,19 @@ final class Valoracion
     public function url(string $url): self
     {
         $this->url = $url;
+        return $this;
+    }
+
+    /**
+     * La causa que ha provocado este resultado, si se sabe con certeza (código de Causas).
+     * Solo sirve para agrupar: no cambia el estado ni la gravedad.
+     */
+    public function causa(?string $codigo): self
+    {
+        if ($codigo !== null && !Causas::existe($codigo)) {
+            throw new \InvalidArgumentException("Causa desconocida: $codigo");
+        }
+        $this->causa = $codigo;
         return $this;
     }
 
@@ -210,6 +224,7 @@ final class Valoracion
             wcagVersion: $this->ficha->wcagVersion,
             gravedad: $gravedad,
             esfuerzo: $this->ficha->esfuerzo,
+            codigoGrupoCausa: $this->causa,
             fuente: $this->fuente,
             codigosEvidencia: array_values(array_unique($this->evidencias)),
         );

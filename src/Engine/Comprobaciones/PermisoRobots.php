@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ProconSEO\Engine\Comprobaciones;
 
+use ProconSEO\Engine\Causas;
 use ProconSEO\Engine\Comprobacion;
 use ProconSEO\Engine\Entorno;
 use ProconSEO\Engine\NoVerificable;
@@ -70,8 +71,9 @@ final class PermisoRobots implements Comprobacion
                 ->consecuencia('Mientras robots.txt responda con un error temporal, Google y otros buscadores pueden dejar de rastrear todo el sitio.')
                 ->correccion('Revisar el servidor para que /robots.txt responda 200 (o 404 si no se quiere ninguno).')
                 ->limitacion('Un solo análisis no distingue un fallo puntual de uno persistente; no se presupone qué tiene guardado cada buscador.')
+                ->causa(Causas::ROBOTS_ERROR_TEMPORAL)
                 ->problema(Gravedad::Medio),
-            default => throw new NoVerificable('No se pudo consultar robots.txt: ' . Entorno::describirDescarga($r) . '.'),
+            default => throw new NoVerificable('No se pudo consultar robots.txt: ' . Entorno::describirDescarga($r) . '.', Causas::ROBOTS_NO_CONSULTABLE),
         };
     }
 
