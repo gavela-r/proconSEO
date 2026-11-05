@@ -89,12 +89,62 @@ final class AnalizadorSitemapTest extends TestCase
         self::assertSame('formato_desconocido', self::error('<rss><channel></channel></rss>'));
     }
 
-    public function testRechazaGzipYTamanioExcesivo(): void
+    public function testRechazaTamanioExcesivo(): void
     {
-        self::assertSame('comprimido', self::error("\x1f\x8b\x08\x00resto"));
-
         $this->expectException(ErrorExtraccion::class);
         (new AnalizadorSitemap(50))->analizar(str_repeat(' ', 51));
+    }
+
+    public function testLeeUnSitemapComprimido(): void
+    {
+        $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset ' . self::NS . '><url><loc>https://www.x.example/a</loc></url><url><loc>https://www.x.example/b</loc></url></urlset>';
+
+        $contenido = self::leer((string) gzencode($xml));
+
+        self::assertSame(['https://www.x.example/a', 'https://www.x.example/b'], $contenido->urls());
+    }
+
+    public function testLeeUnIndiceComprimidoGrandePorPartes(): void
+    {
+        $entradas = '';
+        for ($i = 0; $i < 3000; $i++) {
+            $entradas .= '<sitemap><loc>https://www.x.example/sitemap-' . $i . '.xml.gz</loc></sitemap>';
+        }
+        $contenido = self::leer((string) gzencode('<sitemapindex ' . self::NS . '>' . $entradas . '</sitemapindex>'));
+
+        self::assertTrue($contenido->esIndice());
+        self::assertCount(3000, $contenido->urls());
+    }
+
+    public function testUnaBombaGzipSeCortaAlPasarElLimite(): void
+    {
+        // 50 MB de espacios comprimidos ocupan unos 50 KB.
+        $bomba = (string) gzencode('<urlset ' . self::NS . '>' . str_repeat(' ', 50 * 1024 * 1024) . '</urlset>', 9);
+        self::assertLessThan(100 * 1024, strlen($bomba));
+
+        $antes = memory_get_peak_usage();
+        $inicio = microtime(true);
+        self::assertSame('demasiado_grande', self::error($bomba));
+        self::assertLessThan(2.0, microtime(true) - $inicio);
+        self::assertLessThan(40 * 1024 * 1024, memory_get_peak_usage() - $antes);
+    }
+
+    public function testRechazaGzipDanadoIncompletoODoble(): void
+    {
+        $xml = '<urlset ' . self::NS . '><url><loc>https://www.x.example/</loc></url></urlset>';
+        $gz = (string) gzencode($xml);
+
+        self::assertSame('comprimido_danado', self::error("\x1f\x8b\x08\x00resto"));
+        self::assertSame('comprimido_danado', self::error(substr($gz, 0, (int) (strlen($gz) / 2))));
+        self::assertSame('comprimido_danado', self::error((string) gzencode($gz)));
+        self::assertSame('xml_mal_formado', self::error((string) gzencode('   ')));
+    }
+
+    public function testDentroDelGzipSiguenLasMismasDefensas(): void
+    {
+        $xxe = '<?xml version="1.0"?><!DOCTYPE u [<!ENTITY x SYSTEM "file:///etc/passwd">]><urlset ' . self::NS . '><url><loc>&x;</loc></url></urlset>';
+
+        self::assertSame('dtd_no_permitido', self::error((string) gzencode($xxe)));
     }
 
     public function testNoSigueNingunaUrl(): void
