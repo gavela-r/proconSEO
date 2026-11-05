@@ -16,6 +16,9 @@ use ProconSEO\Engine\Extraccion\Url;
  *   expansión exponencial de entidades.
  * - Sin red (LIBXML_NONET) y sin sustitución de entidades.
  * - Límite de 10 MB (perfil v1) y de 50.000 entradas (protocolo); lo que exceda se marca.
+ * - Los sitemaps .xml.gz se descomprimen aquí, por partes y midiendo el tamaño ya
+ *   descomprimido: un fichero pequeño que crece a gigas (bomba gzip) se corta al pasar el
+ *   límite, sin llegar a ocupar la memoria.
  * - No sigue ninguna URL: las devuelve para que la Parte 1 decida si están en el ámbito.
  */
 final class AnalizadorSitemap
@@ -36,8 +39,11 @@ final class AnalizadorSitemap
         if (trim($xml) === '') {
             throw new ErrorExtraccion('xml_mal_formado', 'El sitemap está vacío.');
         }
-        if (str_starts_with($xml, "\x1f\x8b")) {
-            throw new ErrorExtraccion('comprimido', 'El sitemap está comprimido con gzip y debe descomprimirse antes.');
+        if (self::esGzip($xml)) {
+            $xml = $this->descomprimir($xml);
+            if (trim($xml) === '') {
+                throw new ErrorExtraccion('xml_mal_formado', 'El sitemap comprimido está vacío.');
+            }
         }
         if (preg_match('/<!DOCTYPE/i', $xml) === 1) {
             throw new ErrorExtraccion('dtd_no_permitido', 'El sitemap declara un DOCTYPE; se rechaza para evitar entidades externas.');
@@ -96,6 +102,46 @@ final class AnalizadorSitemap
         }
 
         return new ContenidoSitemap($tipo, $entradas, $avisos, $truncado);
+    }
+
+    public static function esGzip(string $datos): bool
+    {
+        return str_starts_with($datos, "\x1f\x8b");
+    }
+
+    /** @throws ErrorExtraccion si está dañado, anidado o al descomprimirlo pasa del límite */
+    private function descomprimir(string $comprimido): string
+    {
+        $inflador = @inflate_init(ZLIB_ENCODING_GZIP);
+        if ($inflador === false) {
+            throw new ErrorExtraccion('comprimido_danado', 'No se pudo preparar la descompresión del sitemap.');
+        }
+        $salida = '';
+        // Deflate multiplica como mucho por ~1.032: 4 KB comprimidos no pasan de ~4 MB de golpe.
+        $bloque = 4096;
+        $total = strlen($comprimido);
+        for ($i = 0; $i < $total; $i += $bloque) {
+            $ultimo = $i + $bloque >= $total;
+            $parte = @inflate_add($inflador, substr($comprimido, $i, $bloque), $ultimo ? ZLIB_FINISH : ZLIB_SYNC_FLUSH);
+            if ($parte === false) {
+                throw new ErrorExtraccion('comprimido_danado', 'El sitemap comprimido está dañado.');
+            }
+            $salida .= $parte;
+            if (strlen($salida) > $this->limiteBytes) {
+                throw new ErrorExtraccion('demasiado_grande', 'El sitemap descomprimido supera el límite de ' . $this->limiteBytes . ' bytes.');
+            }
+            if (inflate_get_status($inflador) === ZLIB_STREAM_END) {
+                break;
+            }
+        }
+        if (inflate_get_status($inflador) !== ZLIB_STREAM_END) {
+            throw new ErrorExtraccion('comprimido_danado', 'El sitemap comprimido está incompleto.');
+        }
+        if (self::esGzip($salida)) {
+            // Un sitemap no se comprime dos veces: no se abre una segunda capa.
+            throw new ErrorExtraccion('comprimido_danado', 'El sitemap está comprimido más de una vez.');
+        }
+        return $salida;
     }
 
     private function conEspacioDeNombres(DOMElement $raiz): bool
