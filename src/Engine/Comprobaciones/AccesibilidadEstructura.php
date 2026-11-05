@@ -20,6 +20,12 @@ use RuntimeException;
  */
 final class AccesibilidadEstructura implements Comprobacion
 {
+    /** Texto o dirección de un enlace a la declaración de accesibilidad (es, ca, gl, eu, en). */
+    private const DECLARACION = '/accesibilidad|accessibilitat|accesibilidade|irisgarritasun|accessibility/u';
+
+    /** El texto del enlace dice que es una declaración (no, p. ej., un servicio de accesibilidad). */
+    private const ES_DECLARACION = '/declaraci[oó]n|declaraci[oó]|adierazpen|statement/u';
+
     /** Enlaces genéricos cuyo propósito depende del contexto (2.4.4). */
     private const GENERICOS = ['aquí', 'aqui', 'pincha aquí', 'haz clic aquí', 'clic aquí', 'click aquí', 'leer más', 'leer mas',
         'más', 'ver más', 'más información', 'saber más', 'enlace', 'link', 'click here', 'here', 'read more', 'more'];
@@ -30,6 +36,7 @@ final class AccesibilidadEstructura implements Comprobacion
             'ACC-03.title-pagina' => Cobertura::Implementada,
             'ACC-03.estructura-semantica' => Cobertura::ParcialmenteImplementada,
             'ACC-03.tablas-encabezados' => Cobertura::ParcialmenteImplementada,
+            'ACC-03.declaracion-accesibilidad' => Cobertura::Implementada,
             'ACC-06.enlaces-nombre' => Cobertura::Implementada,
             'ACC-06.enlaces-proposito' => Cobertura::ParcialmenteImplementada,
             'ACC-06.saltar-bloques' => Cobertura::ParcialmenteImplementada,
@@ -46,6 +53,7 @@ final class AccesibilidadEstructura implements Comprobacion
             'ACC-03.title-pagina' => $this->titulo($e),
             'ACC-03.estructura-semantica' => $this->estructura($e),
             'ACC-03.tablas-encabezados' => $this->tablas($e),
+            'ACC-03.declaracion-accesibilidad' => $this->declaracion($e),
             'ACC-06.enlaces-nombre' => $this->enlacesNombre($e),
             'ACC-06.enlaces-proposito' => $this->enlacesProposito($e),
             'ACC-06.saltar-bloques' => $this->saltarBloques($e),
@@ -144,6 +152,51 @@ final class AccesibilidadEstructura implements Comprobacion
             ->correccion('Marcar la fila o columna de títulos con <th scope="col"> o <th scope="row">. Si la tabla solo sirve para maquetar, añadir role="presentation".')
             ->revisionHumana('Hay que confirmar si es una tabla de datos o solo de maquetación.')
             ->noVerificable('Tabla sin encabezados: falta confirmar si contiene datos.');
+    }
+
+    /**
+     * ACC-03.declaracion-accesibilidad (Real Decreto 1112/2018, art. 13): la web enlaza su
+     * declaración de accesibilidad. Se busca un enlace cuyo texto o dirección hable de
+     * accesibilidad (en castellano, catalán, gallego, euskera o inglés).
+     */
+    private function declaracion(Entorno $e): BorradorResultado
+    {
+        $v = $e->resultado('ACC-03.declaracion-accesibilidad');
+        $candidatos = [];
+        foreach ($e->documento()->enlaces as $a) {
+            if (!$a['tieneHref'] || $a['noNavegable'] || str_starts_with(trim($a['href']), '#')) {
+                continue;
+            }
+            $texto = mb_strtolower($a['nombre'] . ' ' . rawurldecode($a['href']));
+            if (preg_match(self::DECLARACION, $texto) === 1) {
+                $candidatos[] = $a;
+            }
+        }
+
+        if ($candidatos !== []) {
+            $declaraciones = array_values(array_filter($candidatos, static fn (array $a): bool => preg_match(self::ES_DECLARACION, mb_strtolower($a['nombre'] . ' ' . rawurldecode($a['href']))) === 1));
+            $a = $declaraciones[0] ?? $candidatos[0];
+            $v->valor('Enlace «' . mb_substr($a['nombre'] !== '' ? $a['nombre'] : $a['href'], 0, 120) . '» → ' . ($a['url'] ?? $a['href']))
+                ->elemento('<a href="' . $a['href'] . '">' . mb_substr($a['nombre'], 0, 120) . '</a>');
+            $limitacion = 'Solo se comprueba que el enlace existe; el contenido de la declaración (fecha, nivel de cumplimiento, contacto) lo revisa una persona.';
+            if ($declaraciones === []) {
+                $limitacion .= ' El enlace habla de accesibilidad pero no dice «declaración»: conviene confirmar que lo sea.';
+            }
+            return $v->limitacion($limitacion)->correcto();
+        }
+
+        $e->exigeHtmlCompleto('un enlace a la declaración de accesibilidad');
+        return $v
+            ->explicacion('La web no enlaza ninguna declaración de accesibilidad: una página que explica qué partes son accesibles y cómo pedir ayuda.')
+            ->valor('Ningún enlace de la página habla de accesibilidad.')
+            ->consecuencia('En el sector público es obligatoria (Real Decreto 1112/2018). En el resto es recomendable: muestra el compromiso y da un contacto a quien encuentre barreras.')
+            ->correccion('Publicar una página «Declaración de accesibilidad» y enlazarla desde el pie de todas las páginas.')
+            ->correccionCms([
+                'wordpress' => 'Crear la página en Páginas > Añadir nueva y enlazarla en Apariencia > Menús (menú del pie) o en el widget del pie.',
+                'prestashop' => 'Crear la página en Diseño > Páginas (CMS) y añadirla al bloque de enlaces del pie.',
+            ])
+            ->limitacion('Solo se revisan los enlaces de esta página; la declaración puede estar enlazada desde otra. Que sea obligatoria depende de si la web es del sector público: hay que decidirlo con el cliente.')
+            ->decisionRevisar();
     }
 
     private function enlacesNombre(Entorno $e): BorradorResultado
