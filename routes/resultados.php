@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use ProconSEO\Results\CompromisosKitDigital;
+use ProconSEO\Results\FiltroResultados;
 use ProconSEO\Results\Informe;
 use ProconSEO\Results\RepositorioResultados;
 use ProconSEO\Run\Fabrica;
@@ -40,8 +42,36 @@ return static function (Router $r): void {
             'titulo' => 'Resultados del análisis',
             'estilos' => $estilos,
             'analisis' => $analisis,
-            'informe' => new Informe($repositorio->resultados($id), $repositorio->recursos($id), $repositorio->fases($id), $catalogo()),
+            'informe' => new Informe(
+                $repositorio->resultados($id),
+                $repositorio->recursos($id),
+                $repositorio->fases($id),
+                $catalogo(),
+                FiltroResultados::desdeConsulta($p->consulta), // RF-23
+            ),
             'eventos' => $repositorio->eventosSeguridad($id),
+            'conKitDigital' => CompromisosKitDigital::aplica($analisis['proyecto_tipo']),
+        ]));
+    });
+
+    // Vista "Compromisos Kit Digital" (especificación 6.7, RF-07): solo en proyectos Kit Digital.
+    $r->get('/analisis/{id}/kit-digital', static function (Peticion $p) use ($repo, $catalogo, $estilos): Respuesta {
+        $repositorio = $repo();
+        $id = (int) $p->parametro('id');
+        $analisis = $repositorio->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+        if (!CompromisosKitDigital::aplica($analisis['proyecto_tipo'])) {
+            throw new ErrorDominio('no_encontrado', 'La vista «Compromisos Kit Digital» solo existe en proyectos de tipo Web Kit Digital o Tienda Kit Digital.', 404);
+        }
+
+        $cat = $catalogo();
+        $resultados = Informe::conTitulos($repositorio->resultados($id), $cat);
+
+        return Respuesta::html(Vista::render('results/kit_digital', [
+            'titulo' => 'Compromisos Kit Digital',
+            'estilos' => $estilos,
+            'analisis' => $analisis,
+            'compromisos' => $cat === null ? null : CompromisosKitDigital::agrupar($resultados, $cat, $analisis['proyecto_tipo']),
+            'hayResultados' => $resultados !== [],
         ]));
     });
 
@@ -50,7 +80,9 @@ return static function (Router $r): void {
         $repositorio = $repo();
         $resultado = $repositorio->resultado((int) $p->parametro('id'))
             ?? throw new ErrorDominio('no_encontrado', 'El resultado no existe.', 404);
-        $ficha = $catalogo()?->obtener((string) $resultado['id_comprobacion']);
+        $cat = $catalogo();
+        $ficha = $cat?->obtener((string) $resultado['id_comprobacion']);
+        $resultado = Informe::conTitulos([$resultado], $cat)[0];
 
         return Respuesta::html(Vista::render('results/detalle', [
             'titulo' => $ficha?->nombre ?? (string) $resultado['id_comprobacion'],
