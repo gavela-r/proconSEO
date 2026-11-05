@@ -11,6 +11,7 @@ use ProconSEO\Engine\AgrupadorCausas;
 use ProconSEO\Engine\Causas;
 use ProconSEO\Engine\Motor;
 use ProconSEO\Shared\Contract\BorradorResultado;
+use ProconSEO\Shared\Enum\Alcance;
 use ProconSEO\Tests\Engine\Soporte\Ejecucion;
 use ProconSEO\Tests\Engine\Soporte\Fixtures;
 
@@ -187,5 +188,31 @@ final class AgrupadorCausasTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         Causas::descripcion('inventada');
+    }
+
+    public function testEnElSitioCompletoUnaCausaDeUnSoloResultadoSeConserva(): void
+    {
+        // En «video», IA-08.canonical-declarado es el único resultado de la causa «canonical».
+        $individual = Ejecucion::de('video');
+        self::assertSame('mejorable', $individual->estado('IA-08.canonical-declarado'));
+        self::assertNull($individual->resultado('IA-08.canonical-declarado')->codigoGrupoCausa);
+
+        $sitio = Ejecucion::de('video', alcance: Alcance::SitioCompleto, contexto: Fixtures::contexto('video', Alcance::SitioCompleto));
+        self::assertSame(Causas::CANONICAL, $sitio->resultado('IA-08.canonical-declarado')->codigoGrupoCausa);
+        self::assertContains(Causas::CANONICAL, array_map(static fn ($g) => $g->codigo, $sitio->salida->gruposCausa));
+        // Solo cambia la causa: el estado es el mismo.
+        self::assertSame('mejorable', $sitio->estado('IA-08.canonical-declarado'));
+    }
+
+    public function testElMinimoNuncaBajaDeUno(): void
+    {
+        [$resultados, $grupos] = (new AgrupadorCausas())->agrupar(Ejecucion::de('no-cumple')->salida->resultados, true, 0);
+
+        foreach ($resultados as $r) {
+            if ($r->codigoGrupoCausa === null) {
+                continue;
+            }
+            self::assertContains($r->codigoGrupoCausa, array_map(static fn ($g) => $g->codigo, $grupos));
+        }
     }
 }
