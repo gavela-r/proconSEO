@@ -155,12 +155,6 @@
       <code><![CDATA[$script->textContent]]></code>
     </UndefinedPropertyFetch>
   </file>
-  <file src="src/Fetch/ClienteHttpSeguro.php">
-    <InvalidOperand>
-      <code><![CDATA[$ultima + $intervalo]]></code>
-      <code><![CDATA[1 / $this->limites->peticionesPorSegundoHost]]></code>
-    </InvalidOperand>
-  </file>
   <file src="src/Fetch/RelojSistema.php">
     <InvalidOperand>
       <code><![CDATA[hrtime(true) / 1e9]]></code>
