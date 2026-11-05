@@ -12,6 +12,7 @@ use ProconSEO\Fetch\DestinoRechazado;
 use ProconSEO\Fetch\LimitesDescarga;
 use ProconSEO\Fetch\PageSpeed\ClientePageSpeed;
 use ProconSEO\Fetch\ValidadorDestino;
+use ProconSEO\Shared\Contract\ConsolidadorSitio;
 use ProconSEO\Shared\Contract\ContextoAnalisis;
 use ProconSEO\Shared\Contract\InformePageSpeed;
 use ProconSEO\Shared\Contract\MotorAnalisis;
@@ -153,6 +154,7 @@ final class Orquestador
             $this->registrarBloqueos($id, $cliente);
             $cancelado = $progreso->estaCancelado();
             $limiteAlcanzado = null;
+            $salidaSitio = null;
 
             // F3 — Descubrimiento. En el sitio completo se recorren las páginas y el motor analiza cada una.
             if ($alcance === Alcance::UrlIndividual) {
@@ -164,10 +166,14 @@ final class Orquestador
             } else {
                 [$salidasSitio, $cancelado, $limiteAlcanzado] = $this->recorrerSitio($id, $cliente, $proveedor, $robots, $pagina, $limites, $limitesRastreo, $ambito, $progreso, $contexto, $inicio);
                 array_push($salidas, ...$salidasSitio);
+                if ($this->motor instanceof ConsolidadorSitio) {
+                    [$salidas, $salidaSitio] = $this->consolidarSitio($this->motor, $contexto($pagina), $salidas, $progreso);
+                }
             }
 
-            $resultados = array_sum(array_map(static fn (SalidaMotor $s): int => count($s->resultados), $salidas));
-            $causas = array_sum(array_map(static fn (SalidaMotor $s): int => count($s->gruposCausa), $salidas));
+            $todas = $salidaSitio === null ? $salidas : [...$salidas, $salidaSitio];
+            $resultados = array_sum(array_map(static fn (SalidaMotor $s): int => count($s->resultados), $todas));
+            $causas = array_sum(array_map(static fn (SalidaMotor $s): int => count($s->gruposCausa), $todas));
             $estadoMotor = $cancelado ? EstadoFase::Parcial : EstadoFase::Terminada;
             $this->terminar($id, Fase::Extraccion, $estadoMotor);
             $this->terminar($id, Fase::Comprobaciones, $estadoMotor, $resultados . ' resultados' . (count($salidas) > 1 ? ' en ' . count($salidas) . ' páginas.' : '.'));
@@ -175,7 +181,7 @@ final class Orquestador
 
             // F8 — Cierre: guardar todo (sanitizado) y decidir el estado final.
             $this->empezar($id, Fase::Cierre);
-            $this->guardarTodo($id, $cliente, $salidas, $proveedor->bloqueadas());
+            $this->guardarTodo($id, $cliente, $salidas, $proveedor->bloqueadas(), $salidaSitio);
             $this->terminar($id, Fase::Cierre, EstadoFase::Terminada);
 
             if ($cancelado) {
@@ -263,13 +269,45 @@ final class Orquestador
      * @param list<SalidaMotor> $salidas    La de la página analizada y, en el sitio completo, una por página
      * @param list<array{recurso: RecursoDescargado, motivo: string, comprobacion: ?string}> $bloqueadas
      *        Lo que se pidió y no se consultó (robots.txt o tope): también queda en la lista de recursos
+     * @param SalidaMotor|null $sitio Las comprobaciones de todo el sitio (sus evidencias llevan «S-» delante)
      */
-    private function guardarTodo(int $id, ClienteHttpSeguro $cliente, array $salidas, array $bloqueadas = []): void
+    private function guardarTodo(int $id, ClienteHttpSeguro $cliente, array $salidas, array $bloqueadas = [], ?SalidaMotor $sitio = null): void
     {
         $ids = $this->guardado->guardarRecursos($id, [...$cliente->registro(), ...$bloqueadas]);
         foreach ($salidas as $i => $salida) {
             $this->guardado->guardarSalida($id, $salida, $ids, $i === 0 ? '' : "P{$i}-");
         }
+        if ($sitio !== null) {
+            $this->guardado->guardarSalida($id, $sitio, $ids, 'S-');
+        }
+    }
+
+    /**
+     * Al terminar el recorrido, el motor compara las páginas entre sí (titles repetidos, páginas
+     * sin enlaces…). Esas subcomprobaciones se guardan una sola vez para todo el sitio, así que se
+     * quitan de cada página (allí solo dicen «se valora para todo el sitio»).
+     *
+     * @param list<SalidaMotor> $salidas
+     * @return array{0: list<SalidaMotor>, 1: SalidaMotor} las páginas sin esas subcomprobaciones y la del sitio
+     */
+    private function consolidarSitio(ConsolidadorSitio $motor, ContextoAnalisis $contexto, array $salidas, ProgresoBd $progreso): array
+    {
+        $deSitio = array_flip($motor->subcomprobacionesDeSitio());
+        $resumenes = [];
+        $paginas = [];
+        foreach ($salidas as $s) {
+            if ($s->resumen !== null) {
+                $resumenes[] = $s->resumen;
+            }
+            $paginas[] = new SalidaMotor(
+                array_values(array_filter($s->resultados, static fn ($r): bool => !isset($deSitio[$r->idComprobacion]))),
+                $s->evidencias,
+                $s->gruposCausa,
+                $s->senales,
+            );
+        }
+
+        return [$paginas, $motor->consolidarSitio($contexto, $resumenes, $progreso, $progreso)];
     }
 
     /**
@@ -324,6 +362,7 @@ final class Orquestador
                 $salida->evidencias,
                 $salida->gruposCausa,
                 $salida->senales,
+                $salida->resumen,
             );
             if ($progreso->estaCancelado()) {
                 break;

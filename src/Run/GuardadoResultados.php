@@ -65,7 +65,7 @@ final class GuardadoResultados
 
     /**
      * @param array<string, int> $idsRecursos
-     * @param string             $prefijo Delante de los códigos de evidencia y de causa («P3-»), para que
+     * @param string             $prefijo Delante de los códigos de evidencia («P3-»), para que
      *                                    los de varias páginas de un mismo análisis no choquen
      */
     public function guardarSalida(int $analisisId, SalidaMotor $salida, array $idsRecursos, string $prefijo = ''): void
@@ -74,9 +74,13 @@ final class GuardadoResultados
         $this->bd->beginTransaction();
         try {
             $grupos = [];
-            $insertarGrupo = $this->bd->prepare('INSERT INTO grupos_causa (analisis_id, codigo, descripcion) VALUES (?, ?, ?)');
+            // Sin prefijo de página: la misma causa en varias páginas es un solo grupo (RF-24).
+            $insertarGrupo = $this->bd->prepare(
+                'INSERT INTO grupos_causa (analisis_id, codigo, descripcion) VALUES (?, ?, ?)
+                 ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)'
+            );
             foreach ($salida->gruposCausa as $g) {
-                $insertarGrupo->execute([$analisisId, $prefijo . $g->codigo, $s->texto($g->descripcion)]);
+                $insertarGrupo->execute([$analisisId, $g->codigo, $s->texto($g->descripcion)]);
                 $grupos[$g->codigo] = (int) $this->bd->lastInsertId();
             }
 
