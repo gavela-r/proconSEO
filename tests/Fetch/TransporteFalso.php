@@ -14,6 +14,8 @@ final class TransporteFalso implements TransporteHttp
     public array $peticiones = [];
     /** @var list<RespuestaHttp> */
     private array $cola = [];
+    /** @var array<string, RespuestaHttp> Respuestas fijas por URL; tienen prioridad sobre la cola */
+    public array $porUrl = [];
     /** @var (callable(): mixed)|null Se ejecuta tras cada envío */
     public $alEnviar = null;
 
@@ -25,7 +27,7 @@ final class TransporteFalso implements TransporteHttp
     public function enviar(PeticionHttp $peticion): RespuestaHttp
     {
         $this->peticiones[] = $peticion;
-        $respuesta = array_shift($this->cola) ?? new RespuestaHttp(0, error: RespuestaHttp::ERROR_RED, detalleError: 'sin respuesta preparada');
+        $respuesta = $this->porUrl[$peticion->destino->url->url()] ?? array_shift($this->cola) ?? new RespuestaHttp(0, error: RespuestaHttp::ERROR_RED, detalleError: 'sin respuesta preparada');
         if ($this->alEnviar !== null) {
             ($this->alEnviar)();
         }

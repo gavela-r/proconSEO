@@ -150,6 +150,7 @@ final class LimitesAuditoriaTest extends TestCase
         self::assertSame('http://192.168.1.1/', $rechazos[0]['url']);
     }
 
+    /** Ojo: activa el interruptor de verdad y detiene cualquier análisis que esté en marcha en la base de datos local. */
     public function testInterruptorDetieneLoQueHayYNoDejaLanzarMas(): void
     {
         $enCola = $this->lanzar('https://ejemplo.es/', '192.0.2.70');

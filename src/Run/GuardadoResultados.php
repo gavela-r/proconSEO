@@ -65,8 +65,10 @@ final class GuardadoResultados
 
     /**
      * @param array<string, int> $idsRecursos
+     * @param string             $prefijo Delante de los códigos de evidencia y de causa («P3-»), para que
+     *                                    los de varias páginas de un mismo análisis no choquen
      */
-    public function guardarSalida(int $analisisId, SalidaMotor $salida, array $idsRecursos): void
+    public function guardarSalida(int $analisisId, SalidaMotor $salida, array $idsRecursos, string $prefijo = ''): void
     {
         $s = $this->sanitizador;
         $this->bd->beginTransaction();
@@ -74,7 +76,7 @@ final class GuardadoResultados
             $grupos = [];
             $insertarGrupo = $this->bd->prepare('INSERT INTO grupos_causa (analisis_id, codigo, descripcion) VALUES (?, ?, ?)');
             foreach ($salida->gruposCausa as $g) {
-                $insertarGrupo->execute([$analisisId, $g->codigo, $s->texto($g->descripcion)]);
+                $insertarGrupo->execute([$analisisId, $prefijo . $g->codigo, $s->texto($g->descripcion)]);
                 $grupos[$g->codigo] = (int) $this->bd->lastInsertId();
             }
 
@@ -85,7 +87,7 @@ final class GuardadoResultados
             );
             foreach ($salida->evidencias as $e) {
                 $insertarEvidencia->execute([
-                    $analisisId, $e->codigo, $e->tipo->value, $s->texto($e->contenido),
+                    $analisisId, $prefijo . $e->codigo, $e->tipo->value, $s->texto($e->contenido),
                     $e->urlRecurso === null ? null : ($idsRecursos[$e->urlRecurso] ?? null),
                     $s->url($e->urlRecurso), (int) $e->truncado, $e->capturadoEn?->format('Y-m-d H:i:s.v'),
                 ]);
