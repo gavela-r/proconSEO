@@ -69,7 +69,7 @@ final class ProveedorAcotadoTest extends TestCase
         self::assertSame('enlace interno', $bloqueadas[0]['motivo']);
     }
 
-    public function testEnCadaPaginaEmpiezaElTopeYSeOlvidaElHtmlDeLaAnterior(): void
+    public function testEnCadaPaginaEmpiezaElTopeYSeRecuerdaElHtmlDeLaAnterior(): void
     {
         $robots = new \ProconSEO\Shared\Contract\RecursoDescargado('https://ejemplo.es/sitemap.xml', 'https://ejemplo.es/sitemap.xml', ResultadoDescarga::Correcto, 200, tipoContenido: 'application/xml', cuerpo: '<urlset/>');
         $falso = new ProveedorFalso(['https://ejemplo.es/sitemap.xml' => $robots, 'http://ejemplo.es/a' => '']);
@@ -84,8 +84,22 @@ final class ProveedorAcotadoTest extends TestCase
         $proveedor->obtener('https://ejemplo.es/sitemap.xml', 'sitemap');
         $proveedor->obtener('http://ejemplo.es/a', 'variante http');
 
-        self::assertSame(['https://ejemplo.es/sitemap.xml', 'http://ejemplo.es/a', 'http://ejemplo.es/a'], $falso->pedidas,
-            'El sitemap se recuerda; la página HTML de la anterior se olvida y el tope vuelve a empezar');
-        self::assertSame(3, $proveedor->urlsExtra());
+        self::assertSame(['https://ejemplo.es/sitemap.xml', 'http://ejemplo.es/a'], $falso->pedidas,
+            'El sitemap y la página HTML de la anterior se recuerdan: el menú de cada página no se vuelve a pedir');
+        self::assertSame(2, $proveedor->urlsExtra());
+        self::assertNotSame(ResultadoDescarga::FueraDeAmbito, $proveedor->obtener('http://otra/', 'x')->resultado, 'El tope vuelve a empezar en la página b');
+    }
+
+    public function testPasadoElTopeDeMemoriaSeOlvidanLasPaginasMasAntiguas(): void
+    {
+        $grande = str_repeat('x', intdiv(ProveedorAcotado::MAX_BYTES_HTML, 2) + 1);
+        $falso = new ProveedorFalso(['https://ejemplo.es/a' => $grande, 'https://ejemplo.es/b' => $grande]);
+        $proveedor = new ProveedorAcotado($falso, null, 'Sitio completo');
+
+        $proveedor->obtener('https://ejemplo.es/a', 'enlace');
+        $proveedor->obtener('https://ejemplo.es/b', 'enlace');
+
+        self::assertNull($proveedor->enMemoria('https://ejemplo.es/a'), 'Las dos no caben: se olvida la más antigua');
+        self::assertNotNull($proveedor->enMemoria('https://ejemplo.es/b'));
     }
 }
