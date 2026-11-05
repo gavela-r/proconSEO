@@ -195,6 +195,54 @@ final class PlantillasResultadosTest extends TestCase
         ], false);
     }
 
+    public function testCambiosDesdeElAnalisisAnterior(): void
+    {
+        $antes = [
+            Filas::resultado(['id_comprobacion' => 'SEO-03.title-presente', 'estado' => 'problema', 'gravedad' => 'alto']),
+            Filas::resultado(['id_comprobacion' => 'SEO-04.description', 'estado' => 'correcto']),
+        ];
+        $ahora = [
+            Filas::resultado(['id_comprobacion' => 'SEO-03.title-presente', 'estado' => 'correcto', 'titulo' => self::MALICIOSO]),
+            Filas::resultado(['id_comprobacion' => 'SEO-04.description', 'estado' => 'problema', 'gravedad' => 'medio', 'url_recurso' => 'https://ejemplo.es/' . self::MALICIOSO]),
+        ];
+        $html = Vista::render('results/dashboard', [
+            'analisis' => Filas::analisis(['version_catalogo' => '1.2.0']),
+            'informe' => new Informe($ahora, [], [], null),
+            'eventos' => [],
+            'conKitDigital' => false,
+            'anterior' => ['id' => 7, 'estado' => 'completado', 'creado_en' => '2026-10-01 10:00:00', 'terminado_en' => '2026-10-01 10:05:00', 'version_catalogo' => '1.1.0'],
+            'comparacion' => new \ProconSEO\Results\ComparacionAnalisis($antes, $ahora),
+        ], false);
+
+        $this->assertSinHtmlInyectado($html);
+        self::assertStringContainsString('Cambios desde el análisis anterior', $html);
+        self::assertStringContainsString('href="/analisis/7"', $html);
+        self::assertStringContainsString('Arreglados (1)', $html);
+        self::assertStringContainsString('Nuevos (1)', $html);
+        self::assertStringContainsString('no significa que Google', $html, 'Avisa de que el buscador puede tardar');
+        self::assertStringContainsString('versiones distintas del catálogo', $html);
+        self::assertLessThan(strpos($html, 'id="t-bloqueos"'), strpos($html, 'id="t-cambios"'), 'Va antes del detalle');
+        self::assertDoesNotMatchRegularExpression('/\d+\s*%/', strip_tags($html), 'Sin porcentajes');
+    }
+
+    public function testSiNadaSePudoComprobarNoDiceQueNoHayaCambiado(): void
+    {
+        $nv = [Filas::resultado(['estado' => 'no_verificable'])];
+        $html = Vista::render('results/_cambios', [
+            'anterior' => ['id' => 7, 'creado_en' => '2026-10-01 10:00:00', 'terminado_en' => null, 'version_catalogo' => null],
+            'comparacion' => new \ProconSEO\Results\ComparacionAnalisis($nv, $nv),
+            'versionCatalogo' => null,
+        ], false);
+
+        self::assertStringContainsString('No se puede comparar', $html);
+        self::assertStringNotContainsString('No ha cambiado nada', $html);
+    }
+
+    public function testSinAnalisisAnteriorNoHaySeccionDeCambios(): void
+    {
+        self::assertStringNotContainsString('t-cambios', $this->dashboard([Filas::resultado()]));
+    }
+
     private function assertSinHtmlInyectado(string $html): void
     {
         self::assertStringNotContainsString('<script>alert', $html);

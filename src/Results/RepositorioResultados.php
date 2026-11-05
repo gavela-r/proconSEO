@@ -34,6 +34,30 @@ final class RepositorioResultados
     }
 
     /**
+     * El análisis terminado justo antes de este, de la misma dirección y con el mismo alcance
+     * dentro del mismo proyecto, para ver qué ha cambiado. Los cancelados o con error no
+     * cuentan: no se recorrieron enteros.
+     *
+     * @param array<string, mixed> $analisis Fila de analisis()
+     * @return array<string, mixed>|null
+     */
+    public function analisisAnterior(array $analisis): ?array
+    {
+        $consulta = $this->bd->prepare(
+            "SELECT id, estado, creado_en, terminado_en, version_catalogo
+             FROM analisis
+             WHERE proyecto_id = ? AND url_normalizada = ? AND alcance = ? AND id < ?
+               AND estado IN ('completado', 'parcial')
+             ORDER BY id DESC
+             LIMIT 1"
+        );
+        $consulta->execute([$analisis['proyecto_id'], $analisis['url_normalizada'], $analisis['alcance'], $analisis['id']]);
+        $fila = $consulta->fetch();
+
+        return $fila === false ? null : $fila;
+    }
+
+    /**
      * Resultados del análisis con su estado vigente, si la revisión está pendiente,
      * su grupo de causa y los códigos de sus evidencias.
      *

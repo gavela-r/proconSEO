@@ -7,6 +7,8 @@
  * @var \ProconSEO\Results\Informe $informe
  * @var list<array<string, mixed>> $eventos
  * @var bool $conKitDigital
+ * @var array<string, mixed>|null $anterior
+ * @var \ProconSEO\Results\ComparacionAnalisis|null $comparacion
  */
 
 use ProconSEO\Projects\Formato;
@@ -122,6 +124,11 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
         <?php endforeach; ?>
     </div>
 </section>
+
+<?php if (($comparacion ?? null) !== null && ($anterior ?? null) !== null): ?>
+    <!-- Cambios desde el análisis anterior de la misma dirección -->
+    <?= Vista::render('results/_cambios', ['anterior' => $anterior, 'comparacion' => $comparacion, 'versionCatalogo' => $analisis['version_catalogo']], false) ?>
+<?php endif; ?>
 
 <!-- Filtros y búsqueda por texto (RF-23). Sin JavaScript: es un formulario GET normal. -->
 <form class="filtros" id="resultados" role="search" action="/analisis/<?= e($id) ?>#resultados" method="get" aria-label="Filtrar resultados">
