@@ -161,12 +161,6 @@
       <code><![CDATA[1 / $this->limites->peticionesPorSegundoHost]]></code>
     </InvalidOperand>
   </file>
-  <file src="src/Fetch/Http/TransporteCurl.php">
-    <TypeDoesNotContainType>
-      <code><![CDATA[$truncado]]></code>
-      <code><![CDATA[$truncado]]></code>
-    </TypeDoesNotContainType>
-  </file>
   <file src="src/Fetch/RelojSistema.php">
     <InvalidOperand>
       <code><![CDATA[hrtime(true) / 1e9]]></code>

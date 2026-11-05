@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace ProconSEO\Fetch\Http;
 
+use CurlHandle;
+use stdClass;
+
 /**
  * Transporte real con cURL, configurado para no salirse de lo validado:
  *
@@ -12,6 +15,8 @@ namespace ProconSEO\Fetch\Http;
  * - Solo http/https, sin proxy, sin cookies y sin reutilizar conexiones.
  * - Verifica siempre el certificado TLS y el nombre del servidor (SEG-03).
  * - Corta la descarga al superar $maxBytes, medidos ya descomprimidos (SEG-05).
+ *
+ * Una petición o varias a la vez (curl_multi) usan exactamente la misma configuración.
  */
 final class TransporteCurl implements TransporteHttp
 {
@@ -24,17 +29,59 @@ final class TransporteCurl implements TransporteHttp
 
     public function enviar(PeticionHttp $peticion): RespuestaHttp
     {
-        $cuerpo = '';
-        $truncado = false;
-        $cabeceras = [];
-        $bytesCabeceras = 0;
+        return $this->enviarVarias([$peticion])[0];
+    }
 
-        $curl = curl_init();
-        if ($curl === false) {
-            return new RespuestaHttp(0, error: RespuestaHttp::ERROR_RED, detalleError: 'No se pudo iniciar cURL.');
+    public function enviarVarias(array $peticiones): array
+    {
+        $multi = curl_multi_init();
+        /** @var array<int, array{curl: CurlHandle, estado: stdClass}> $enCurso */
+        $enCurso = [];
+        /** @var array<int, RespuestaHttp> $respuestas */
+        $respuestas = [];
+
+        foreach ($peticiones as $i => $peticion) {
+            $estado = (object) ['cuerpo' => '', 'truncado' => false, 'cabeceras' => [], 'bytesCabeceras' => 0, 'errno' => 0];
+            $curl = curl_init();
+            if ($curl === false) {
+                $respuestas[$i] = new RespuestaHttp(0, error: RespuestaHttp::ERROR_RED, detalleError: 'No se pudo iniciar cURL.');
+                continue;
+            }
+            curl_setopt_array($curl, $this->opciones($peticion, $estado));
+            curl_multi_add_handle($multi, $curl);
+            $enCurso[$i] = ['curl' => $curl, 'estado' => $estado];
         }
 
-        curl_setopt_array($curl, [
+        // Todas a la vez; cada una con su propio tiempo máximo y su límite de bytes.
+        do {
+            $codigo = curl_multi_exec($multi, $activas);
+            while (($info = curl_multi_info_read($multi)) !== false) {
+                foreach ($enCurso as $e) {
+                    if ($e['curl'] === $info['handle']) {
+                        $e['estado']->errno = (int) $info['result'];
+                    }
+                }
+            }
+            if ($activas > 0) {
+                curl_multi_select($multi, 1.0);
+            }
+        } while ($activas > 0 && $codigo === CURLM_OK);
+
+        foreach ($enCurso as $i => $e) {
+            $respuestas[$i] = $this->respuesta($e['curl'], $e['estado']);
+            curl_multi_remove_handle($multi, $e['curl']);
+            curl_close($e['curl']);
+        }
+        curl_multi_close($multi);
+        ksort($respuestas);
+
+        return array_values($respuestas);
+    }
+
+    /** @return array<int, mixed> */
+    private function opciones(PeticionHttp $peticion, stdClass $estado): array
+    {
+        return [
             CURLOPT_URL => $peticion->destino->url->url(),
             CURLOPT_RESOLVE => $peticion->destino->opcionCurlResolve(),
             CURLOPT_HTTPGET => true,
@@ -57,45 +104,45 @@ final class TransporteCurl implements TransporteHttp
                 'Accept-Language: ' . $peticion->idioma,
             ],
             CURLOPT_RETURNTRANSFER => false,
-            CURLOPT_HEADERFUNCTION => static function ($c, string $linea) use (&$cabeceras, &$bytesCabeceras): int {
-                $bytesCabeceras += strlen($linea);
-                if ($bytesCabeceras > self::MAX_BYTES_CABECERAS || count($cabeceras) > self::MAX_CABECERAS) {
+            CURLOPT_HEADERFUNCTION => static function ($c, string $linea) use ($estado): int {
+                $estado->bytesCabeceras += strlen($linea);
+                if ($estado->bytesCabeceras > self::MAX_BYTES_CABECERAS || count($estado->cabeceras) > self::MAX_CABECERAS) {
                     return -1;
                 }
                 if (str_starts_with($linea, 'HTTP/')) {
-                    $cabeceras = []; // respuestas intermedias como 100 Continue
+                    $estado->cabeceras = []; // respuestas intermedias como 100 Continue
                 } elseif (str_contains($linea, ':')) {
                     [$nombre, $valor] = explode(':', $linea, 2);
                     $nombre = strtolower(trim($nombre));
                     $valor = trim($valor);
-                    $cabeceras[$nombre] = isset($cabeceras[$nombre]) ? $cabeceras[$nombre] . ', ' . $valor : $valor;
+                    $estado->cabeceras[$nombre] = isset($estado->cabeceras[$nombre]) ? $estado->cabeceras[$nombre] . ', ' . $valor : $valor;
                 }
 
                 return strlen($linea);
             },
-            CURLOPT_WRITEFUNCTION => static function ($c, string $datos) use (&$cuerpo, &$truncado, $peticion): int {
-                $disponible = $peticion->maxBytes - strlen($cuerpo);
+            CURLOPT_WRITEFUNCTION => static function ($c, string $datos) use ($estado, $peticion): int {
+                $disponible = $peticion->maxBytes - strlen($estado->cuerpo);
                 if (strlen($datos) > $disponible) {
-                    $cuerpo .= substr($datos, 0, max(0, $disponible));
-                    $truncado = true;
+                    $estado->cuerpo .= substr($datos, 0, max(0, $disponible));
+                    $estado->truncado = true;
 
                     return -1; // cURL aborta la descarga
                 }
-                $cuerpo .= $datos;
+                $estado->cuerpo .= $datos;
 
                 return strlen($datos);
             },
-        ]);
+        ];
+    }
 
-        curl_exec($curl);
-        $errno = curl_errno($curl);
-        $mensaje = curl_error($curl);
-        $estado = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
-        curl_close($curl);
+    private function respuesta(CurlHandle $curl, stdClass $estado): RespuestaHttp
+    {
+        $errno = (int) $estado->errno;
+        $codigo = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
 
         // Abortado por superar el tamaño: no es un error, es un recurso truncado.
-        if ($truncado) {
-            return new RespuestaHttp($estado, $cabeceras, $cuerpo, true);
+        if ($estado->truncado) {
+            return new RespuestaHttp($codigo, $estado->cabeceras, $estado->cuerpo, true);
         }
 
         if ($errno !== 0) {
@@ -105,9 +152,9 @@ final class TransporteCurl implements TransporteHttp
                 default => RespuestaHttp::ERROR_RED,
             };
 
-            return new RespuestaHttp($estado, $cabeceras, '', false, $tipo, $mensaje);
+            return new RespuestaHttp($codigo, $estado->cabeceras, '', false, $tipo, (string) curl_strerror($errno));
         }
 
-        return new RespuestaHttp($estado, $cabeceras, $cuerpo);
+        return new RespuestaHttp($codigo, $estado->cabeceras, $estado->cuerpo);
     }
 }

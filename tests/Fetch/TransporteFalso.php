@@ -24,6 +24,16 @@ final class TransporteFalso implements TransporteHttp
         $this->cola[] = $respuesta;
     }
 
+    /** @var int Cuántas veces se pidieron varias a la vez */
+    public int $tandas = 0;
+
+    public function enviarVarias(array $peticiones): array
+    {
+        $this->tandas++;
+
+        return array_map($this->enviar(...), array_values($peticiones));
+    }
+
     public function enviar(PeticionHttp $peticion): RespuestaHttp
     {
         $this->peticiones[] = $peticion;

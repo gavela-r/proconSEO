@@ -205,6 +205,7 @@ final class OrquestadorTest extends TestCase
         $this->orquestador($motor, $pageSpeed)->ejecutar($this->lanzar());
 
         self::assertCount(2, $google->peticiones, 'Móvil y ordenador');
+        self::assertSame(1, $google->tandas, 'Pedidos a la vez, no uno detrás de otro');
         self::assertSame(2000.0, $motor->contexto?->pageSpeed(InformePageSpeed::MOVIL)?->laboratorio['lcp_ms']);
         self::assertStringContainsString('cuota', (string) $motor->contexto?->pageSpeed(InformePageSpeed::ORDENADOR)?->error);
     }
