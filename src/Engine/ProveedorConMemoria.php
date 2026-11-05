@@ -25,6 +25,11 @@ final class ProveedorConMemoria implements ProveedorRecursos
         return $this->memoria[$url] ??= $this->proveedor->obtener($url, $motivo, $idComprobacion);
     }
 
+    public function tiene(string $url): bool
+    {
+        return isset($this->memoria[$url]);
+    }
+
     /** Registra un recurso ya descargado (la página principal) para no pedirlo otra vez. */
     public function recordar(RecursoDescargado $recurso): void
     {

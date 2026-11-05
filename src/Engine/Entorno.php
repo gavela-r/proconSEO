@@ -43,6 +43,13 @@ final class Entorno
     /** @var list<BorradorEvidencia> */
     private array $evidencias = [];
 
+    /** URLs extra pedidas (sin contar robots.txt ni la página), para el límite del perfil. */
+    private int $urlsExtra = 0;
+
+    /** Extensiones que no son páginas HTML. */
+    private const NO_PAGINAS = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg', 'zip', 'rar', 'doc', 'docx',
+        'xls', 'xlsx', 'ppt', 'pptx', 'mp4', 'mp3', 'webm', 'mov', 'xml', 'txt', 'csv', 'ics', 'exe', 'dmg'];
+
     public function __construct(
         public readonly ContextoAnalisis $contexto,
         public readonly ProveedorConMemoria $proveedor,
@@ -106,6 +113,35 @@ final class Entorno
         return $this->documento;
     }
 
+    /**
+     * La página apenas tiene texto en el HTML inicial y carga scripts: lo que «falta» puede
+     * aparecer al ejecutar JavaScript. Sin navegador no se puede afirmar una ausencia
+     * (especificación 10, «Contenido que aparece tras la carga»).
+     */
+    public function contenidoPuedeDependerDeJs(): bool
+    {
+        $doc = $this->documento();
+        if (mb_strlen($doc->texto) >= 200) {
+            return false;
+        }
+        $xp = new \DOMXPath($doc->dom);
+        // Señales de aplicación JavaScript: contenedor raíz vacío, scripts de módulo o aviso <noscript>.
+        $raizVacia = $xp->query('//body//*[@id="root" or @id="app" or @id="__next" or @id="__nuxt" or @data-reactroot or @ng-app or @ng-version][not(normalize-space())]');
+        $modulos = $xp->query('//script[@type="module"]');
+        $avisos = $xp->query('//noscript[contains(translate(., "JAVSCRIPT", "javscript"), "javascript")]');
+        return ($raizVacia !== false && $raizVacia->length > 0)
+            || ($modulos !== false && $modulos->length > 0)
+            || ($avisos !== false && $avisos->length > 0);
+    }
+
+    /** Lanza NoVerificable si una ausencia podría deberse a contenido que añade JavaScript. */
+    public function exigeHtmlCompleto(string $queFalta): void
+    {
+        if ($this->contenidoPuedeDependerDeJs()) {
+            throw new NoVerificable("No se encuentra $queFalta en el HTML inicial, pero la página carga casi todo con JavaScript: sin navegador no se puede afirmar que falte.");
+        }
+    }
+
     /** El análisis permite consultar otras URLs (alcance con contexto o sitio completo). */
     public function exigeAlcance(Alcance $minimo, string $paraQue): void
     {
@@ -115,9 +151,60 @@ final class Entorno
         }
     }
 
+    /**
+     * Pide una URL a la Parte 1. Las URLs extra (todo salvo robots.txt) cuentan para el límite
+     * del perfil (rastreo.urls_contexto, 20 en v1); al agotarlo, lanza NoVerificable y no pide nada.
+     */
     public function obtener(string $url, string $motivo, string $idComprobacion): RecursoDescargado
     {
+        if (!$this->proveedor->tiene($url) && !str_ends_with((string) parse_url($url, PHP_URL_PATH), '/robots.txt')) {
+            if ($this->urlsExtra >= $this->limiteUrlsExtra()) {
+                throw new NoVerificable('Se alcanzó el límite de ' . $this->limiteUrlsExtra() . ' URLs adicionales del perfil de ejecución.');
+            }
+            $this->urlsExtra++;
+        }
         return $this->proveedor->obtener($url, $motivo, $idComprobacion);
+    }
+
+    public function limiteUrlsExtra(): int
+    {
+        $clave = $this->contexto->alcance === Alcance::SitioCompleto ? 'paginas_sitio_completo' : 'urls_contexto';
+        $valor = $this->contexto->perfil['rastreo'][$clave]['valor'] ?? null;
+        return is_int($valor) && $valor > 0 ? $valor : ($clave === 'urls_contexto' ? 20 : 200);
+    }
+
+    /** true si el host de la URL es el de la página o uno de los autorizados. */
+    public function esInterna(string $url): bool
+    {
+        $host = Url::host($url);
+        if ($host === null) {
+            return false;
+        }
+        return $host === Url::host($this->url()) || in_array($host, array_map('strtolower', $this->contexto->hostsAutorizados), true);
+    }
+
+    /**
+     * Páginas internas enlazadas desde la página analizada: http(s), del ámbito, sin fragmento,
+     * sin repetir, sin la propia página y sin ficheros que no son HTML. En orden de aparición.
+     *
+     * @return list<string>
+     */
+    public function enlacesInternos(): array
+    {
+        $propia = Url::sinFragmento($this->url());
+        $urls = [];
+        foreach ($this->documento()->enlaces as $a) {
+            if ($a['url'] === null) {
+                continue;
+            }
+            $url = Url::sinFragmento($a['url']);
+            $extension = strtolower(pathinfo((string) parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+            if ($url === $propia || !$this->esInterna($url) || in_array($extension, self::NO_PAGINAS, true)) {
+                continue;
+            }
+            $urls[$url] = true;
+        }
+        return array_keys($urls);
     }
 
     public const ROBOTS_LEIDO = 'leido';
