@@ -40,6 +40,9 @@ use Throwable;
  */
 final class Orquestador
 {
+    /** Token con el que nos identificamos ante robots.txt (el user-agent empieza por él). */
+    private const AGENTE = 'proconSEO';
+
     /**
      * @param Closure(Ambito, LimitesDescarga): ClienteHttpSeguro $fabricaCliente
      */
@@ -119,6 +122,11 @@ final class Orquestador
             );
             $proveedor->recordar($robots);
             $proveedor->recordar($pagina);
+            // Lo que pidan las comprobaciones también respeta robots.txt (la página indicada se analiza igualmente).
+            if ($robots->esCorrecto()) {
+                $proveedor->respetarRobots((new AnalizadorRobots())->analizar($robots->cuerpo),
+                    (string) preg_replace('#^([a-z]+://[^/?\#]+).*$#i', '$1', $robots->urlFinal), self::AGENTE);
+            }
 
             $this->terminar($id, Fase::Renderizado, EstadoFase::Omitida, 'Sin navegador en esta versión: lo que depende del renderizado queda no verificable.');
 
@@ -262,7 +270,7 @@ final class Orquestador
             return [[], false, 'no se pudo leer robots.txt y no se recorrió el sitio.'];
         }
 
-        $rastreador = new Rastreador($cliente, $proveedor, $ambito->hosts(), $limitesRastreo, $reglas, 'proconSEO',
+        $rastreador = new Rastreador($cliente, $proveedor, $ambito->hosts(), $limitesRastreo, $reglas, self::AGENTE,
             $limites->maxBytesHtml, $limites->maxBytesSitemap);
         $progresoPagina = new ProgresoPorPagina($progreso, $limitesRastreo->maxPaginas);
         $progresoPagina->siguiente(); // la primera página ya está analizada
