@@ -11,51 +11,73 @@ use ProconSEO\Shared\Enum\ResultadoDescarga;
 /**
  * Lo que recibe el motor en lugar del cliente HTTP:
  * - recuerda lo ya descargado, para no pedir robots.txt o el sitemap una vez por página;
- * - pone un tope de URLs distintas por alcance (con contexto: 20 además de la página y
+ * - pone un tope de URLs nuevas por página analizada (con contexto: 20 además de la página y
  *   robots.txt). Pasado el tope no se descarga nada: se devuelve «fuera de ámbito» con el
  *   motivo, y la comprobación que lo pidió queda no_verificable.
+ *
+ * En el sitio completo, al pasar a otra página se olvidan las páginas HTML de la anterior
+ * (no cabría todo el sitio en memoria); robots.txt, sitemaps y demás se conservan.
  */
 final class ProveedorAcotado implements ProveedorRecursos
 {
-    /** @var array<string, RecursoDescargado> */
-    private array $memoria = [];
+    /** @var array<string, RecursoDescargado> Se conservan todo el análisis */
+    private array $permanentes = [];
+    /** @var array<string, RecursoDescargado> Páginas HTML de la página que se está analizando */
+    private array $temporales = [];
     private int $nuevas = 0;
+    private int $totalNuevas = 0;
 
     public function __construct(
         private readonly ProveedorRecursos $proveedor,
-        private readonly ?int $maxNuevas = null,
+        private readonly ?int $maxNuevasPorPagina = null,
         private readonly string $alcance = '',
     ) {
     }
 
     public function obtener(string $url, string $motivo, ?string $idComprobacion = null): RecursoDescargado
     {
-        if (isset($this->memoria[$url])) {
-            return $this->memoria[$url];
+        $guardado = $this->permanentes[$url] ?? $this->temporales[$url] ?? null;
+        if ($guardado !== null) {
+            return $guardado;
         }
-        if ($this->maxNuevas !== null && $this->nuevas >= $this->maxNuevas) {
+        if ($this->maxNuevasPorPagina !== null && $this->nuevas >= $this->maxNuevasPorPagina) {
             return new RecursoDescargado($url, $url, ResultadoDescarga::FueraDeAmbito,
-                motivo: "Se ha llegado al máximo de {$this->maxNuevas} URLs extra del alcance «{$this->alcance}».");
+                motivo: "Se ha llegado al máximo de {$this->maxNuevasPorPagina} URLs extra por página del alcance «{$this->alcance}».");
         }
         $this->nuevas++;
+        $this->totalNuevas++;
 
-        return $this->memoria[$url] = $this->proveedor->obtener($url, $motivo, $idComprobacion);
+        $recurso = $this->proveedor->obtener($url, $motivo, $idComprobacion);
+        if (self::esHtml($recurso)) {
+            $this->temporales[$url] = $recurso;
+        } else {
+            $this->permanentes[$url] = $recurso;
+        }
+
+        return $recurso;
     }
 
-    /** Registra algo ya descargado (la página o robots.txt) sin contarlo en el tope. */
+    /** Registra algo ya descargado (robots.txt, la página inicial) sin contarlo en el tope. */
     public function recordar(RecursoDescargado $recurso): void
     {
-        $this->memoria[$recurso->urlSolicitada] ??= $recurso;
+        $this->permanentes[$recurso->urlSolicitada] ??= $recurso;
     }
 
-    /** Libera una página ya analizada, para no tener todo el sitio en memoria. */
-    public function olvidar(RecursoDescargado $recurso): void
+    /** Empieza otra página del sitio: tope a cero y fuera las páginas HTML de la anterior. */
+    public function nuevaPagina(RecursoDescargado $pagina): void
     {
-        unset($this->memoria[$recurso->urlSolicitada]);
+        $this->nuevas = 0;
+        $this->temporales = [$pagina->urlSolicitada => $pagina];
     }
 
+    /** URLs extra pedidas en todo el análisis. */
     public function urlsExtra(): int
     {
-        return $this->nuevas;
+        return $this->totalNuevas;
+    }
+
+    private static function esHtml(RecursoDescargado $r): bool
+    {
+        return str_contains(strtolower((string) $r->tipoContenido), 'html');
     }
 }

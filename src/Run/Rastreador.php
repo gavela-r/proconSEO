@@ -171,7 +171,7 @@ final class Rastreador
             return;
         }
 
-        $ruta = strtok($url, '?');
+        $ruta = explode('?', $url, 2)[0];
         if ($ruta !== $url && ($this->variantes[$ruta] ?? 0) >= LimitesRastreo::MAX_VARIANTES) {
             return;
         }

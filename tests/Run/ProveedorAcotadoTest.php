@@ -44,4 +44,24 @@ final class ProveedorAcotadoTest extends TestCase
         self::assertStringContainsString('máximo de 1 URLs', (string) $fuera->motivo);
         self::assertSame(['https://ejemplo.es/a'], $falso->pedidas);
     }
+
+    public function testEnCadaPaginaEmpiezaElTopeYSeOlvidaElHtmlDeLaAnterior(): void
+    {
+        $robots = new \ProconSEO\Shared\Contract\RecursoDescargado('https://ejemplo.es/sitemap.xml', 'https://ejemplo.es/sitemap.xml', ResultadoDescarga::Correcto, 200, tipoContenido: 'application/xml', cuerpo: '<urlset/>');
+        $falso = new ProveedorFalso(['https://ejemplo.es/sitemap.xml' => $robots, 'http://ejemplo.es/a' => '']);
+        $proveedor = new ProveedorAcotado($falso, 2, 'Sitio completo');
+
+        $proveedor->nuevaPagina(ProveedorFalso::html('https://ejemplo.es/a', ''));
+        $proveedor->obtener('https://ejemplo.es/sitemap.xml', 'sitemap');
+        $proveedor->obtener('http://ejemplo.es/a', 'variante http');
+        self::assertSame(ResultadoDescarga::FueraDeAmbito, $proveedor->obtener('http://otra/', 'x')->resultado, 'Tope de 2 en la página a');
+
+        $proveedor->nuevaPagina(ProveedorFalso::html('https://ejemplo.es/b', ''));
+        $proveedor->obtener('https://ejemplo.es/sitemap.xml', 'sitemap');
+        $proveedor->obtener('http://ejemplo.es/a', 'variante http');
+
+        self::assertSame(['https://ejemplo.es/sitemap.xml', 'http://ejemplo.es/a', 'http://ejemplo.es/a'], $falso->pedidas,
+            'El sitemap se recuerda; la página HTML de la anterior se olvida y el tope vuelve a empezar');
+        self::assertSame(3, $proveedor->urlsExtra());
+    }
 }

@@ -113,7 +113,7 @@ final class Orquestador
                 match ($alcance) {
                     Alcance::UrlIndividual => null, // el propio motor no pide otras URLs en este alcance
                     Alcance::UrlContexto => $limitesRastreo->maxUrlsContexto,
-                    Alcance::SitioCompleto => $limitesRastreo->maxUrlsContexto + LimitesRastreo::MAX_SITEMAPS,
+                    Alcance::SitioCompleto => $limitesRastreo->maxUrlsContexto + LimitesRastreo::MAX_SITEMAPS, // por página; los sitemaps se leen en la primera
                 },
                 $alcance->etiqueta(),
             );
@@ -268,13 +268,12 @@ final class Orquestador
         $progresoPagina->siguiente(); // la primera página ya está analizada
 
         $salidas = [];
-        foreach ($rastreador->paginas($pagina, $reglas?->sitemaps ?? [], $progreso, $inicio + $limitesRastreo->segundosSitio) as $otra) {
+        foreach ($rastreador->paginas($pagina, $reglas?->sitemaps ?? [], $progreso, $inicio + (float) $limitesRastreo->segundosSitio) as $otra) {
             $progresoPagina->siguiente();
             $this->repositorio->actualizarFase($id, Fase::Descubrimiento, EstadoFase::EnCurso, count($salidas) + 2, $limitesRastreo->maxPaginas, mb_substr('Analizando ' . $otra->urlFinal, 0, 500));
 
-            $proveedor->recordar($otra);
+            $proveedor->nuevaPagina($otra);
             $salida = $this->motor->ejecutar($contexto($otra), $proveedor, $progresoPagina, $progreso);
-            $proveedor->olvidar($otra);
             $this->registrarBloqueos($id, $cliente);
 
             $salidas[] = new SalidaMotor(

@@ -47,7 +47,11 @@ $v = static fn (string $clave): string => (string) ($valores[$clave] ?? '');
                 <label for="alcance-<?= e($valor) ?>"><?= e($texto) ?></label>
             </div>
         <?php endforeach; ?>
-        <p class="ayuda">Por ahora se analiza siempre la URL indicada; el rastreo de más páginas llegará en una próxima versión.</p>
+        <p class="ayuda">
+            <strong>URL individual</strong>: solo esa página.
+            <strong>URL con contexto</strong>: esa página y las pocas relacionadas que necesite cada comprobación (como mucho 20).
+            <strong>Sitio completo</strong>: recorre la web por sus enlaces y su sitemap, hasta 200 páginas; puede tardar varios minutos.
+        </p>
     </fieldset>
 
     <label for="hosts_extra">Otros dominios autorizados <span class="opcional">(opcional)</span></label>
