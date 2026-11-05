@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ProconSEO\Run;
 
 use Closure;
+use ProconSEO\Engine\Extraccion\Robots\AnalizadorRobots;
 use ProconSEO\Fetch\Ambito;
 use ProconSEO\Fetch\ClienteHttpSeguro;
 use ProconSEO\Fetch\DestinoRechazado;
@@ -16,6 +17,7 @@ use ProconSEO\Shared\Contract\RecursoDescargado;
 use ProconSEO\Shared\Contract\SalidaMotor;
 use ProconSEO\Shared\Contract\SenalSeguridad;
 use ProconSEO\Shared\Enum\Alcance;
+use ProconSEO\Shared\Enum\Cobertura;
 use ProconSEO\Shared\Enum\DecisionCierre;
 use ProconSEO\Shared\Enum\EstadoAnalisis;
 use ProconSEO\Shared\Enum\EstadoFase;
@@ -59,6 +61,7 @@ final class Orquestador
         $progreso = new ProgresoBd($this->repositorio, $id);
         $cliente = ($this->fabricaCliente)($ambito, $limites);
         $url = (string) $analisis['url_normalizada'];
+        $inicio = microtime(true);
 
         $this->repositorio->guardarConfiguracion($id, [
             'hosts_autorizados' => $ambito->hosts(),
@@ -92,7 +95,7 @@ final class Orquestador
             // F2 — Recuperación: robots.txt del origen y página analizada.
             $this->empezar($id, Fase::Recuperacion);
             $origen = (string) preg_replace('#^([a-z]+://[^/]+).*$#i', '$1', $url);
-            $cliente->obtener($origen . '/robots.txt', 'robots.txt del origen', 'IA-01');
+            $robots = $cliente->obtener($origen . '/robots.txt', 'robots.txt del origen', 'IA-01');
             $pagina = $cliente->obtener($url, 'página analizada');
             $this->registrarBloqueos($id, $cliente);
             $this->terminar($id, Fase::Recuperacion, $pagina->esCorrecto() ? EstadoFase::Terminada : EstadoFase::Parcial, $this->resumenRecuperacion($pagina));
@@ -101,37 +104,64 @@ final class Orquestador
                 return $this->cerrarCancelado($id, $cliente);
             }
 
-            // F3 y F4 — todavía no disponibles en esta versión.
-            $this->terminar($id, Fase::Descubrimiento, EstadoFase::Omitida, $analisis['alcance'] === Alcance::UrlIndividual->value
-                ? 'No aplica a una URL individual.'
-                : 'El descubrimiento de URLs relacionadas aún no está disponible: se analiza solo la URL indicada.');
+            $alcance = Alcance::from((string) $analisis['alcance']);
+            $perfil = $this->repositorio->parametrosPerfil((int) $analisis['perfil_id']);
+            $limitesRastreo = LimitesRastreo::desdePerfil($perfil);
+            // Lo que pida el motor pasa por aquí: memoria compartida y tope de URLs extra del alcance.
+            $proveedor = new ProveedorAcotado(
+                $cliente,
+                match ($alcance) {
+                    Alcance::UrlIndividual => null, // el propio motor no pide otras URLs en este alcance
+                    Alcance::UrlContexto => $limitesRastreo->maxUrlsContexto,
+                    Alcance::SitioCompleto => $limitesRastreo->maxUrlsContexto + LimitesRastreo::MAX_SITEMAPS, // por página; los sitemaps se leen en la primera
+                },
+                $alcance->etiqueta(),
+            );
+            $proveedor->recordar($robots);
+            $proveedor->recordar($pagina);
+
             $this->terminar($id, Fase::Renderizado, EstadoFase::Omitida, 'Sin navegador en esta versión: lo que depende del renderizado queda no verificable.');
 
             // F5–F7 — Extracción, comprobaciones y consolidación las hace el motor (Parte 2).
             $this->empezar($id, Fase::Extraccion);
             $proyecto = $this->repositorio->proyecto((int) $analisis['proyecto_id']);
-            $contexto = new ContextoAnalisis(
+            $contexto = fn (RecursoDescargado $p): ContextoAnalisis => new ContextoAnalisis(
                 idAnalisis: $id,
-                alcance: Alcance::from((string) $analisis['alcance']),
-                paginaPrincipal: $pagina,
+                alcance: $alcance,
+                paginaPrincipal: $p,
                 hostsAutorizados: $ambito->hosts(),
                 objetivo: $analisis['objetivo'],
                 tipoProyecto: TipoProyecto::tryFrom((string) ($proyecto['tipo'] ?? '')),
                 sector: Sector::tryFrom((string) ($proyecto['sector'] ?? '')),
-                perfil: $this->repositorio->parametrosPerfil((int) $analisis['perfil_id']),
+                perfil: $perfil,
             );
-            $salida = $this->motor->ejecutar($contexto, $cliente, $progreso, $progreso);
+            $salidas = [$this->motor->ejecutar($contexto($pagina), $proveedor, $progreso, $progreso)];
             $this->registrarBloqueos($id, $cliente);
             $cancelado = $progreso->estaCancelado();
+            $limiteAlcanzado = null;
 
+            // F3 — Descubrimiento. En el sitio completo se recorren las páginas y el motor analiza cada una.
+            if ($alcance === Alcance::UrlIndividual) {
+                $this->terminar($id, Fase::Descubrimiento, EstadoFase::Omitida, 'No aplica a una URL individual.');
+            } elseif ($alcance === Alcance::UrlContexto) {
+                $this->terminar($id, Fase::Descubrimiento, EstadoFase::Terminada, "Se consultaron {$proveedor->urlsExtra()} URLs relacionadas que pedían las comprobaciones (máximo {$limitesRastreo->maxUrlsContexto}).");
+            } elseif ($cancelado) {
+                $this->terminar($id, Fase::Descubrimiento, EstadoFase::Omitida, 'El análisis se canceló antes de recorrer el sitio.');
+            } else {
+                [$salidasSitio, $cancelado, $limiteAlcanzado] = $this->recorrerSitio($id, $cliente, $proveedor, $robots, $pagina, $limites, $limitesRastreo, $ambito, $progreso, $contexto, $inicio);
+                array_push($salidas, ...$salidasSitio);
+            }
+
+            $resultados = array_sum(array_map(static fn (SalidaMotor $s): int => count($s->resultados), $salidas));
+            $causas = array_sum(array_map(static fn (SalidaMotor $s): int => count($s->gruposCausa), $salidas));
             $estadoMotor = $cancelado ? EstadoFase::Parcial : EstadoFase::Terminada;
             $this->terminar($id, Fase::Extraccion, $estadoMotor);
-            $this->terminar($id, Fase::Comprobaciones, $estadoMotor, count($salida->resultados) . ' resultados.');
-            $this->terminar($id, Fase::Consolidacion, $estadoMotor, count($salida->gruposCausa) . ' causas agrupadas.');
+            $this->terminar($id, Fase::Comprobaciones, $estadoMotor, $resultados . ' resultados' . (count($salidas) > 1 ? ' en ' . count($salidas) . ' páginas.' : '.'));
+            $this->terminar($id, Fase::Consolidacion, $estadoMotor, $causas . ' causas agrupadas.');
 
             // F8 — Cierre: guardar todo (sanitizado) y decidir el estado final.
             $this->empezar($id, Fase::Cierre);
-            $this->guardarTodo($id, $cliente, $salida);
+            $this->guardarTodo($id, $cliente, $salidas);
             $this->terminar($id, Fase::Cierre, EstadoFase::Terminada);
 
             if ($cancelado) {
@@ -139,6 +169,9 @@ final class Orquestador
             }
             if (!$pagina->esCorrecto()) {
                 return $this->cerrarYaGuardado($id, EstadoAnalisis::Parcial, 'Análisis parcial: ' . $this->resumenRecuperacion($pagina), $cliente, $pagina);
+            }
+            if ($limiteAlcanzado !== null) {
+                return $this->cerrarYaGuardado($id, EstadoAnalisis::Parcial, 'Análisis parcial: ' . $limiteAlcanzado, $cliente, $pagina);
             }
 
             return $this->cerrarYaGuardado($id, EstadoAnalisis::Completado, null, $cliente, $pagina);
@@ -187,10 +220,87 @@ final class Orquestador
         return $estado;
     }
 
-    private function guardarTodo(int $id, ClienteHttpSeguro $cliente, SalidaMotor $salida): void
+    /** @param list<SalidaMotor> $salidas La de la página analizada y, en el sitio completo, una por página */
+    private function guardarTodo(int $id, ClienteHttpSeguro $cliente, array $salidas): void
     {
         $ids = $this->guardado->guardarRecursos($id, $cliente->registro());
-        $this->guardado->guardarSalida($id, $salida, $ids);
+        foreach ($salidas as $i => $salida) {
+            $this->guardado->guardarSalida($id, $salida, $ids, $i === 0 ? '' : "P{$i}-");
+        }
+    }
+
+    /**
+     * F3 en el sitio completo: recorre las páginas y el motor analiza cada una según aparece.
+     * De las páginas siguientes a la primera solo se guardan las comprobaciones implementadas:
+     * las no implementadas serían la misma fila repetida en cada página.
+     *
+     * @param Closure(RecursoDescargado): ContextoAnalisis $contexto
+     * @return array{0: list<SalidaMotor>, 1: bool, 2: ?string} salidas, cancelado y límite alcanzado
+     */
+    private function recorrerSitio(
+        int $id,
+        ClienteHttpSeguro $cliente,
+        ProveedorAcotado $proveedor,
+        RecursoDescargado $robots,
+        RecursoDescargado $pagina,
+        LimitesDescarga $limites,
+        LimitesRastreo $limitesRastreo,
+        Ambito $ambito,
+        ProgresoBd $progreso,
+        Closure $contexto,
+        float $inicio,
+    ): array {
+        $this->empezar($id, Fase::Descubrimiento);
+
+        // RFC 9309: sin robots.txt (4xx) se puede rastrear todo; si no se pudo leer (5xx, red) no se rastrea nada.
+        $reglas = null;
+        if ($robots->esCorrecto()) {
+            $reglas = (new AnalizadorRobots())->analizar($robots->cuerpo);
+        } elseif ($robots->estadoHttp === null || $robots->estadoHttp === 429 || $robots->estadoHttp >= 500) {
+            $this->terminar($id, Fase::Descubrimiento, EstadoFase::Parcial, 'No se pudo leer robots.txt, así que no se recorre el sitio: solo se analiza la URL indicada.');
+
+            return [[], false, 'no se pudo leer robots.txt y no se recorrió el sitio.'];
+        }
+
+        $rastreador = new Rastreador($cliente, $proveedor, $ambito->hosts(), $limitesRastreo, $reglas, 'proconSEO',
+            $limites->maxBytesHtml, $limites->maxBytesSitemap);
+        $progresoPagina = new ProgresoPorPagina($progreso, $limitesRastreo->maxPaginas);
+        $progresoPagina->siguiente(); // la primera página ya está analizada
+
+        $salidas = [];
+        foreach ($rastreador->paginas($pagina, $reglas?->sitemaps ?? [], $progreso, $inicio + (float) $limitesRastreo->segundosSitio) as $otra) {
+            $progresoPagina->siguiente();
+            $this->repositorio->actualizarFase($id, Fase::Descubrimiento, EstadoFase::EnCurso, count($salidas) + 2, $limitesRastreo->maxPaginas, mb_substr('Analizando ' . $otra->urlFinal, 0, 500));
+
+            $proveedor->nuevaPagina($otra);
+            $salida = $this->motor->ejecutar($contexto($otra), $proveedor, $progresoPagina, $progreso);
+            $this->registrarBloqueos($id, $cliente);
+
+            $salidas[] = new SalidaMotor(
+                array_values(array_filter($salida->resultados, static fn ($r): bool => $r->cobertura !== Cobertura::NoImplementada)),
+                $salida->evidencias,
+                $salida->gruposCausa,
+                $salida->senales,
+            );
+            if ($progreso->estaCancelado()) {
+                break;
+            }
+        }
+
+        $r = $rastreador->resumen();
+        $cancelado = $progreso->estaCancelado();
+        $limite = match (true) {
+            $r['limite_paginas'] => "se llegó al máximo de {$limitesRastreo->maxPaginas} páginas ({$r['pendientes']} sin analizar).",
+            $r['tiempo_agotado'] => "se llegó al tiempo máximo del análisis ({$r['pendientes']} páginas sin analizar).",
+            default => null,
+        };
+        $mensaje = ($r['analizadas'] + 1) . ' páginas analizadas'
+            . ($r['descartadas_robots'] > 0 ? ", {$r['descartadas_robots']} no permitidas por robots.txt" : '')
+            . ($r['fallidas'] > 0 ? ", {$r['fallidas']} no se pudieron descargar o no eran HTML" : '')
+            . ($limite === null ? '.' : '. Parcial: ' . $limite);
+        $this->terminar($id, Fase::Descubrimiento, $cancelado || $limite !== null ? EstadoFase::Parcial : EstadoFase::Terminada, $mensaje);
+
+        return [$salidas, $cancelado, $limite];
     }
 
     /** @var array<int, true> índices del registro ya anotados como evento */

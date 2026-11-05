@@ -53,9 +53,17 @@ final class ClienteHttpSeguro implements ProveedorRecursos
     public function descargar(string $url, string $motivo, ?string $idComprobacion, int $maxBytes): RecursoDescargado
     {
         $recurso = $this->seguirRedirecciones($url, $maxBytes);
-        $this->registro[] = ['recurso' => $recurso, 'motivo' => $motivo, 'comprobacion' => $idComprobacion];
+        // El registro guarda los datos de cada descarga, no su contenido: en un sitio completo
+        // serían cientos de páginas en memoria.
+        $this->registro[] = ['recurso' => self::sinCuerpo($recurso), 'motivo' => $motivo, 'comprobacion' => $idComprobacion];
 
         return $recurso;
+    }
+
+    private static function sinCuerpo(RecursoDescargado $r): RecursoDescargado
+    {
+        return $r->cuerpo === '' ? $r : new RecursoDescargado($r->urlSolicitada, $r->urlFinal, $r->resultado, $r->estadoHttp, $r->redirecciones,
+            $r->cabeceras, $r->tipoContenido, '', $r->truncado, $r->bytes, $r->tlsVerificado, $r->motivo, $r->descargadoEn, $r->idRecurso);
     }
 
     /**

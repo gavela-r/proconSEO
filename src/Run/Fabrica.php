@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ProconSEO\Run;
 
 use PDO;
-use ProconSEO\Engine\Catalogo\CatalogoJson;
+use ProconSEO\Engine\Motor;
 use ProconSEO\Fetch\Ambito;
 use ProconSEO\Fetch\ClienteHttpSeguro;
 use ProconSEO\Fetch\Http\TransporteCurl;
@@ -25,6 +25,7 @@ use ProconSEO\Shared\Contract\MotorAnalisis;
 final class Fabrica
 {
     private ?Catalogo $catalogo = null;
+    private ?Motor $motor = null;
 
     public function __construct(private readonly ?PDO $bd = null)
     {
@@ -42,7 +43,7 @@ final class Fabrica
 
     public function catalogo(): Catalogo
     {
-        return $this->catalogo ??= CatalogoJson::v1();
+        return $this->catalogo ??= ($this->motor ??= Motor::v1())->catalogo();
     }
 
     public function validador(): ValidadorDestino
@@ -74,10 +75,10 @@ final class Fabrica
         return IpOrigen::desde($_SERVER, IpOrigen::proxies((string) Config::obtener('PROXIES_DE_CONFIANZA', '')));
     }
 
-    /** Motor provisional hasta que la Parte 2 publique el suyo. */
+    /** Motor de la Parte 2, con las comprobaciones implementadas hasta ahora. */
     public function motor(): MotorAnalisis
     {
-        return new MotorProvisional($this->catalogo());
+        return $this->motor ??= Motor::v1();
     }
 
     public function orquestador(): Orquestador
