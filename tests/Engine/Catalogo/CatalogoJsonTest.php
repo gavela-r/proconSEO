@@ -20,14 +20,14 @@ final class CatalogoJsonTest extends TestCase
         $catalogo = CatalogoJson::v1();
 
         self::assertInstanceOf(Catalogo::class, $catalogo);
-        self::assertSame('1.0.0', $catalogo->version());
+        self::assertSame('1.1.0', $catalogo->version());
     }
 
     public function testDevuelveTodasLasSubcomprobacionesSinRepetir(): void
     {
         $ids = array_map(static fn ($f) => $f->id, CatalogoJson::v1()->todas());
 
-        self::assertCount(168, $ids);
+        self::assertCount(170, $ids);
         self::assertSame($ids, array_values(array_unique($ids)));
     }
 

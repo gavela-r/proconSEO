@@ -9,6 +9,7 @@ use ProconSEO\Engine\Comprobaciones\AccesibilidadAria;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadEstructura;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadFormularios;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadImagenes;
+use ProconSEO\Engine\Comprobaciones\AccesibilidadMeta;
 use ProconSEO\Engine\Comprobaciones\Acciones;
 use ProconSEO\Engine\Comprobaciones\CanonicalSitemap;
 use ProconSEO\Engine\Comprobaciones\DatosEstructurados;
@@ -103,6 +104,7 @@ final class Motor implements MotorAnalisis
             new AccesibilidadEstructura(),
             new AccesibilidadFormularios(),
             new AccesibilidadAria(),
+            new AccesibilidadMeta(),
             new PageSpeed(),
         ]);
     }

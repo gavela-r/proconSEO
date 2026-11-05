@@ -7,7 +7,7 @@
   "explicacion_sencilla": "Algunas personas necesitan más tiempo para leer o rellenar. Y las animaciones que no se pueden parar, o que parpadean, pueden marear o provocar crisis.",
   "modo": "automatico",
   "esfuerzo": "medio",
-  "mvp": "no",
+  "mvp": "parcial",
   "ref_investigacion": [],
   "reutiliza": [],
   "fuentes": [
@@ -56,6 +56,27 @@
       "necesita": [
         "pagina",
         "navegador"
+      ],
+      "alcance_minimo": "url_individual",
+      "wcag": [
+        "2.2.1"
+      ],
+      "kit_digital": [
+        "wcag_2_1_aa"
+      ],
+      "reutiliza": []
+    },
+    {
+      "id": "ACC-07.recarga-automatica",
+      "nombre": "Sin recarga ni redirección temporizada",
+      "que_comprueba": "No hay <meta http-equiv=\"refresh\"> que recargue la página o lleve a otra pasado un tiempo (regla ACT bc659a: se admite 0 s o más de 20 horas).",
+      "cuando_aplica": "Si la página tiene meta refresh.",
+      "condicion": null,
+      "modo": "automatico",
+      "mvp": "si",
+      "motivo_no_mvp": null,
+      "necesita": [
+        "pagina"
       ],
       "alcance_minimo": "url_individual",
       "wcag": [

@@ -301,10 +301,10 @@ Los 55 criterios A y AA se agrupan en 12 bloques. Cada incidencia indica el crit
 | ACC-01 | Contenido no textual | 1.1.1 A | Parcial (falta de alt; la adecuación es humana) |
 | ACC-02 | Audio, vídeo y multimedia | 1.2.1, 1.2.2, 1.2.3, 1.4.2 A · 1.2.4, 1.2.5 AA | Parcial (detección de medios y pistas) |
 | ACC-03 | Estructura, relaciones y orden | 1.3.1, 1.3.2, 1.3.3, 2.4.2 A · 2.4.6 AA | Parcial (title, tablas, labels) |
-| ACC-04 | Adaptación y presentación | 1.3.4, 1.4.4, 1.4.5, 1.4.10, 1.4.12, 1.4.13 AA | No (navegador) |
+| ACC-04 | Adaptación y presentación | 1.3.4, 1.4.4, 1.4.5, 1.4.10, 1.4.12, 1.4.13 AA | Parcial (zoom bloqueado en la meta viewport; el resto necesita navegador) |
 | ACC-05 | Color y contraste | 1.4.1 A · 1.4.3, 1.4.11 AA | PSI (contraste de texto 1.4.3) |
 | ACC-06 | Teclado, foco y navegación | 2.1.1, 2.1.2, 2.1.4, 2.4.1, 2.4.3, 2.4.4 A · 2.4.7, 2.4.11 AA | Parcial (nombres de enlace) |
-| ACC-07 | Tiempo, movimiento y parpadeo | 2.2.1, 2.2.2, 2.3.1 A | No |
+| ACC-07 | Tiempo, movimiento y parpadeo | 2.2.1, 2.2.2, 2.3.1 A | Parcial (meta refresh con espera) |
 | ACC-08 | Entrada y objetivos táctiles | 2.5.1, 2.5.2, 2.5.3, 2.5.4 A · 2.5.7, 2.5.8 AA | No (navegador) |
 | ACC-09 | Formularios, errores y autenticación | 3.3.1, 3.3.2, 3.3.7 A · 1.3.5, 3.3.3, 3.3.4, 3.3.8 AA | Parcial (labels, autocomplete) |
 | ACC-10 | Idioma y predictibilidad | 3.1.1, 3.2.1, 3.2.2 A · 3.1.2 AA | Parcial (lang) |

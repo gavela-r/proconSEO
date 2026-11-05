@@ -308,8 +308,8 @@ final class CatalogoV1Test extends TestCase
             'SEO-05' => 'parcial', 'SEO-06' => 'no', 'SEO-07' => 'si', 'SEO-08' => 'parcial', 'SEO-09' => 'no',
             'SEO-10' => 'parcial', 'SEO-11' => 'psi', 'SEO-12' => 'si', 'SEO-13' => 'no', 'SEO-14' => 'parcial',
             'SEO-15' => 'si', 'SEO-16' => 'no',
-            'ACC-01' => 'parcial', 'ACC-02' => 'parcial', 'ACC-03' => 'parcial', 'ACC-04' => 'no',
-            'ACC-05' => 'psi', 'ACC-06' => 'parcial', 'ACC-07' => 'no', 'ACC-08' => 'no', 'ACC-09' => 'parcial',
+            'ACC-01' => 'parcial', 'ACC-02' => 'parcial', 'ACC-03' => 'parcial', 'ACC-04' => 'parcial',
+            'ACC-05' => 'psi', 'ACC-06' => 'parcial', 'ACC-07' => 'parcial', 'ACC-08' => 'no', 'ACC-09' => 'parcial',
             'ACC-10' => 'parcial', 'ACC-11' => 'no', 'ACC-12' => 'parcial',
         ];
         $real = array_map(static fn (array $c): string => $c['mvp'], self::criterios());
