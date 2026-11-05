@@ -21,14 +21,17 @@ use ProconSEO\Engine\Comprobaciones\EstadoTecnico;
 use ProconSEO\Engine\Comprobaciones\PermisoRobots;
 use ProconSEO\Engine\Comprobaciones\Redirecciones;
 use ProconSEO\Engine\Comprobaciones\RespuestaUtilizable;
+use ProconSEO\Engine\Seguridad\DetectorInstrucciones;
 use ProconSEO\Shared\Contract\BorradorResultado;
 use ProconSEO\Shared\Contract\ContextoAnalisis;
 use ProconSEO\Shared\Contract\InformadorProgreso;
 use ProconSEO\Shared\Contract\MotorAnalisis;
 use ProconSEO\Shared\Contract\ProveedorRecursos;
 use ProconSEO\Shared\Contract\SalidaMotor;
+use ProconSEO\Shared\Contract\SenalSeguridad;
 use ProconSEO\Shared\Contract\TokenCancelacion;
 use ProconSEO\Shared\Enum\Cobertura;
+use ProconSEO\Shared\Enum\DecisionCierre;
 use ProconSEO\Shared\Enum\Fase;
 use RuntimeException;
 use Throwable;
@@ -40,6 +43,9 @@ use Throwable;
  * - las implementadas, con lo que observen;
  * - las que no se pudieron ejecutar (dependencia fallida, error o cancelación), no_verificable;
  * - las no implementadas, no_verificable / no_implementada con su motivo.
+ *
+ * Después agrupa los resultados que comparten causa (AgrupadorCausas) y registra como señal el
+ * texto de la web dirigido al analizador (SEG-07), sin que cambie ningún resultado.
  *
  * No hace red (pide a ProveedorRecursos), no escribe en la base de datos y el contenido de la
  * web nunca cambia qué se comprueba ni cómo se valora.
@@ -148,7 +154,40 @@ final class Motor implements MotorAnalisis
         }
         $progreso->fase(Fase::Comprobaciones, $total, $total);
 
-        return new SalidaMotor($resultados, $entorno->evidencias());
+        $progreso->fase(Fase::Consolidacion, 0, 1, 'Agrupando resultados por causa');
+        [$resultados, $grupos] = (new AgrupadorCausas())->agrupar($resultados, $entorno->paginaDisponible());
+        $senales = $this->senales($entorno);
+        $progreso->fase(Fase::Consolidacion, 1, 1);
+
+        return new SalidaMotor($resultados, $entorno->evidencias(), $grupos, $senales);
+    }
+
+    /**
+     * SEG-07: texto de la web dirigido al analizador. Se registra y nada más: los resultados ya
+     * están calculados y no se tocan.
+     *
+     * @return list<SenalSeguridad>
+     */
+    private function senales(Entorno $entorno): array
+    {
+        try {
+            $documento = null;
+            if ($entorno->paginaDisponible()) {
+                try {
+                    $documento = $entorno->documento();
+                } catch (NoVerificable) {
+                }
+            }
+            $robots = $entorno->robotsLeido();
+            return (new DetectorInstrucciones())->detectar($documento, $entorno->url(), $robots?->cuerpo, $robots?->urlFinal);
+        } catch (Throwable $e) {
+            return [new SenalSeguridad(
+                DetectorInstrucciones::REGLA,
+                'No se pudo completar la búsqueda de texto dirigido al analizador (error interno ' . $e::class . ').',
+                DecisionCierre::Continuar,
+                $entorno->url(),
+            )];
+        }
     }
 
     private function evaluar(Comprobacion $comprobacion, string $id, Entorno $entorno): BorradorResultado
@@ -156,7 +195,7 @@ final class Motor implements MotorAnalisis
         try {
             $resultado = $comprobacion->evaluar($id, $entorno);
         } catch (NoVerificable $e) {
-            return $entorno->resultado($id)->noEjecutada($e->getMessage());
+            return $entorno->resultado($id)->causa($e->causa)->noEjecutada($e->getMessage());
         } catch (Throwable $e) {
             // Un fallo del código nunca se convierte en un hallazgo sobre la web.
             return $entorno->resultado($id)->noEjecutada('Error interno al ejecutar la comprobación (' . $e::class . ').');

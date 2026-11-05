@@ -13,4 +13,9 @@ use RuntimeException;
  */
 final class NoVerificable extends RuntimeException
 {
+    /** @param ?string $causa Código de Causas si se sabe qué lo ha provocado (para agruparlo). */
+    public function __construct(string $motivo, public readonly ?string $causa = null)
+    {
+        parent::__construct($motivo);
+    }
 }
