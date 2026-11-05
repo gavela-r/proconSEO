@@ -169,7 +169,7 @@ final class Orquestador
 
             // F8 — Cierre: guardar todo (sanitizado) y decidir el estado final.
             $this->empezar($id, Fase::Cierre);
-            $this->guardarTodo($id, $cliente, $salidas);
+            $this->guardarTodo($id, $cliente, $salidas, $proveedor->bloqueadas());
             $this->terminar($id, Fase::Cierre, EstadoFase::Terminada);
 
             if ($cancelado) {
@@ -228,10 +228,14 @@ final class Orquestador
         return $estado;
     }
 
-    /** @param list<SalidaMotor> $salidas La de la página analizada y, en el sitio completo, una por página */
-    private function guardarTodo(int $id, ClienteHttpSeguro $cliente, array $salidas): void
+    /**
+     * @param list<SalidaMotor> $salidas    La de la página analizada y, en el sitio completo, una por página
+     * @param list<array{recurso: RecursoDescargado, motivo: string, comprobacion: ?string}> $bloqueadas
+     *        Lo que se pidió y no se consultó (robots.txt o tope): también queda en la lista de recursos
+     */
+    private function guardarTodo(int $id, ClienteHttpSeguro $cliente, array $salidas, array $bloqueadas = []): void
     {
-        $ids = $this->guardado->guardarRecursos($id, $cliente->registro());
+        $ids = $this->guardado->guardarRecursos($id, [...$cliente->registro(), ...$bloqueadas]);
         foreach ($salidas as $i => $salida) {
             $this->guardado->guardarSalida($id, $salida, $ids, $i === 0 ? '' : "P{$i}-");
         }
