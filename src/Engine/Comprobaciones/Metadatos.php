@@ -36,18 +36,18 @@ final class Metadatos implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'SEO-03.title-presente' => $this->titlePresente($e),
-            'SEO-03.title-unico' => $this->titleUnico($e),
-            'SEO-03.title-longitud' => $this->titleLongitud($e),
-            'SEO-04.description-presente' => $this->descriptionPresente($e),
-            'SEO-04.description-unica' => $this->descriptionUnica($e),
-            'SEO-05.h1-presente' => $this->h1($e),
-            'SEO-05.estructura-encabezados' => $this->estructura($e),
-            'SEO-05.encabezados-vacios' => $this->vacios($e),
-            'SEO-10.viewport' => $this->viewport($e),
+            'SEO-03.title-presente' => $this->titlePresente($entorno),
+            'SEO-03.title-unico' => $this->titleUnico($entorno),
+            'SEO-03.title-longitud' => $this->titleLongitud($entorno),
+            'SEO-04.description-presente' => $this->descriptionPresente($entorno),
+            'SEO-04.description-unica' => $this->descriptionUnica($entorno),
+            'SEO-05.h1-presente' => $this->h1($entorno),
+            'SEO-05.estructura-encabezados' => $this->estructura($entorno),
+            'SEO-05.encabezados-vacios' => $this->vacios($entorno),
+            'SEO-10.viewport' => $this->viewport($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }

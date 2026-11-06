@@ -6,6 +6,7 @@ namespace ProconSEO\Engine;
 
 use ProconSEO\Engine\Catalogo\CatalogoJson;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadAria;
+use ProconSEO\Engine\Comprobaciones\AccesibilidadEntrada;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadEstructura;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadFormularios;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadImagenes;
@@ -18,11 +19,14 @@ use ProconSEO\Engine\Comprobaciones\DatosEstructurados;
 use ProconSEO\Engine\Comprobaciones\DirectivasIndexacion;
 use ProconSEO\Engine\Comprobaciones\Enlazado;
 use ProconSEO\Engine\Comprobaciones\Idiomas;
+use ProconSEO\Engine\Comprobaciones\IdiomaTexto;
 use ProconSEO\Engine\Comprobaciones\Metadatos;
 use ProconSEO\Engine\Comprobaciones\Multimedia;
 use ProconSEO\Engine\Comprobaciones\PageSpeed;
+use ProconSEO\Engine\Comprobaciones\Paginacion;
 use ProconSEO\Engine\Comprobaciones\EstadoTecnico;
 use ProconSEO\Engine\Comprobaciones\PermisoRobots;
+use ProconSEO\Engine\Comprobaciones\ProductoCoherente;
 use ProconSEO\Engine\Comprobaciones\Redirecciones;
 use ProconSEO\Engine\Comprobaciones\RespuestaUtilizable;
 use ProconSEO\Engine\Extraccion\HuellaPagina;
@@ -107,15 +111,19 @@ final class Motor implements MotorAnalisis, ConsolidadorSitio
             new Redirecciones(),
             new Metadatos(),
             new Enlazado(),
+            new Paginacion(),
             new Multimedia(),
             new DatosEstructurados(),
+            new ProductoCoherente(),
             new CanonicalSitemap(),
             new Idiomas(),
+            new IdiomaTexto(),
             new Acciones(),
             new AccesibilidadImagenes(),
             new AccesibilidadEstructura(),
             new AccesibilidadFormularios(),
             new AccesibilidadAria(),
+            new AccesibilidadEntrada(),
             new AccesibilidadMeta(),
             new PageSpeed(),
             new ComprobacionesSitio(),

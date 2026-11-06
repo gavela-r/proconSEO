@@ -42,12 +42,12 @@ final class CanonicalSitemap implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'IA-08.canonical-declarado' => $this->canonical($e),
-            'IA-08.presencia-sitemap' => $this->sitemap($e),
-            'IA-08.datos-negocio-coherentes' => $this->datosNegocio($e),
+            'IA-08.canonical-declarado' => $this->canonical($entorno),
+            'IA-08.presencia-sitemap' => $this->sitemap($entorno),
+            'IA-08.datos-negocio-coherentes' => $this->datosNegocio($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }

@@ -75,6 +75,11 @@ final class RepositorioResultadosTest extends TestCase
         $anterior = $this->repo->analisisAnterior((array) $this->repo->analisis($actual));
 
         self::assertSame($primero, (int) ($anterior['id'] ?? 0), 'Ni el cancelado, ni otro alcance, ni otra dirección');
+        self::assertSame('https://ejemplo.es/', $anterior['url_normalizada']);
+
+        $candidatos = array_map(static fn (array $a): string => $a['url_normalizada'] . ' ' . $a['alcance'], $this->repo->analisisParaComparar((array) $this->repo->analisis($actual)));
+        self::assertSame(['https://otra.es/ url_individual', 'https://ejemplo.es/ sitio_completo', 'https://ejemplo.es/ url_individual'], array_slice($candidatos, 0, 3),
+            'Para elegir: todos los terminados del proyecto, del más reciente al más antiguo, sin el cancelado');
         self::assertNull($this->repo->analisisAnterior((array) $this->repo->analisis($primero)));
     }
 

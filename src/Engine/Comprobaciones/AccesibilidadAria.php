@@ -68,14 +68,14 @@ final class AccesibilidadAria implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'ACC-12.nombres-controles' => $this->nombres($e),
-            'ACC-12.roles-aria-validos' => $this->roles($e),
-            'ACC-12.iframe-title' => $this->iframes($e),
-            'ACC-12.ids-referenciados-duplicados' => $this->idsDuplicados($e),
-            'ACC-12.chatbot-detectado' => $this->chatbot($e),
+            'ACC-12.nombres-controles' => $this->nombres($entorno),
+            'ACC-12.roles-aria-validos' => $this->roles($entorno),
+            'ACC-12.iframe-title' => $this->iframes($entorno),
+            'ACC-12.ids-referenciados-duplicados' => $this->idsDuplicados($entorno),
+            'ACC-12.chatbot-detectado' => $this->chatbot($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }
@@ -118,7 +118,7 @@ final class AccesibilidadAria implements Comprobacion
         if ($sin === []) {
             return $v->valor('Los ' . count($controles) . ' controles tienen nombre accesible.')->correcto();
         }
-        $lista = array_map([self::class, 'etiqueta'], $sin);
+        $lista = array_map(self::etiqueta(...), $sin);
         return $v->valor(count($sin) . ' de ' . count($controles) . ' controles sin nombre accesible.')
             ->elemento($lista[0])
             ->evidencia($e->evidencia(TipoEvidencia::FragmentoHtml, implode("\n", array_slice($lista, 0, 20))))

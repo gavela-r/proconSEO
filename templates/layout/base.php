@@ -26,6 +26,7 @@ $titulo = $titulo ?? 'proconSEO';
             <ul class="menu">
                 <li><a href="/proyectos">Proyectos</a></li>
                 <li><a href="/catalogo">Catálogo</a></li>
+                <li><a href="/avisos">Avisos</a></li>
             </ul>
         </nav>
     </div>

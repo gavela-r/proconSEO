@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
+use ProconSEO\Results\BorradoAnalisis;
 use ProconSEO\Results\ComparacionAnalisis;
 use ProconSEO\Results\CompromisosKitDigital;
 use ProconSEO\Results\FiltroResultados;
 use ProconSEO\Results\Informe;
 use ProconSEO\Results\RepositorioResultados;
+use ProconSEO\Review\CapturaSegura;
 use ProconSEO\Run\Fabrica;
 use ProconSEO\Shared\BaseDatos;
+use ProconSEO\Shared\Config;
 use ProconSEO\Shared\Contract\Catalogo;
 use ProconSEO\Shared\Error\ErrorDominio;
 use ProconSEO\Shared\Http\Peticion;
@@ -39,8 +42,13 @@ return static function (Router $r): void {
         $id = (int) $p->parametro('id');
         $analisis = $repositorio->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
         $cat = $catalogo();
-        // Qué ha cambiado desde el análisis anterior de la misma dirección y alcance.
-        $anterior = $repositorio->analisisAnterior($analisis);
+        // Qué ha cambiado respecto a otro análisis del histórico: por defecto, el anterior de la misma
+        // dirección y alcance; con ?comparar={id}, cualquiera anterior del mismo proyecto.
+        $candidatos = $repositorio->analisisParaComparar($analisis);
+        $elegido = (int) $p->entrada('comparar', 0);
+        $anterior = $elegido > 0
+            ? (array_values(array_filter($candidatos, static fn (array $a): bool => (int) $a['id'] === $elegido))[0] ?? null)
+            : $repositorio->analisisAnterior($analisis);
         $comparacion = $anterior === null ? null : new ComparacionAnalisis(
             $repositorio->resultados((int) $anterior['id']),
             Informe::conTitulos($repositorio->resultados($id), $cat),
@@ -59,9 +67,51 @@ return static function (Router $r): void {
             ),
             'anterior' => $anterior,
             'comparacion' => $comparacion,
+            'candidatos' => $candidatos,
             'eventos' => $repositorio->eventosSeguridad($id),
             'conKitDigital' => CompromisosKitDigital::aplica($analisis['proyecto_tipo']),
         ]));
+    });
+
+    // Borrado definitivo de un análisis con confirmación previa (RF-16; decisión 16).
+    $borrado = static fn (): BorradoAnalisis => new BorradoAnalisis(
+        BaseDatos::conexion(),
+        new CapturaSegura(Config::raiz() . '/storage/capturas'),
+        (new Fabrica())->auditoria(),
+    );
+
+    $confirmarBorrado = static function (Peticion $p, ?string $error = null, int $estado = 200) use ($repo, $borrado, $estilos): Respuesta {
+        $analisis = $repo()->analisis((int) $p->parametro('id'))
+            ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+
+        return Respuesta::html(Vista::render('results/borrar', [
+            'titulo' => 'Borrar análisis',
+            'estilos' => $estilos,
+            'analisis' => $analisis,
+            'resumen' => $borrado()->resumen((int) $analisis['id']),
+            'enMarcha' => BorradoAnalisis::enMarcha((string) $analisis['estado']),
+            'error' => $error,
+        ]), $estado);
+    };
+
+    $r->get('/analisis/{id}/borrar', static fn (Peticion $p): Respuesta => $confirmarBorrado($p));
+
+    $r->delete('/analisis/{id}', static function (Peticion $p) use ($borrado, $confirmarBorrado): Respuesta {
+        if ($p->entrada('confirmo') !== '1') {
+            return $confirmarBorrado($p, 'Marca la casilla para confirmar que quieres borrarlo para siempre.', 422);
+        }
+
+        try {
+            $proyectoId = $borrado()->borrar((int) $p->parametro('id'), Fabrica::ipOrigen());
+        } catch (ErrorDominio $e) {
+            if ($e->codigo !== 'analisis_en_marcha') {
+                throw $e;
+            }
+
+            return $confirmarBorrado($p, $e->getMessage(), 409);
+        }
+
+        return Respuesta::redirigir("/proyectos/{$proyectoId}?borrado=1");
     });
 
     // Vista "Compromisos Kit Digital" (especificación 6.7, RF-07): solo en proyectos Kit Digital.

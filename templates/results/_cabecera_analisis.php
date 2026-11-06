@@ -33,6 +33,10 @@ $url = $analisis['url_final'] ?? $analisis['url_normalizada'] ?? $analisis['url_
         <h1><?= $vista === 'kit' ? 'Compromisos Kit Digital' : 'Resultados del análisis' ?></h1>
         <p><span class="codigo"><?= e($url) ?></span> · <?= e(Formato::fecha((string) $analisis['creado_en'])) ?> · <?= e($estado?->etiqueta() ?? $analisis['estado']) ?></p>
     </div>
+    <div class="acciones">
+        <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/csv" download>Exportar CSV (Excel)</a>
+        <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/json" download>Exportar JSON</a>
+    </div>
 </div>
 
 <?php if ($enMarcha): ?>

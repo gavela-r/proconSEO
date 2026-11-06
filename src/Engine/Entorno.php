@@ -251,7 +251,7 @@ final class Entorno
      * Si el robot puede rastrear la URL analizada. Lanza NoVerificable si robots.txt no se pudo
      * consultar o dio un error temporal.
      *
-     * @return array{permitido: bool, regla: ?string, linea: ?int}
+     * @return array{permitido: bool, regla: ?string, linea: ?int, grupo?: ?string}
      */
     public function permisoRobots(string $agente): array
     {

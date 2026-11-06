@@ -36,13 +36,13 @@ final class DirectivasIndexacion implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'IA-02.meta-robots' => $this->meta($e),
-            'IA-02.x-robots-tag' => $this->cabecera($e),
-            'IA-02.fragmentos' => $this->fragmentos($e),
-            'IA-02.coherencia-directivas' => $this->coherencia($e),
+            'IA-02.meta-robots' => $this->meta($entorno),
+            'IA-02.x-robots-tag' => $this->cabecera($entorno),
+            'IA-02.fragmentos' => $this->fragmentos($entorno),
+            'IA-02.coherencia-directivas' => $this->coherencia($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }
@@ -205,7 +205,7 @@ final class DirectivasIndexacion implements Comprobacion
             if (!$permiso['permitido']) {
                 return $v
                     ->valor('noindex en la página y robots.txt bloquea a Googlebot (' . $permiso['regla'] . ').')
-                    ->evidencia($e->evidencia(TipoEvidencia::Texto, 'noindex: ' . implode('; ', self::fuentesNoindex($e)) . "\nrobots.txt línea " . $permiso['linea'] . ': ' . $permiso['regla']))
+                    ->evidencia($e->evidencia(TipoEvidencia::Texto, 'noindex: ' . implode('; ', self::fuentesNoindex($e)) . "\nrobots.txt línea " . (string) $permiso['linea'] . ': ' . $permiso['regla']))
                     ->consecuencia('Google no puede leer la página y, por tanto, no ve el noindex: la URL puede seguir apareciendo en resultados, sin descripción.')
                     ->correccion('Elegir una sola vía: para sacarla de Google, permitir el rastreo en robots.txt y mantener el noindex; para no rastrearla, quitar el noindex.')
                     ->problema(Gravedad::Medio);

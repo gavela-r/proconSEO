@@ -41,17 +41,17 @@ final class AccesibilidadImagenes implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'ACC-01.img-alt-presente' => $this->altPresente($e),
-            'ACC-01.img-enlace-sin-nombre' => $this->enlaceConImagen($e),
-            'ACC-01.input-image-alt' => $this->inputImage($e),
-            'ACC-01.svg-area-nombre' => $this->svgArea($e),
-            'ACC-01.alt-adecuado' => $this->altAdecuado($e),
-            'ACC-02.medios-detectados' => $this->medios($e),
-            'ACC-02.pistas-subtitulos' => $this->subtitulos($e),
-            'ACC-02.audio-automatico' => $this->audioAutomatico($e),
+            'ACC-01.img-alt-presente' => $this->altPresente($entorno),
+            'ACC-01.img-enlace-sin-nombre' => $this->enlaceConImagen($entorno),
+            'ACC-01.input-image-alt' => $this->inputImage($entorno),
+            'ACC-01.svg-area-nombre' => $this->svgArea($entorno),
+            'ACC-01.alt-adecuado' => $this->altAdecuado($entorno),
+            'ACC-02.medios-detectados' => $this->medios($entorno),
+            'ACC-02.pistas-subtitulos' => $this->subtitulos($entorno),
+            'ACC-02.audio-automatico' => $this->audioAutomatico($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }
