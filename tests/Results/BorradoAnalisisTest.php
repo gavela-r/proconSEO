@@ -124,6 +124,7 @@ final class BorradoAnalisisTest extends TestCase
 
         $html = Vista::render('results/borrar', ['analisis' => Filas::analisis(['proyecto_nombre' => '<script>x</script>']), 'resumen' => $resumen, 'enMarcha' => false, 'error' => null], false);
         self::assertStringContainsString('No se puede deshacer', $html);
+        self::assertStringContainsString('/analisis/1/exportar/pdf', $html, 'Se ofrece exportar antes de borrar');
         self::assertStringContainsString('170 resultados, 8 evidencias, 1 revisión humana y 1 captura', preg_replace('/\s+/u', ' ', strip_tags($html)));
         self::assertStringContainsString('name="_metodo" value="DELETE"', $html);
         self::assertStringContainsString('name="_csrf"', $html);
