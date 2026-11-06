@@ -34,6 +34,7 @@ $url = $analisis['url_final'] ?? $analisis['url_normalizada'] ?? $analisis['url_
         <p><span class="codigo"><?= e($url) ?></span> · <?= e(Formato::fecha((string) $analisis['creado_en'])) ?> · <?= e($estado?->etiqueta() ?? $analisis['estado']) ?></p>
     </div>
     <div class="acciones">
+        <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/pdf" download>Exportar PDF</a>
         <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/csv" download>Exportar CSV (Excel)</a>
         <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/json" download>Exportar JSON</a>
     </div>

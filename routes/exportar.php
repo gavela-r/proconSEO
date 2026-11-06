@@ -5,7 +5,10 @@ declare(strict_types=1);
 use ProconSEO\Export\DatosExportacion;
 use ProconSEO\Export\ExportadorCsv;
 use ProconSEO\Export\ExportadorJson;
+use ProconSEO\Export\ExportadorPdf;
+use ProconSEO\Projects\Formato;
 use ProconSEO\Projects\RepositorioProyectos;
+use ProconSEO\Results\Informe;
 use ProconSEO\Results\RepositorioResultados;
 use ProconSEO\Run\Fabrica;
 use ProconSEO\Shared\BaseDatos;
@@ -14,20 +17,21 @@ use ProconSEO\Shared\Error\ErrorDominio;
 use ProconSEO\Shared\Http\Peticion;
 use ProconSEO\Shared\Http\Respuesta;
 use ProconSEO\Shared\Http\Router;
+use ProconSEO\Shared\Vista;
 
 // Parte 3 (Adrián): exportaciones (especificación 4.7, RF-50 a RF-52; decisión 17: Excel en CSV).
 // Solo su responsable edita este fichero.
 return static function (Router $r): void {
-    $datos = static function (): DatosExportacion {
-        $catalogo = null;
+    $catalogo = static function (): ?Catalogo {
         try {
-            $catalogo = (new Fabrica())->catalogo();
+            return (new Fabrica())->catalogo();
         } catch (Throwable) {
             // Sin catálogo se exporta el identificador de cada comprobación en lugar de su nombre.
+            return null;
         }
-
-        return new DatosExportacion(new RepositorioResultados(BaseDatos::conexion()), $catalogo instanceof Catalogo ? $catalogo : null);
     };
+
+    $datos = static fn (): DatosExportacion => new DatosExportacion(new RepositorioResultados(BaseDatos::conexion()), $catalogo());
 
     /** Descarga de un fichero generado: nunca se muestra en el navegador como página. */
     $descarga = static fn (string $contenido, string $tipo, string $nombre): Respuesta => new Respuesta($contenido, 200, [
@@ -49,6 +53,24 @@ return static function (Router $r): void {
         $d = $analisis($p);
 
         return $descarga(ExportadorJson::generar($d), 'application/json; charset=utf-8', DatosExportacion::nombreFichero($d, 'json'));
+    });
+
+    // PDF en el orden de la especificación 4.4, sin recursos remotos.
+    $r->get('/analisis/{id}/exportar/pdf', static function (Peticion $p) use ($analisis, $catalogo, $descarga): Respuesta {
+        // Un análisis con cientos de resultados tarda varios segundos en maquetarse.
+        set_time_limit(120);
+        $d = $analisis($p);
+        $id = (int) $d['analisis']['id'];
+        $repo = new RepositorioResultados(BaseDatos::conexion());
+
+        $html = Vista::render('results/pdf', [
+            'analisis' => $repo->analisis($id),
+            'informe' => new Informe($repo->resultados($id), $repo->recursos($id), $repo->fases($id), $catalogo()),
+            'exportacion' => $d,
+            'generado' => Formato::fecha(gmdate('Y-m-d H:i:s')),
+        ], false);
+
+        return $descarga(ExportadorPdf::generar($html), 'application/pdf', DatosExportacion::nombreFichero($d, 'pdf'));
     });
 
     // Exportación completa del proyecto (RF-05): el proyecto y todos sus análisis con sus resultados,

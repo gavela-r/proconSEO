@@ -64,6 +64,16 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
 <?php else: ?>
     <p class="aviso aviso--error" role="note"><strong>No se puede deshacer.</strong> El análisis, sus resultados, evidencias, revisiones y capturas desaparecen para siempre. Solo queda una anotación en el registro de auditoría con quién lo borró y cuándo.</p>
 
+    <section class="panel panel--separado" aria-labelledby="t-exportar">
+        <h2 id="t-exportar">Antes de borrar, guarda una copia</h2>
+        <p>Si puede hacerte falta más adelante, descárgalo primero:</p>
+        <div class="acciones">
+            <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/pdf" download>PDF</a>
+            <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/csv" download>CSV (Excel)</a>
+            <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/json" download>JSON completo</a>
+        </div>
+    </section>
+
     <form class="formulario" action="/analisis/<?= e($id) ?>" method="post"<?= $error !== null ? ' aria-describedby="error-borrado"' : '' ?>>
         <?= csrf_campo() ?>
         <input type="hidden" name="_metodo" value="DELETE">
