@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Informe de la web · Panadería La Espiga (ejemplo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/*
+  Informe PDF de proconSEO con la identidad visual de Proconsi (estilo suizo), en formato de
+  documento: A4 vertical. Paleta: negro #000000 (texto), rojo #e30613 (títulos y énfasis, con
+  moderación), gris #6c6c6c (secundario). Poppins. Logo de Proconsi abajo a la izquierda.
+*/
+:root {
+  --negro: #000000;
+  --rojo: #e30613;
+  --gris: #6c6c6c;
+  --tarjeta: #f4f4f4;
+  --linea: #d6d6d6;
+  --rosa: #fdecec;
+  --fuente: "Poppins", Arial, sans-serif;
+}
+@page { size: A4 portrait; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #ffffff; color: var(--negro); font-family: var(--fuente); }
+body { -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 10pt; line-height: 1.5; }
+
+.pagina {
+  width: 210mm; height: 297mm; position: relative; overflow: hidden;
+  padding: 22mm 20mm 32mm; page-break-after: always; break-after: page; background: #fff;
+}
+.pagina:last-child { page-break-after: auto; break-after: auto; }
+@media screen { body { background: #e9e9e9; } .pagina { margin: 24px auto; box-shadow: 0 2px 10px rgba(0,0,0,.15); } }
+
+/* Cabecera de sección: marca roja, título y entradilla */
+.marca { width: 14mm; height: 1.3mm; background: var(--rojo); }
+h1, h2, h3, p { margin: 0; }
+.titulo { font-weight: 700; font-size: 24pt; line-height: 1.15; margin-top: 4mm; letter-spacing: -0.01em; }
+.titulo em { font-style: normal; color: var(--rojo); }
+.entradilla { font-size: 11.5pt; color: var(--gris); margin-top: 2.5mm; max-width: 150mm; }
+.bloque { margin-top: 9mm; }
+.bloque + .bloque { margin-top: 11mm; }
+.subtitulo { font-weight: 600; font-size: 13pt; margin-bottom: 4mm; }
+.subtitulo em { font-style: normal; color: var(--rojo); }
+.texto { color: var(--gris); }
+.texto strong { color: var(--negro); font-weight: 600; }
+
+/* Pie: logo abajo a la izquierda, número de página a la derecha */
+.pie { position: absolute; left: 20mm; right: 20mm; bottom: 12mm; display: flex; justify-content: space-between; align-items: flex-end; }
+.pie img { width: 36mm; height: auto; display: block; }
+.pie span { font-size: 8pt; color: var(--gris); text-align: right; }
+.prueba { position: absolute; top: 11mm; right: 20mm; font-size: 7.5pt; font-weight: 600; color: var(--rojo); letter-spacing: .08em; text-transform: uppercase; }
+
+/* Tarjetas */
+.fila { display: grid; gap: 6mm; }
+.fila-3 { grid-template-columns: repeat(3, 1fr); }
+.tarjeta { background: var(--tarjeta); border-radius: 3mm; padding: 6mm; }
+.cifra { font-weight: 700; font-size: 20pt; color: var(--rojo); line-height: 1.1; white-space: nowrap; }
+.cifra span { font-size: 11pt; font-weight: 600; }
+.etiqueta { font-weight: 700; font-size: 11.5pt; margin-top: 2.5mm; line-height: 1.3; }
+.raya { width: 10mm; height: .9mm; background: var(--rojo); margin: 3mm 0; }
+.recuento { list-style: none; margin: 3mm 0 0; padding: 0; font-size: 9pt; color: var(--gris); }
+.recuento li { display: flex; justify-content: space-between; padding: 1.2mm 0; border-bottom: 1px solid var(--linea); }
+.recuento li:last-child { border-bottom: 0; }
+.recuento b { color: var(--negro); font-weight: 600; }
+.recuento .rojo b { color: var(--rojo); }
+
+/* Mensaje principal: franja rosa con trazo rojo */
+.mensaje { background: var(--rosa); border-radius: 3mm; display: flex; align-items: center; gap: 5mm; padding: 5mm 6mm; }
+.mensaje::before { content: ""; flex: none; width: 1.4mm; height: 8mm; background: var(--rojo); }
+.mensaje p { font-weight: 600; font-size: 11pt; }
+.mensaje em { font-style: normal; color: var(--rojo); }
+
+/* Portada */
+.portada { padding-top: 70mm; }
+.portada .antetitulo { font-size: 12pt; color: var(--gris); margin-top: 5mm; }
+.portada .titulo { font-size: 36pt; margin-top: 2mm; }
+.portada .entradilla { font-size: 13pt; }
+.portada .datos { display: grid; grid-template-columns: 45mm 1fr; gap: 2.5mm 6mm; margin-top: 18mm; font-size: 10.5pt; }
+.portada .datos dt { color: var(--gris); }
+.portada .datos dd { margin: 0; font-weight: 500; }
+
+/* Lista de prioridades */
+.prioridades { list-style: none; margin: 0; padding: 0; display: grid; gap: 3mm; }
+.prioridades li { display: grid; grid-template-columns: 14mm 1fr auto; gap: 4mm; align-items: baseline; padding-bottom: 3mm; border-bottom: 1px solid var(--linea); }
+.prioridades li:last-child { border-bottom: 0; padding-bottom: 0; }
+.prioridades .num { font-weight: 700; font-size: 16pt; color: var(--rojo); }
+.prioridades .que { font-weight: 600; font-size: 11pt; }
+.prioridades .que span { display: block; font-weight: 400; font-size: 9.5pt; color: var(--gris); margin-top: .5mm; }
+.prioridades .cuanto { font-size: 9pt; color: var(--gris); text-align: right; white-space: nowrap; }
+.prioridades .cuanto b { color: var(--negro); font-weight: 600; }
+
+/* Fichas de problema */
+.ficha { background: var(--tarjeta); border-radius: 3mm; padding: 6mm 7mm; }
+.ficha + .ficha { margin-top: 6mm; }
+.ficha .cabeza { display: flex; align-items: center; gap: 3mm; flex-wrap: wrap; }
+.ficha .nombre { font-weight: 700; font-size: 13pt; }
+.ficha .gravedad { font-size: 8pt; font-weight: 600; color: #fff; background: var(--rojo); padding: .6mm 2.5mm; border-radius: 1mm; }
+.ficha dl { margin: 4mm 0 0; display: grid; grid-template-columns: 34mm 1fr; gap: 2mm 5mm; font-size: 9.5pt; line-height: 1.45; }
+.ficha dt { color: var(--gris); font-weight: 500; }
+.ficha dd { margin: 0; }
+.ficha .ref { margin-top: 4mm; font-size: 8pt; color: var(--gris); }
+code { font-family: Consolas, "Courier New", monospace; font-size: .9em; }
+
+/* Tablas y glosario */
+table { width: 100%; border-collapse: collapse; font-size: 8.8pt; }
+th { text-align: left; font-weight: 600; color: var(--gris); font-size: 7.5pt; text-transform: uppercase; letter-spacing: .05em; padding: 0 3mm 2mm 0; border-bottom: 1.2px solid var(--negro); }
+td { padding: 2mm 3mm 2mm 0; border-bottom: 1px solid var(--linea); vertical-align: top; }
+td.problema { color: var(--rojo); font-weight: 600; }
+td.mejorable { font-weight: 600; }
+td.gris { color: var(--gris); }
+.glosario { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5mm 9mm; }
+.glosario div { border-top: 1px solid var(--linea); padding-top: 2.5mm; }
+.glosario b { font-weight: 600; font-size: 10pt; }
+.glosario p { font-size: 9pt; color: var(--gris); margin-top: 1mm; }
+.nota { font-size: 8.5pt; color: var(--gris); margin-top: 5mm; }
+.limites { margin: 0; padding: 0; list-style: none; display: grid; gap: 3mm; }
+.limites li { display: flex; gap: 4mm; }
+.limites li::before { content: ""; flex: none; width: 2mm; height: 2mm; margin-top: 1.8mm; background: var(--rojo); border-radius: 50%; }
+.nowrap { white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<!-- 1. Portada -->
+<section class="pagina portada">
+  <span class="prueba">Datos de prueba · Ejemplo</span>
+  <div class="marca"></div>
+  <p class="antetitulo">Informe de la web</p>
+  <h1 class="titulo">Panadería <em>La Espiga</em></h1>
+  <p class="entradilla">Búsqueda con IA, SEO y accesibilidad de <span class="nowrap">www.panaderia-ejemplo.es</span></p>
+  <dl class="datos">
+    <dt>Alcance</dt><dd>Sitio completo · 38 páginas</dd>
+    <dt>Fecha del análisis</dt><dd>6 de noviembre de 2026</dd>
+    <dt>Análisis anterior</dt><dd>2 de octubre de 2026</dd>
+    <dt>Preparado por</dt><dd>[Nombre del técnico o técnica]</dd>
+    <dt>Herramienta</dt><dd>proconSEO · perfil v3 · catálogo 1.2.0</dd>
+  </dl>
+  <footer class="pie"><img src="logo-proconsi.png" alt="Proconsi"><span></span></footer>
+</section>
+
+<!-- 2. Resumen y prioridades -->
+<section class="pagina">
+  <span class="prueba">Datos de prueba · Ejemplo</span>
+  <div class="marca"></div>
+  <h2 class="titulo">En pocas <em>palabras</em></h2>
+  <p class="entradilla">La web funciona y Google puede encontrarla, pero hay dos problemas que conviene arreglar ya. Desde el último análisis se han arreglado 4 cosas y han aparecido 2.</p>
+
+  <div class="bloque fila fila-3">
+    <div class="tarjeta">
+      <p class="cifra">0 <span>problemas</span></p>
+      <p class="etiqueta">Búsqueda con IA</p>
+      <div class="raya"></div>
+      <ul class="recuento"><li>Mejorable<b>3</b></li><li>Correcto<b>21</b></li><li>No verificable<b>4</b></li></ul>
+    </div>
+    <div class="tarjeta">
+      <p class="cifra">2 <span>problemas</span></p>
+      <p class="etiqueta">SEO</p>
+      <div class="raya"></div>
+      <ul class="recuento"><li class="rojo">Problema<b>2</b></li><li>Mejorable<b>5</b></li><li>Correcto<b>34</b></li><li>No verificable<b>6</b></li></ul>
+    </div>
+    <div class="tarjeta">
+      <p class="cifra">3 <span>problemas</span></p>
+      <p class="etiqueta">Accesibilidad</p>
+      <div class="raya"></div>
+      <ul class="recuento"><li class="rojo">Problema<b>3</b></li><li>Mejorable<b>2</b></li><li>Correcto<b>18</b></li><li>No verificable<b>9</b></li></ul>
+    </div>
+  </div>
+  <p class="nota">Son recuentos de comprobaciones, no una nota: un solo problema grave puede pesar más que muchos correctos.</p>
+
+  <div class="bloque">
+    <h3 class="subtitulo">Qué arreglar <em>primero</em></h3>
+    <ol class="prioridades">
+      <li><span class="num">01</span><span class="que">noindex en 6 páginas<span>Las páginas de encargos piden a Google que no las muestre.</span></span><span class="cuanto"><b>Crítico</b><br>esfuerzo bajo</span></li>
+      <li><span class="num">02</span><span class="que">Imágenes sin atributo alt<span>7 de las 12 fotos de la portada no tienen texto alternativo.</span></span><span class="cuanto"><b>Alto</b><br>esfuerzo bajo</span></li>
+      <li><span class="num">03</span><span class="que">Sin atributo lang<span>El lector de pantalla no sabe en qué idioma leer.</span></span><span class="cuanto"><b>Medio</b><br>esfuerzo bajo</span></li>
+      <li><span class="num">04</span><span class="que">Meta description repetida<span>La misma en 10 páginas del blog.</span></span><span class="cuanto"><b>Mejorable</b><br>esfuerzo medio</span></li>
+    </ol>
+  </div>
+
+  <div class="mensaje" style="margin-top:7mm"><p>Los tres primeros se arreglan en <em>menos de una hora</em> desde WordPress.</p></div>
+  <footer class="pie"><img src="logo-proconsi.png" alt="Proconsi"><span>2</span></footer>
+</section>
+
+<!-- 3. Detalle de los problemas -->
+<section class="pagina">
+  <span class="prueba">Datos de prueba · Ejemplo</span>
+  <div class="marca"></div>
+  <h2 class="titulo">Detalle de los <em>problemas</em></h2>
+  <p class="entradilla">Una ficha por causa. El término técnico va delante y la explicación, al lado.</p>
+
+  <div class="bloque">
+    <article class="ficha">
+      <div class="cabeza"><span class="nombre">noindex olvidado</span><span class="gravedad">Crítico</span></div>
+      <dl>
+        <dt>Qué pasa</dt><dd>6 páginas de encargos tienen <code>&lt;meta name="robots" content="noindex"&gt;</code>, probablemente de cuando la web estaba en construcción.</dd>
+        <dt>Por qué importa</dt><dd>Si la página le dice a Google que no la guarde, no sale en ninguna búsqueda.</dd>
+        <dt>Cómo se arregla</dt><dd>Con Yoast: editar cada página → Avanzado → «¿Permitir a los motores de búsqueda mostrar esta página?» → Sí.</dd>
+        <dt>Esfuerzo</dt><dd>Bajo: unos minutos por página.</dd>
+        <dt>Dónde</dt><dd>/encargos/ y 5 páginas más (lista completa en el anexo).</dd>
+      </dl>
+      <p class="ref">SEO-01.noindex-desarrollo · Evidencias <span class="nowrap">E-012 a E-017</span></p>
+    </article>
+    <article class="ficha">
+      <div class="cabeza"><span class="nombre">Imágenes sin atributo alt</span><span class="gravedad">Alto</span></div>
+      <dl>
+        <dt>Qué pasa</dt><dd>7 de las 12 fotos de productos de la portada no tienen atributo <code>alt</code>.</dd>
+        <dt>Por qué importa</dt><dd>El lector de pantalla no puede describirlas: para una persona ciega, esas imágenes no existen.</dd>
+        <dt>Cómo se arregla</dt><dd>En WordPress: Medios → cada imagen → «Texto alternativo». Describir lo que se ve: «Barra de pan de centeno con semillas».</dd>
+        <dt>Esfuerzo</dt><dd>Bajo: menos de una hora.</dd>
+        <dt>Dónde</dt><dd>Portada y 3 páginas de productos.</dd>
+      </dl>
+      <p class="ref">ACC-01.img-alt-presente · WCAG 2.1 · 1.1.1 Contenido no textual (A) · <span class="nowrap">E-004, E-005</span></p>
+    </article>
+  </div>
+  <footer class="pie"><img src="logo-proconsi.png" alt="Proconsi"><span>3</span></footer>
+</section>
+
+<!-- 4. Cambios y límites -->
+<section class="pagina">
+  <span class="prueba">Datos de prueba · Ejemplo</span>
+  <div class="marca"></div>
+  <h2 class="titulo">Cambios desde el <em>2 de octubre</em></h2>
+  <p class="entradilla">Comparado con el análisis anterior de la misma dirección, después de las revisiones.</p>
+
+  <div class="bloque fila fila-3">
+    <div class="tarjeta"><p class="cifra">4</p><p class="etiqueta">Arreglados</p><div class="raya"></div><p class="texto">Enlaces rotos del menú, title de contacto, HTTPS en todas las páginas y sitemap.</p></div>
+    <div class="tarjeta"><p class="cifra">2</p><p class="etiqueta">Nuevos</p><div class="raya"></div><p class="texto">El noindex de las páginas de encargos y una meta description repetida en el blog.</p></div>
+    <div class="tarjeta"><p class="cifra">9</p><p class="etiqueta">Siguen igual</p><div class="raya"></div><p class="texto">Sobre todo de accesibilidad: alt, lang y nombres de botones.</p></div>
+  </div>
+  <p class="nota">Que algo esté arreglado en la web no significa que Google ya lo haya visto: puede tardar días o semanas en volver a pasar.</p>
+
+  <div class="bloque">
+    <h3 class="subtitulo">Lo que no se ha podido <em>comprobar</em></h3>
+    <p class="texto" style="margin-bottom:4mm">No significa que esté mal ni que esté bien: la herramienta no tenía pruebas suficientes y lo dice.</p>
+    <ul class="limites">
+      <li><span><strong>Contraste y uso con teclado.</strong> <span class="texto">Hace falta ver la página dibujada en un navegador, y esta versión no lo hace. Conviene revisarlo a mano.</span></span></li>
+      <li><span><strong>Velocidad en móvil (PageSpeed).</strong> <span class="texto">Google PageSpeed no respondió durante el análisis.</span></span></li>
+      <li><span><strong>Formulario de encargos.</strong> <span class="texto">Por seguridad no se envían formularios; solo se revisó cómo está hecho.</span></span></li>
+    </ul>
+  </div>
+
+  <div class="bloque mensaje"><p>Siguiente análisis programado: <em>6 de diciembre de 2026</em>.</p></div>
+  <footer class="pie"><img src="logo-proconsi.png" alt="Proconsi"><span>4</span></footer>
+</section>
+
+<!-- 5. Anexo técnico y glosario -->
+<section class="pagina">
+  <span class="prueba">Datos de prueba · Ejemplo</span>
+  <div class="marca"></div>
+  <h2 class="titulo">Anexo <em>técnico</em></h2>
+  <p class="entradilla">Una fila por resultado, para quien hace los cambios.</p>
+
+  <div class="bloque">
+    <table>
+      <thead><tr><th>Código</th><th>Comprobación</th><th>Estado</th><th>Página</th><th>Evidencia</th></tr></thead>
+      <tbody>
+        <tr><td><code>SEO-01</code></td><td>noindex de desarrollo olvidado</td><td class="problema">Problema · crítico</td><td>/encargos/ y 5 más</td><td>E-012</td></tr>
+        <tr><td><code>ACC-01</code></td><td>Imágenes con atributo alt</td><td class="problema">Problema · alto</td><td>/</td><td>E-004</td></tr>
+        <tr><td><code>ACC-10</code></td><td>Idioma de la página declarado</td><td class="problema">Problema · medio</td><td>Todas</td><td>E-001</td></tr>
+        <tr><td><code>SEO-04</code></td><td>Meta description repetida</td><td class="mejorable">Mejorable</td><td>/blog/ y 9 más</td><td>S-E-002</td></tr>
+        <tr><td><code>SEO-03</code></td><td>Title presente</td><td class="gris">Correcto</td><td>38 páginas</td><td>—</td></tr>
+        <tr><td><code>IA-01</code></td><td>robots.txt recuperado</td><td class="gris">Correcto</td><td>/robots.txt</td><td>E-002</td></tr>
+        <tr><td><code>SEO-11</code></td><td>Velocidad en móvil (PageSpeed)</td><td class="gris">No verificable</td><td>/</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p class="nota">Perfil v3 · catálogo 1.2.0 · 3 peticiones por segundo · sin navegador · 38 de 200 páginas posibles · Sitios autorizados: panaderia-ejemplo.es, www.panaderia-ejemplo.es</p>
+  </div>
+
+  <div class="bloque">
+    <h3 class="subtitulo">Glosario</h3>
+    <div class="glosario">
+      <div><b>noindex</b><p>Instrucción (meta robots o X-Robots-Tag) que pide a los buscadores que no guarden la página en su índice.</p></div>
+      <div><b>texto alternativo (alt)</b><p>Atributo de una imagen con el texto que lee el lector de pantalla en su lugar.</p></div>
+      <div><b>atributo lang</b><p>Declara el idioma de la página; el lector de pantalla lo usa para pronunciar bien.</p></div>
+      <div><b>meta description</b><p>Resumen de la página que Google puede mostrar debajo del title en los resultados.</p></div>
+      <div><b>WCAG 2.1 AA</b><p>Pautas de accesibilidad del W3C que exigen la ley y el Kit Digital (<span class="nowrap">UNE-EN 301 549</span>).</p></div>
+      <div><b>robots.txt</b><p>Fichero que dice a cada robot (Googlebot, GPTBot…) qué partes de la web puede rastrear.</p></div>
+    </div>
+  </div>
+  <footer class="pie"><img src="logo-proconsi.png" alt="Proconsi"><span>5</span></footer>
+</section>
+
+</body>
+</html>
