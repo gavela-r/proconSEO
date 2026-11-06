@@ -46,7 +46,7 @@ $bloques = count($entrada['bloques']);
         <?php foreach ($entrada['resultados'] as $r): ?>
             <li>
                 <strong><?= e(Etiquetas::bloque((string) $r['bloque'])) ?></strong> —
-                <?= e($r['consecuencia'] ?? $r['explicacion_sencilla']) ?>
+                <?= \ProconSEO\Results\Glosario::comun()->enlazar($r['consecuencia'] ?? $r['explicacion_sencilla']) ?>
                 <a href="/resultados/<?= e($r['id']) ?>"><?= e($r['titulo']) ?><?php if ($r['titulo'] !== $r['id_comprobacion']): ?><span class="solo-lectores"> (<?= e($r['id_comprobacion']) ?>)</span><?php endif; ?></a>
                 <?php if ($r['estado_vigente'] !== $estado): ?>
                     <span class="chip"><?= e(Etiquetas::estado((string) $r['estado_vigente'])) ?></span>

@@ -186,3 +186,13 @@ details.plegable[open] > summary { margin-bottom: .5rem; }
 
 /* Cambios desde el análisis anterior */
 .cambios__recuento { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; list-style: none; padding: 0; margin: .5rem 0 1rem; }
+
+/* Glosario */
+.termino { text-decoration: underline dotted; text-underline-offset: .2em; color: inherit; cursor: help; }
+.termino:hover, .termino:focus-visible { color: var(--primario); }
+.glosario__indice { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; list-style: none; padding: 0; }
+.glosario { display: grid; gap: .35rem 0; }
+.glosario dt { font-weight: 700; margin-top: .75rem; scroll-margin-top: 1rem; }
+.glosario dt:target { background: var(--fondo-suave, #fff7d6); }
+.glosario dd { margin: 0; max-width: 70ch; }
+.glosario__variantes { font-weight: 400; color: var(--texto-suave); }

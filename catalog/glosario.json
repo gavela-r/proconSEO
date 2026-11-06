@@ -1,0 +1,292 @@
+{
+  "version": "1.0.0",
+  "nota": "Términos técnicos que aparecen en los resultados. En pantalla se enlazan a /glosario con su definición. Las variantes son otras formas de escribir el mismo término.",
+  "terminos": [
+    {
+      "termino": "noindex",
+      "variantes": [
+        "no index",
+        "no indexar"
+      ],
+      "bloque": "seo",
+      "definicion": "Instrucción (meta robots o cabecera X-Robots-Tag) que pide a los buscadores que no guarden la página en su índice. Con ella, la página no sale en los resultados de búsqueda."
+    },
+    {
+      "termino": "nofollow",
+      "variantes": [],
+      "bloque": "seo",
+      "definicion": "Indica a los buscadores que no sigan un enlace o los enlaces de una página. Se usa en enlaces patrocinados o no fiables."
+    },
+    {
+      "termino": "meta robots",
+      "variantes": [
+        "X-Robots-Tag"
+      ],
+      "bloque": "seo",
+      "definicion": "Etiqueta del HTML (o cabecera HTTP, X-Robots-Tag) con instrucciones para los robots de los buscadores: indexar o no, seguir enlaces o no."
+    },
+    {
+      "termino": "robots.txt",
+      "variantes": [],
+      "bloque": "ia",
+      "definicion": "Fichero en la raíz de la web que dice a cada robot (Googlebot, GPTBot…) qué partes puede rastrear. Si bloquea a un robot, ese buscador o asistente no puede leer la web."
+    },
+    {
+      "termino": "sitemap",
+      "variantes": [
+        "sitemap.xml",
+        "mapa del sitio"
+      ],
+      "bloque": "seo",
+      "definicion": "Fichero XML con la lista de páginas de la web que se quieren indexar. Ayuda a los buscadores a encontrarlas todas."
+    },
+    {
+      "termino": "canonical",
+      "variantes": [
+        "URL canónica",
+        "etiqueta canonical",
+        "rel=canonical"
+      ],
+      "bloque": "seo",
+      "definicion": "Etiqueta <link rel=\"canonical\"> que indica cuál es la dirección principal de una página cuando hay varias con el mismo contenido. Evita contenido duplicado."
+    },
+    {
+      "termino": "indexación",
+      "variantes": [
+        "indexar",
+        "indexable"
+      ],
+      "bloque": "seo",
+      "definicion": "Que el buscador guarde la página en su base de datos (el índice) para poder mostrarla en los resultados. Una página rastreada no siempre se indexa."
+    },
+    {
+      "termino": "rastreo",
+      "variantes": [
+        "rastrear",
+        "crawler",
+        "rastreador"
+      ],
+      "bloque": "seo",
+      "definicion": "Recorrido que hace un robot (crawler) por la web siguiendo enlaces para descubrir y descargar páginas. Es el paso previo a la indexación."
+    },
+    {
+      "termino": "user-agent",
+      "variantes": [
+        "user agent"
+      ],
+      "bloque": "ia",
+      "definicion": "Nombre con el que se identifica un robot o navegador al pedir una página (por ejemplo, Googlebot o GPTBot). robots.txt da permisos por user-agent."
+    },
+    {
+      "termino": "llms.txt",
+      "variantes": [],
+      "bloque": "ia",
+      "definicion": "Propuesta de fichero, en la raíz de la web, con un resumen en texto pensado para modelos de lenguaje. No es un estándar oficial: su ausencia no es un error."
+    },
+    {
+      "termino": "title",
+      "variantes": [
+        "etiqueta title"
+      ],
+      "bloque": "seo",
+      "definicion": "Etiqueta <title> del HTML: el texto azul que aparece en los resultados de Google y en la pestaña del navegador. Debe ser único por página."
+    },
+    {
+      "termino": "meta description",
+      "variantes": [],
+      "bloque": "seo",
+      "definicion": "Etiqueta <meta name=\"description\"> con un resumen de la página. Google puede mostrarla debajo del title en los resultados."
+    },
+    {
+      "termino": "H1",
+      "variantes": [
+        "encabezado principal"
+      ],
+      "bloque": "seo",
+      "definicion": "Encabezado principal de la página (<h1>). Debe decir de qué trata. Los encabezados h1 a h6 forman su estructura."
+    },
+    {
+      "termino": "hreflang",
+      "variantes": [],
+      "bloque": "seo",
+      "definicion": "Atributo que indica las versiones de una página en otros idiomas o países, para que el buscador muestre la adecuada a cada usuario."
+    },
+    {
+      "termino": "redirección",
+      "variantes": [
+        "redirige",
+        "redirecciones"
+      ],
+      "bloque": "seo",
+      "definicion": "Respuesta del servidor que envía a otra dirección. La 301 es permanente (traslada la relevancia en buscadores); la 302 es temporal."
+    },
+    {
+      "termino": "HTTP 404",
+      "variantes": [],
+      "bloque": "seo",
+      "definicion": "Código de respuesta que indica que la página no existe (404) o que se eliminó a propósito (410). Un enlace a ella es un enlace roto."
+    },
+    {
+      "termino": "HTTP 5xx",
+      "variantes": [],
+      "bloque": "seo",
+      "definicion": "Códigos de error del servidor (500, 502, 503, 504): la web falló al responder. Si se repiten, los buscadores dejan de visitarla."
+    },
+    {
+      "termino": "HTTPS",
+      "variantes": [
+        "TLS",
+        "SSL"
+      ],
+      "bloque": "seo",
+      "definicion": "Conexión cifrada entre el navegador y la web, con un certificado TLS válido. Google la tiene en cuenta y los navegadores marcan como «no segura» la web sin ella."
+    },
+    {
+      "termino": "enlace interno",
+      "variantes": [
+        "enlaces internos",
+        "enlazado interno"
+      ],
+      "bloque": "seo",
+      "definicion": "Enlace de una página a otra de la misma web. Son los caminos por los que los robots descubren las páginas."
+    },
+    {
+      "termino": "enlace roto",
+      "variantes": [
+        "enlaces rotos"
+      ],
+      "bloque": "seo",
+      "definicion": "Enlace que lleva a una página que no existe o da error (404, 410 o 5xx)."
+    },
+    {
+      "termino": "contenido duplicado",
+      "variantes": [],
+      "bloque": "seo",
+      "definicion": "Varias páginas con el mismo contenido, title o description. El buscador no sabe cuál mostrar y puede elegir mal."
+    },
+    {
+      "termino": "datos estructurados",
+      "variantes": [
+        "Schema.org",
+        "JSON-LD",
+        "microdatos"
+      ],
+      "bloque": "ia",
+      "definicion": "Información en formato estándar (Schema.org, normalmente en JSON-LD) que describe de forma exacta el negocio, sus productos o su horario. La leen los buscadores y los asistentes con IA."
+    },
+    {
+      "termino": "Open Graph",
+      "variantes": [
+        "og:title",
+        "og:image"
+      ],
+      "bloque": "ia",
+      "definicion": "Etiquetas meta (og:title, og:image…) que definen el título, la imagen y la descripción que se muestran al compartir la página en redes o en mensajería."
+    },
+    {
+      "termino": "viewport",
+      "variantes": [
+        "meta viewport"
+      ],
+      "bloque": "seo",
+      "definicion": "Etiqueta que indica al móvil cómo ajustar la página al ancho de la pantalla. Sin ella la web se ve diminuta en el móvil."
+    },
+    {
+      "termino": "Core Web Vitals",
+      "variantes": [
+        "LCP",
+        "CLS",
+        "INP"
+      ],
+      "bloque": "seo",
+      "definicion": "Métricas de Google sobre la experiencia de carga: LCP (cuánto tarda en verse lo principal), CLS (cuánto se mueve la página al cargar) e INP (cuánto tarda en reaccionar al tocar)."
+    },
+    {
+      "termino": "PageSpeed",
+      "variantes": [
+        "PageSpeed Insights",
+        "Lighthouse"
+      ],
+      "bloque": "seo",
+      "definicion": "Herramienta gratuita de Google (basada en Lighthouse) que mide la velocidad y el rendimiento de una página en móvil y ordenador."
+    },
+    {
+      "termino": "WCAG",
+      "variantes": [
+        "WCAG 2.1",
+        "WCAG 2.2",
+        "pautas WCAG"
+      ],
+      "bloque": "acc",
+      "definicion": "Pautas de accesibilidad del W3C. La ley española y el Kit Digital exigen WCAG 2.1 nivel AA (norma UNE-EN 301 549); WCAG 2.2 añade 6 criterios nuevos."
+    },
+    {
+      "termino": "nivel AA",
+      "variantes": [],
+      "bloque": "acc",
+      "definicion": "Niveles de cumplimiento de WCAG: A es el mínimo y AA el exigido por la ley. Cada criterio tiene su nivel."
+    },
+    {
+      "termino": "texto alternativo",
+      "variantes": [
+        "atributo alt"
+      ],
+      "bloque": "acc",
+      "definicion": "Atributo alt de una imagen: el texto que lee el lector de pantalla en su lugar. Las imágenes decorativas llevan alt vacío."
+    },
+    {
+      "termino": "lector de pantalla",
+      "variantes": [
+        "lectores de pantalla",
+        "NVDA",
+        "JAWS",
+        "VoiceOver"
+      ],
+      "bloque": "acc",
+      "definicion": "Programa que lee en voz alta lo que hay en pantalla (NVDA, JAWS, VoiceOver). Lo usan sobre todo personas ciegas o con baja visión."
+    },
+    {
+      "termino": "contraste",
+      "variantes": [
+        "relación de contraste"
+      ],
+      "bloque": "acc",
+      "definicion": "Diferencia de luminosidad entre el texto y su fondo. WCAG AA pide al menos 4,5:1 para texto normal y 3:1 para texto grande."
+    },
+    {
+      "termino": "ARIA",
+      "variantes": [
+        "aria-label",
+        "atributos ARIA",
+        "WAI-ARIA"
+      ],
+      "bloque": "acc",
+      "definicion": "Atributos (aria-label, role…) que explican a los lectores de pantalla qué es y qué hace un elemento cuando el HTML no basta. Mal usados, empeoran la accesibilidad."
+    },
+    {
+      "termino": "atributo lang",
+      "variantes": [
+        "idioma de la página"
+      ],
+      "bloque": "acc",
+      "definicion": "Atributo lang de <html> que declara el idioma. El lector de pantalla lo usa para pronunciar bien el texto."
+    },
+    {
+      "termino": "foco",
+      "variantes": [
+        "foco del teclado",
+        "foco visible"
+      ],
+      "bloque": "acc",
+      "definicion": "Indicador del elemento que está seleccionado al navegar con el teclado (tecla Tab). Debe verse siempre."
+    },
+    {
+      "termino": "landmark",
+      "variantes": [
+        "landmarks"
+      ],
+      "bloque": "acc",
+      "definicion": "Regiones de la página (header, nav, main, footer) que permiten a los lectores de pantalla saltar directamente a cada parte."
+    }
+  ]
+}

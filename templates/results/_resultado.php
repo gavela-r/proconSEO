@@ -36,7 +36,7 @@ $esfuerzo = Esfuerzo::tryFrom((string) $r['esfuerzo']);
         <?php endif; ?>
     </div>
     <h3 id="r-<?= e($r['id']) ?>"><a href="/resultados/<?= e($r['id']) ?>"><?= e($r['titulo']) ?></a></h3>
-    <p><?= e($r['explicacion_sencilla']) ?></p>
+    <p><?= \ProconSEO\Results\Glosario::comun()->enlazar($r['explicacion_sencilla']) ?></p>
     <?php if ($r['revision_pendiente'] && $r['motivo_revision'] !== null): ?>
         <p><strong>Qué hay que revisar:</strong> <?= e($r['motivo_revision']) ?></p>
     <?php endif; ?>
