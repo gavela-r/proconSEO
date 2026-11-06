@@ -88,6 +88,7 @@ return static function (Router $r): void {
             'estilos' => $estilos,
             'proyecto' => $datos,
             'historial' => $repo()->historial((int) $datos['id']),
+            'borrado' => $p->entrada('borrado') === '1',
         ]));
     });
 
