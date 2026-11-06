@@ -31,7 +31,7 @@ foreach ($lineas as $l) {
 $errores = count(array_filter($lineas, static fn (array $l): bool => $l['nivel'] === ComprobacionInstalacion::ERROR));
 $avisos = count(array_filter($lineas, static fn (array $l): bool => $l['nivel'] === ComprobacionInstalacion::AVISO));
 echo PHP_EOL . ($errores === 0
-    ? 'Todo listo' . ($avisos > 0 ? " ({$avisos} avisos: funciona, pero conviene revisarlos)." : '.')
-    : "Hay {$errores} errores: la herramienta no funcionará bien hasta arreglarlos.") . PHP_EOL;
+    ? 'Todo listo' . ($avisos > 0 ? " (" . ($avisos === 1 ? '1 aviso' : "{$avisos} avisos") . ": funciona, pero conviene revisar" . ($avisos === 1 ? 'lo' : 'los') . ")." : '.')
+    : ($errores === 1 ? 'Hay 1 error: la herramienta no funcionará bien hasta arreglarlo.' : "Hay {$errores} errores: la herramienta no funcionará bien hasta arreglarlos.")) . PHP_EOL;
 
 exit($errores === 0 ? 0 : 1);
