@@ -41,15 +41,15 @@ final class PermisoRobots implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'IA-01.robots-recuperado' => $this->recuperado($e),
-            'IA-01.robots-sintaxis' => $this->sintaxis($e),
-            'IA-01.permiso-buscadores' => $this->permiso($e, $id, self::BUSCADORES, 'los buscadores (Google y Bing)'),
-            'IA-01.permiso-buscadores-ia' => $this->permiso($e, $id, self::BUSCADORES_IA, 'los buscadores con IA (ChatGPT, Claude y Perplexity)'),
-            'IA-01.agentes-entrenamiento' => $this->entrenamiento($e),
-            'IA-01.llms-txt' => $this->llmsTxt($e),
+            'IA-01.robots-recuperado' => $this->recuperado($entorno),
+            'IA-01.robots-sintaxis' => $this->sintaxis($entorno),
+            'IA-01.permiso-buscadores' => $this->permiso($entorno, $id, self::BUSCADORES, 'los buscadores (Google y Bing)'),
+            'IA-01.permiso-buscadores-ia' => $this->permiso($entorno, $id, self::BUSCADORES_IA, 'los buscadores con IA (ChatGPT, Claude y Perplexity)'),
+            'IA-01.agentes-entrenamiento' => $this->entrenamiento($entorno),
+            'IA-01.llms-txt' => $this->llmsTxt($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }
@@ -62,9 +62,9 @@ final class PermisoRobots implements Comprobacion
         $v = $e->resultado('IA-01.robots-recuperado')->evidencia($evidencia)->url($r->urlSolicitada);
 
         return match ($robots['estado']) {
-            Entorno::ROBOTS_LEIDO => $v->valor('HTTP ' . $r->estadoHttp . ': robots.txt leído (' . $r->bytes . ' bytes).')->correcto(),
+            Entorno::ROBOTS_LEIDO => $v->valor('HTTP ' . (string) $r->estadoHttp . ': robots.txt leído (' . $r->bytes . ' bytes).')->correcto(),
             Entorno::ROBOTS_SIN_RESTRICCIONES => $v
-                ->valor('HTTP ' . $r->estadoHttp . ': no hay robots.txt, lo que equivale a «sin restricciones».')
+                ->valor('HTTP ' . (string) $r->estadoHttp . ': no hay robots.txt, lo que equivale a «sin restricciones».')
                 ->correcto(),
             Entorno::ROBOTS_TEMPORAL => $v
                 ->valor('HTTP ' . ($r->estadoHttp ?? '429') . ' al pedir robots.txt.')
@@ -83,7 +83,7 @@ final class PermisoRobots implements Comprobacion
         $v = $e->resultado('IA-01.robots-sintaxis')->url($robots['recurso']->urlSolicitada);
         if ($robots['estado'] !== Entorno::ROBOTS_LEIDO) {
             if ($robots['estado'] === Entorno::ROBOTS_SIN_RESTRICCIONES) {
-                return $v->noAplicable('No hay robots.txt (HTTP ' . $robots['recurso']->estadoHttp . ').');
+                return $v->noAplicable('No hay robots.txt (HTTP ' . (string) $robots['recurso']->estadoHttp . ').');
             }
             throw new NoVerificable('robots.txt no se pudo leer: ' . Entorno::describirDescarga($robots['recurso']) . '.');
         }
@@ -117,7 +117,7 @@ final class PermisoRobots implements Comprobacion
         foreach ($agentes as $agente) {
             $p = $e->permisoRobots($agente);
             $estado[] = $agente . ': ' . ($p['permitido'] ? 'permitido' : 'bloqueado')
-                . ($p['regla'] !== null ? ' (línea ' . $p['linea'] . ', «' . $p['regla'] . '»)' : '');
+                . ($p['regla'] !== null ? ' (línea ' . (string) $p['linea'] . ', «' . $p['regla'] . '»)' : '');
             if (!$p['permitido']) {
                 $bloqueados[] = $agente;
             }
@@ -170,7 +170,7 @@ final class PermisoRobots implements Comprobacion
             return $v->valor('Existe /llms.txt (' . $r->bytes . ' bytes).')->correcto();
         }
         if ($r->estadoHttp !== null && $r->estadoHttp >= 400 && $r->estadoHttp < 500 && $r->estadoHttp !== 429) {
-            return $v->valor('No existe /llms.txt (HTTP ' . $r->estadoHttp . ').')->noAplicable('No existe /llms.txt.');
+            return $v->valor('No existe /llms.txt (HTTP ' . (string) $r->estadoHttp . ').')->noAplicable('No existe /llms.txt.');
         }
         throw new NoVerificable('No se pudo consultar /llms.txt: ' . Entorno::describirDescarga($r) . '.');
     }
@@ -181,7 +181,7 @@ final class PermisoRobots implements Comprobacion
         $robots = $e->robots();
         $texto = 'URL evaluada: ' . $e->url() . "\n" . implode("\n", $estado);
         if ($robots['estado'] === Entorno::ROBOTS_SIN_RESTRICCIONES) {
-            $texto .= "\nrobots.txt respondió HTTP " . $robots['recurso']->estadoHttp . ' (sin restricciones).';
+            $texto .= "\nrobots.txt respondió HTTP " . (string) $robots['recurso']->estadoHttp . ' (sin restricciones).';
         }
         return $e->evidencia(TipoEvidencia::Texto, $texto, $robots['recurso']->urlSolicitada);
     }

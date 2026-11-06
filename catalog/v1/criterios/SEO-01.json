@@ -19,28 +19,23 @@
   "fuentes": [
     {
       "nombre": "Google Search Central — Códigos de estado HTTP y errores de red",
-      "url": "https://developers.google.com/search/docs/crawling-indexing/http-network-errors",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/crawling-indexing/http-network-errors"
     },
     {
       "nombre": "Google Search Central — Search Essentials",
-      "url": "https://developers.google.com/search/docs/essentials",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/essentials"
     },
     {
       "nombre": "Google Search Central — Meta robots, data-nosnippet y X-Robots-Tag",
-      "url": "https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag"
     },
     {
       "nombre": "WordPress — Ajustes de lectura (visibilidad en buscadores)",
-      "url": "https://wordpress.org/documentation/article/settings-reading-screen/",
-      "fecha_verificacion": null
+      "url": "https://wordpress.org/documentation/article/settings-reading-screen/"
     },
     {
       "nombre": "Proconsi — Kit Digital: Sitio web",
-      "url": "https://www.proconsi.com/kit-digital/web/",
-      "fecha_verificacion": null
+      "url": "https://www.proconsi.com/kit-digital/web/"
     }
   ],
   "wcag": [],

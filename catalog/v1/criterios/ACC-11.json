@@ -7,14 +7,13 @@
   "explicacion_sencilla": "Si el menú o el botón de ayuda cambian de sitio en cada página, la web se vuelve difícil de usar, sobre todo para personas con discapacidad cognitiva.",
   "modo": "hibrido",
   "esfuerzo": "medio",
-  "mvp": "no",
+  "mvp": "parcial",
   "ref_investigacion": [],
   "reutiliza": [],
   "fuentes": [
     {
       "nombre": "W3C — WCAG 2.2",
-      "url": "https://www.w3.org/TR/WCAG22/",
-      "fecha_verificacion": null
+      "url": "https://www.w3.org/TR/WCAG22/"
     }
   ],
   "wcag": [
@@ -98,14 +97,13 @@
       "id": "ACC-11.navegacion-coherente",
       "nombre": "Navegación coherente",
       "que_comprueba": "Los menús repetidos aparecen en el mismo orden.",
-      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "cuando_aplica": "Solo con alcance de sitio completo.",
       "condicion": null,
       "modo": "automatico",
-      "mvp": "no",
-      "motivo_no_mvp": "navegador",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
       "necesita": [
-        "otras_urls",
-        "navegador"
+        "otras_urls"
       ],
       "alcance_minimo": "sitio_completo",
       "wcag": [

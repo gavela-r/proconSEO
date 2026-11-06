@@ -1,10 +1,9 @@
 {
-  "version": "1.1.0",
-  "fecha": "2026-11-05",
+  "version": "1.3.0",
+  "fecha": "2026-11-06",
   "especificacion": "1.2",
   "descripcion": "Catálogo de criterios de proconSEO: 11 de búsqueda con IA, 16 de SEO y 12 de accesibilidad (WCAG 2.2 A y AA). Un fichero por criterio en criterios/.",
   "pendiente": [
-    "Verificar cada fuente oficial y anotar su fecha en fecha_verificacion antes de implementar la regla (RNF-05).",
     "Completar ficha_investigacion (Fichas 1 a 55 de la Investigación ejecutiva) en cada criterio WCAG."
   ],
   "valores": {

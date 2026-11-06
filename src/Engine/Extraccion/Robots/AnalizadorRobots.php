@@ -36,6 +36,7 @@ final class AnalizadorRobots
         $sitemaps = [];
         $invalidas = [];
         $ignoradas = [];
+        /** @var array{agentes: list<string>, reglas: list<array{permitir: bool, patron: string, original: string, linea: int}>, linea: int}|null $actual */
         $actual = null;
         $enReglas = false;
 

@@ -17,18 +17,15 @@
   "fuentes": [
     {
       "nombre": "Google Search Central — Introducción a los datos estructurados",
-      "url": "https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data"
     },
     {
       "nombre": "Google Search Central — Datos estructurados de producto",
-      "url": "https://developers.google.com/search/docs/appearance/structured-data/product",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/appearance/structured-data/product"
     },
     {
       "nombre": "Proconsi — Kit Digital: Comercio electrónico",
-      "url": "https://www.proconsi.com/kit-digital/comercio-electronico/",
-      "fecha_verificacion": null
+      "url": "https://www.proconsi.com/kit-digital/comercio-electronico/"
     }
   ],
   "wcag": [],
@@ -78,11 +75,10 @@
       "cuando_aplica": "Solo en páginas de producto.",
       "condicion": "producto",
       "modo": "automatico",
-      "mvp": "no",
-      "motivo_no_mvp": "navegador",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
       "necesita": [
-        "pagina",
-        "navegador"
+        "pagina"
       ],
       "alcance_minimo": "url_individual",
       "wcag": [],
@@ -98,11 +94,10 @@
       "cuando_aplica": "Solo en páginas de producto.",
       "condicion": "producto",
       "modo": "automatico",
-      "mvp": "no",
-      "motivo_no_mvp": "navegador",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
       "necesita": [
-        "pagina",
-        "navegador"
+        "pagina"
       ],
       "alcance_minimo": "url_individual",
       "wcag": [],

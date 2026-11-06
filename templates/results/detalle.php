@@ -69,7 +69,7 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
     <p class="aviso aviso--info" role="status"><strong>Revisión guardada.</strong> El resultado original se conserva y la revisión aparece en el historial.</p>
 <?php endif; ?>
 <h1><?= e($titulo) ?></h1>
-<p class="explicacion"><?= e($r['explicacion_sencilla']) ?></p>
+<p class="explicacion"><?= \ProconSEO\Results\Glosario::comun()->enlazar($r['explicacion_sencilla']) ?></p>
 
 <?php if ($r['revisado']): ?>
     <p class="aviso aviso--info" role="note">
@@ -114,14 +114,14 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
         <?php if (!$sinTexto($r['consecuencia'])): ?>
             <section class="seccion" aria-labelledby="t-importa">
                 <h2 id="t-importa">Por qué importa</h2>
-                <p><?= e($r['consecuencia']) ?></p>
+                <p><?= \ProconSEO\Results\Glosario::comun()->enlazar($r['consecuencia']) ?></p>
             </section>
         <?php endif; ?>
 
         <?php if (!$sinTexto($r['correccion']) || !$sinTexto($r['correccion_cms'])): ?>
             <section class="seccion" aria-labelledby="t-corregir">
                 <h2 id="t-corregir">Cómo corregirlo</h2>
-                <?php if (!$sinTexto($r['correccion'])): ?><p><?= e($r['correccion']) ?></p><?php endif; ?>
+                <?php if (!$sinTexto($r['correccion'])): ?><p><?= \ProconSEO\Results\Glosario::comun()->enlazar($r['correccion']) ?></p><?php endif; ?>
                 <?php if (!$sinTexto($r['correccion_cms'])): ?>
                     <h3>En el gestor de contenidos</h3>
                     <p><?= e($r['correccion_cms']) ?></p>
@@ -134,7 +134,7 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
             <?php if ($sinTexto($r['limitacion']) && !$r['requiere_revision_humana']): ?>
                 <p class="vacio">Sin limitaciones indicadas.</p>
             <?php endif; ?>
-            <?php if (!$sinTexto($r['limitacion'])): ?><p><?= e($r['limitacion']) ?></p><?php endif; ?>
+            <?php if (!$sinTexto($r['limitacion'])): ?><p><?= \ProconSEO\Results\Glosario::comun()->enlazar($r['limitacion']) ?></p><?php endif; ?>
             <?php if ($r['requiere_revision_humana']): ?>
                 <p><strong>Necesita revisión humana<?= $r['motivo_revision'] !== null ? ':' : '.' ?></strong> <?= e($r['motivo_revision'] ?? '') ?></p>
             <?php endif; ?>

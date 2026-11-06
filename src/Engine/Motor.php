@@ -6,6 +6,7 @@ namespace ProconSEO\Engine;
 
 use ProconSEO\Engine\Catalogo\CatalogoJson;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadAria;
+use ProconSEO\Engine\Comprobaciones\AccesibilidadEntrada;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadEstructura;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadFormularios;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadImagenes;
@@ -18,13 +19,17 @@ use ProconSEO\Engine\Comprobaciones\DatosEstructurados;
 use ProconSEO\Engine\Comprobaciones\DirectivasIndexacion;
 use ProconSEO\Engine\Comprobaciones\Enlazado;
 use ProconSEO\Engine\Comprobaciones\Idiomas;
+use ProconSEO\Engine\Comprobaciones\IdiomaTexto;
 use ProconSEO\Engine\Comprobaciones\Metadatos;
 use ProconSEO\Engine\Comprobaciones\Multimedia;
 use ProconSEO\Engine\Comprobaciones\PageSpeed;
+use ProconSEO\Engine\Comprobaciones\Paginacion;
 use ProconSEO\Engine\Comprobaciones\EstadoTecnico;
 use ProconSEO\Engine\Comprobaciones\PermisoRobots;
+use ProconSEO\Engine\Comprobaciones\ProductoCoherente;
 use ProconSEO\Engine\Comprobaciones\Redirecciones;
 use ProconSEO\Engine\Comprobaciones\RespuestaUtilizable;
+use ProconSEO\Engine\Extraccion\HuellaPagina;
 use ProconSEO\Engine\Seguridad\DetectorInstrucciones;
 use ProconSEO\Shared\Contract\BorradorResultado;
 use ProconSEO\Shared\Contract\ConsolidadorSitio;
@@ -106,15 +111,19 @@ final class Motor implements MotorAnalisis, ConsolidadorSitio
             new Redirecciones(),
             new Metadatos(),
             new Enlazado(),
+            new Paginacion(),
             new Multimedia(),
             new DatosEstructurados(),
+            new ProductoCoherente(),
             new CanonicalSitemap(),
             new Idiomas(),
+            new IdiomaTexto(),
             new Acciones(),
             new AccesibilidadImagenes(),
             new AccesibilidadEstructura(),
             new AccesibilidadFormularios(),
             new AccesibilidadAria(),
+            new AccesibilidadEntrada(),
             new AccesibilidadMeta(),
             new PageSpeed(),
             new ComprobacionesSitio(),
@@ -196,6 +205,7 @@ final class Motor implements MotorAnalisis, ConsolidadorSitio
         }
         try {
             $doc = $entorno->documento();
+            $palabras = HuellaPagina::palabras(HuellaPagina::textoPrincipal($doc->dom));
             $corto = static fn (array $textos, int $largo): array => array_map(static fn (string $t): string => mb_substr($t, 0, $largo), array_slice($textos, 0, 5));
             return new ResumenPagina(
                 url: $entorno->url(),
@@ -205,6 +215,9 @@ final class Motor implements MotorAnalisis, ConsolidadorSitio
                 descripciones: $corto($doc->metasPorNombre('description'), 500),
                 canonical: $doc->canonicos[0] ?? null,
                 enlacesInternos: array_slice($entorno->enlacesInternos(), 0, ResumenPagina::MAXIMO_ENLACES),
+                huellaTexto: HuellaPagina::huella($palabras),
+                palabrasTexto: count($palabras),
+                menu: HuellaPagina::menu($doc->dom, $doc->urlBase, $entorno->esInterna(...), ResumenPagina::MAXIMO_MENU),
             );
         } catch (Throwable) {
             // Sin resumen, la página no entra en las comparaciones del sitio; no rompe el análisis.

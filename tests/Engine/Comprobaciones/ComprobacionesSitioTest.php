@@ -70,7 +70,7 @@ final class ComprobacionesSitioTest extends TestCase
         $motor = Motor::v1();
 
         self::assertInstanceOf(ConsolidadorSitio::class, $motor);
-        self::assertSame(['SEO-03.title-duplicado', 'SEO-04.description-duplicada', 'IA-08.enlazado-interno', 'SEO-08.parametros-variantes'], $motor->subcomprobacionesDeSitio());
+        self::assertSame(['SEO-03.title-duplicado', 'SEO-04.description-duplicada', 'IA-08.enlazado-interno', 'SEO-08.parametros-variantes', 'SEO-08.contenido-duplicado', 'ACC-11.navegacion-coherente'], $motor->subcomprobacionesDeSitio());
         self::assertSame(Cobertura::Implementada, $motor->coberturas()['SEO-03.title-duplicado']);
         self::assertSame(Cobertura::ParcialmenteImplementada, $motor->coberturas()['SEO-08.parametros-variantes']);
     }

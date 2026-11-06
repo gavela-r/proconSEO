@@ -7,14 +7,13 @@
   "explicacion_sencilla": "Los botones demasiado pequeños o las acciones que solo funcionan arrastrando dificultan el uso a personas con temblores o poca precisión.",
   "modo": "hibrido",
   "esfuerzo": "medio",
-  "mvp": "no",
+  "mvp": "parcial",
   "ref_investigacion": [],
   "reutiliza": [],
   "fuentes": [
     {
       "nombre": "W3C — WCAG 2.2",
-      "url": "https://www.w3.org/TR/WCAG22/",
-      "fecha_verificacion": null
+      "url": "https://www.w3.org/TR/WCAG22/"
     }
   ],
   "wcag": [
@@ -119,11 +118,10 @@
       "cuando_aplica": "Siempre que la página se haya podido descargar.",
       "condicion": null,
       "modo": "automatico",
-      "mvp": "no",
-      "motivo_no_mvp": "navegador",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
       "necesita": [
-        "pagina",
-        "navegador"
+        "pagina"
       ],
       "alcance_minimo": "url_individual",
       "wcag": [

@@ -15,8 +15,7 @@
   "fuentes": [
     {
       "nombre": "Google Search Central — Consolidar URLs duplicadas (canonical)",
-      "url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls"
     }
   ],
   "wcag": [],
@@ -64,14 +63,13 @@
       "id": "SEO-08.contenido-duplicado",
       "nombre": "Contenido duplicado",
       "que_comprueba": "Páginas distintas con contenido sustancialmente igual.",
-      "cuando_aplica": "Siempre que la página se haya podido descargar.",
+      "cuando_aplica": "Solo con alcance de sitio completo.",
       "condicion": null,
       "modo": "automatico",
-      "mvp": "no",
-      "motivo_no_mvp": "ia",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
       "necesita": [
-        "otras_urls",
-        "ia"
+        "otras_urls"
       ],
       "alcance_minimo": "sitio_completo",
       "wcag": [],

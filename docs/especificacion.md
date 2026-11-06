@@ -274,7 +274,7 @@ Fuera del alcance de la URL (fase futura, con datos externos): citas, menciones 
 | SEO-05 | Encabezados H1–H6 y estructura. Varios H1 o saltos de nivel no son errores automáticos. | O5 | Parcial |
 | SEO-06 | Intención, suficiencia y valor de la página frente a lo que promete. Sin mínimos de palabras. | O1, O2, O3, C08, C13 | No (IA) |
 | SEO-07 | Enlazado interno: enlaces rastreables, rotos y textos ambiguos. | O9, T5, T15 | Sí |
-| SEO-08 | Duplicidad y variantes; solo es problema si hay una contradicción técnica observable. | T6 | Parcial |
+| SEO-08 | Duplicidad y variantes; solo es problema si hay una contradicción técnica observable. | T6 | Parcial (también texto casi igual entre páginas del sitio, comparando palabras, sin IA) |
 | SEO-09 | Contenido en HTML inicial, en DOM automático o solo tras interacción. | T9 | No (navegador) |
 | SEO-10 | Equivalencia de contenido y señales en móvil. | T10 | No (navegador) |
 | SEO-11 | Core Web Vitals (ver 6.4). | V1–V4, C17 | PSI |
@@ -282,7 +282,7 @@ Fuera del alcance de la URL (fase futura, con datos externos): citas, menciones 
 | SEO-13 | Intersticiales, overlays y anuncios que tapan el contenido. | T12 | No (navegador) |
 | SEO-14 | Datos estructurados y elegibilidad para resultados enriquecidos (reutiliza IA-07). Incluye el perfil de producto (ver 6.6). | T13 | Parcial |
 | SEO-15 | Versiones por idioma: códigos y destinos hreflang y reciprocidad. Solo si la web tiene más de un idioma. | T14 | Sí |
-| SEO-16 | Paginación, filtros y facetas, muestreando patrones sin generar combinaciones masivas. Poco relevante para las tiendas pequeñas del Kit Digital. | T16 | No (baja prioridad) |
+| SEO-16 | Paginación, filtros y facetas, muestreando patrones sin generar combinaciones masivas. Poco relevante para las tiendas pequeñas del Kit Digital. | T16 | Parcial (la paginación se enlaza con URLs propias en el HTML; filtros y facetas, no) |
 
 Fuera del alcance de la URL (fase futura, con acceso autorizado o APIs): indexación real, canonical elegida por Google, acciones manuales, búsquedas, impresiones, clics y posiciones (M1–M4), enlaces entrantes y métricas de autoridad (E1–E3), y SEO local con Perfil de Empresa (O10).
 
@@ -305,10 +305,10 @@ Los 55 criterios A y AA se agrupan en 12 bloques. Cada incidencia indica el crit
 | ACC-05 | Color y contraste | 1.4.1 A · 1.4.3, 1.4.11 AA | PSI (contraste de texto 1.4.3) |
 | ACC-06 | Teclado, foco y navegación | 2.1.1, 2.1.2, 2.1.4, 2.4.1, 2.4.3, 2.4.4 A · 2.4.7, 2.4.11 AA | Parcial (nombres de enlace) |
 | ACC-07 | Tiempo, movimiento y parpadeo | 2.2.1, 2.2.2, 2.3.1 A | Parcial (meta refresh con espera) |
-| ACC-08 | Entrada y objetivos táctiles | 2.5.1, 2.5.2, 2.5.3, 2.5.4 A · 2.5.7, 2.5.8 AA | No (navegador) |
+| ACC-08 | Entrada y objetivos táctiles | 2.5.1, 2.5.2, 2.5.3, 2.5.4 A · 2.5.7, 2.5.8 AA | Parcial (etiqueta en el nombre 2.5.3; el resto necesita navegador) |
 | ACC-09 | Formularios, errores y autenticación | 3.3.1, 3.3.2, 3.3.7 A · 1.3.5, 3.3.3, 3.3.4, 3.3.8 AA | Parcial (labels, autocomplete) |
-| ACC-10 | Idioma y predictibilidad | 3.1.1, 3.2.1, 3.2.2 A · 3.1.2 AA | Parcial (lang) |
-| ACC-11 | Consistencia entre páginas | 3.2.6 A · 2.4.5, 3.2.3, 3.2.4 AA | No |
+| ACC-10 | Idioma y predictibilidad | 3.1.1, 3.2.1, 3.2.2 A · 3.1.2 AA | Parcial (lang, y si coincide con el idioma del texto por sus palabras más frecuentes, sin IA) |
+| ACC-11 | Consistencia entre páginas | 3.2.6 A · 2.4.5, 3.2.3, 3.2.4 AA | Parcial (orden del menú entre páginas, 3.2.3, en sitio completo) |
 | ACC-12 | Nombre, rol, estado y mensajes de estado | 4.1.2 A · 4.1.3 AA | Parcial (nombres, roles, title de iframe) |
 
 Valores normativos que hay que aplicar:
@@ -361,8 +361,8 @@ Solo se activan en páginas de producto: cuando hay marcado `Product` o cuando e
 | Subcomprobación | Qué comprueba | MVP |
 |---|---|---|
 | `SEO-14.producto-marcado` | El marcado `Product`/`Offer` es válido y tiene las propiedades necesarias | Sí |
-| `SEO-14.producto-precio-coherente` | El precio del marcado coincide con el visible | No |
-| `SEO-14.producto-disponibilidad` | La disponibilidad marcada coincide con la visible; un producto agotado no es un error por sí solo | No |
+| `SEO-14.producto-precio-coherente` | El precio del marcado coincide con el visible | Parcial (texto del HTML, sin navegador) |
+| `SEO-14.producto-disponibilidad` | La disponibilidad marcada coincide con la visible; un producto agotado no es un error por sí solo | Parcial (texto del HTML, sin navegador) |
 | `IA-06.producto-vigencia` | Precios, ofertas y condiciones no están vencidos ni se contradicen | No (IA) |
 
 ### 6.7 Compromisos Kit Digital (tipos Web Kit Digital y Tienda Kit Digital)
@@ -488,7 +488,7 @@ Se ajustarán al probar en el servidor de Proconsi. Si un análisis llega a un l
 | RNF-02 | Responsive y usable en móvil, tablet y escritorio. |
 | RNF-03 | Trazabilidad: cada análisis guarda la versión del catálogo, el perfil, la configuración efectiva, el consumo y la fecha. |
 | RNF-04 | Reproducibilidad: misma configuración, mismas reglas. Las reglas se pueden actualizar sin alterar resultados anteriores. |
-| RNF-05 | Fuentes: cada regla que dependa de una plataforma o un estándar enlaza a su fuente oficial y fecha de verificación. |
+| RNF-05 | Fuentes: cada regla que dependa de una plataforma o un estándar enlaza a su fuente oficial. |
 | RNF-06 | Ampliable: los proveedores externos (IA, métricas, Search Console…) se conectan mediante interfaces, sin cambiar el núcleo. |
 | RNF-07 | Sin secretos en el repositorio. La configuración va en `.env`. |
 

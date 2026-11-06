@@ -144,6 +144,9 @@ final class CatalogoV1Test extends TestCase
             self::assertNotEmpty($criterio['subcomprobaciones'], "$id: sin subcomprobaciones");
             self::assertNotEmpty($criterio['fuentes'], "$id: sin fuente oficial");
             foreach ($criterio['fuentes'] as $fuente) {
+                // RNF-05: nombre y enlace a la fuente oficial (sin fecha de verificación desde el catálogo 1.3.0).
+                self::assertSame(['nombre', 'url'], array_keys($fuente), "$id: campos de la fuente");
+                self::assertNotSame('', trim($fuente['nombre']), "$id: fuente sin nombre");
                 self::assertMatchesRegularExpression('#^https://#', $fuente['url'], "$id: fuente sin https");
             }
         }
@@ -307,10 +310,10 @@ final class CatalogoV1Test extends TestCase
             'SEO-01' => 'si', 'SEO-02' => 'si', 'SEO-03' => 'parcial', 'SEO-04' => 'parcial',
             'SEO-05' => 'parcial', 'SEO-06' => 'no', 'SEO-07' => 'si', 'SEO-08' => 'parcial', 'SEO-09' => 'no',
             'SEO-10' => 'parcial', 'SEO-11' => 'psi', 'SEO-12' => 'si', 'SEO-13' => 'no', 'SEO-14' => 'parcial',
-            'SEO-15' => 'si', 'SEO-16' => 'no',
+            'SEO-15' => 'si', 'SEO-16' => 'parcial',
             'ACC-01' => 'parcial', 'ACC-02' => 'parcial', 'ACC-03' => 'parcial', 'ACC-04' => 'parcial',
-            'ACC-05' => 'psi', 'ACC-06' => 'parcial', 'ACC-07' => 'parcial', 'ACC-08' => 'no', 'ACC-09' => 'parcial',
-            'ACC-10' => 'parcial', 'ACC-11' => 'no', 'ACC-12' => 'parcial',
+            'ACC-05' => 'psi', 'ACC-06' => 'parcial', 'ACC-07' => 'parcial', 'ACC-08' => 'parcial', 'ACC-09' => 'parcial',
+            'ACC-10' => 'parcial', 'ACC-11' => 'parcial', 'ACC-12' => 'parcial',
         ];
         $real = array_map(static fn (array $c): string => $c['mvp'], self::criterios());
         ksort($esperado);
