@@ -37,14 +37,14 @@ final class Redirecciones implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'SEO-02.url-final' => $this->urlFinal($e),
-            'SEO-02.cadena-redirecciones' => $this->cadena($e),
-            'SEO-02.bucle-redirecciones' => $this->bucle($e),
-            'SEO-02.canonical-coherente' => $this->canonical($e),
-            'SEO-02.variantes-host' => $this->variantes($e),
+            'SEO-02.url-final' => $this->urlFinal($entorno),
+            'SEO-02.cadena-redirecciones' => $this->cadena($entorno),
+            'SEO-02.bucle-redirecciones' => $this->bucle($entorno),
+            'SEO-02.canonical-coherente' => $this->canonical($entorno),
+            'SEO-02.variantes-host' => $this->variantes($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }
@@ -190,7 +190,7 @@ final class Redirecciones implements Comprobacion
         $e->exigePagina();
         $final = Url::sinFragmento($e->url());
         $partes = parse_url($final);
-        $host = (string) ($partes['host'] ?? '');
+        $host = $partes['host'] ?? '';
         $resto = ($partes['path'] ?? '/') . (isset($partes['query']) ? '?' . $partes['query'] : '');
         $otroHost = str_starts_with($host, 'www.') ? substr($host, 4) : 'www.' . $host;
 

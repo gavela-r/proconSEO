@@ -57,18 +57,18 @@ final class AccesibilidadFormularios implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
-        $campos = $this->campos($e);
+        $campos = $this->campos($entorno);
         if ($campos === [] && $id !== 'ACC-09.formulario-billetes') {
-            return $e->resultado($id)->noAplicable('La página no tiene campos de formulario.');
+            return $entorno->resultado($id)->noAplicable('La página no tiene campos de formulario.');
         }
         return match ($id) {
-            'ACC-09.labels-asociados' => $this->etiquetas($e, $campos),
-            'ACC-09.placeholder-como-etiqueta' => $this->placeholder($e, $campos),
-            'ACC-09.autocomplete' => $this->autocomplete($e, $campos),
-            'ACC-09.campos-obligatorios' => $this->obligatorios($e, $campos),
-            'ACC-09.formulario-billetes' => $this->billetes($e),
+            'ACC-09.labels-asociados' => $this->etiquetas($entorno, $campos),
+            'ACC-09.placeholder-como-etiqueta' => $this->placeholder($entorno, $campos),
+            'ACC-09.autocomplete' => $this->autocomplete($entorno, $campos),
+            'ACC-09.campos-obligatorios' => $this->obligatorios($entorno, $campos),
+            'ACC-09.formulario-billetes' => $this->billetes($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }
@@ -115,7 +115,7 @@ final class AccesibilidadFormularios implements Comprobacion
                 ->limitacion('Que el texto de cada etiqueta sea claro lo revisa una persona.')
                 ->correcto();
         }
-        $lista = array_map([self::class, 'describir'], $sin);
+        $lista = array_map(self::describir(...), $sin);
         return $v->valor(count($sin) . ' de ' . count($campos) . ' campos sin etiqueta.')
             ->elemento($lista[0])
             ->evidencia($e->evidencia(TipoEvidencia::FragmentoHtml, implode("\n", array_slice($lista, 0, 20))))
@@ -140,7 +140,7 @@ final class AccesibilidadFormularios implements Comprobacion
         if ($soloPlaceholder === []) {
             return $v->valor('Los campos con placeholder también tienen etiqueta.')->correcto();
         }
-        $lista = array_map([self::class, 'describir'], $soloPlaceholder);
+        $lista = array_map(self::describir(...), $soloPlaceholder);
         return $v->valor(count($soloPlaceholder) . ' campo(s) cuya única indicación es el placeholder.')
             ->elemento($lista[0])
             ->evidencia($e->evidencia(TipoEvidencia::FragmentoHtml, implode("\n", $lista)))
@@ -233,7 +233,7 @@ final class AccesibilidadFormularios implements Comprobacion
         if ($sin === []) {
             return $v->correcto();
         }
-        $lista = array_map([self::class, 'describir'], $sin);
+        $lista = array_map(self::describir(...), $sin);
         return $v->elemento($lista[0])
             ->evidencia($e->evidencia(TipoEvidencia::FragmentoHtml, implode("\n", $lista)))
             ->consecuencia('Una persona ciega no puede saber qué es cada desplegable (origen, destino, fecha) y no puede comprar el billete sola.')

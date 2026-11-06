@@ -127,7 +127,7 @@ final class Url
         return $autoridad;
     }
 
-    /** @param array{autoridad: ?string, ruta: string} $base */
+    /** @param array{esquema: ?string, autoridad: ?string, ruta: string, consulta: ?string, fragmento: ?string} $base */
     private static function fusionar(array $base, string $ruta): string
     {
         if ($base['autoridad'] !== null && $base['ruta'] === '') {

@@ -119,6 +119,9 @@ final class AnalizadorHtml
     {
         $titulos = [];
         foreach ($xp->query('//title[not(ancestor::svg)]') ?: [] as $t) {
+            if (!$t instanceof DOMElement) {
+                continue;
+            }
             $titulos[] = self::normalizar($t->textContent);
         }
         return $titulos;
@@ -298,6 +301,9 @@ final class AnalizadorHtml
         $id = $campo->getAttribute('id');
         if ($id !== '') {
             foreach ($xp->query('//label[@for=' . self::literal($id) . ']') ?: [] as $label) {
+                if (!$label instanceof DOMElement) {
+                    continue;
+                }
                 return self::normalizar($label->textContent);
             }
         }
@@ -468,7 +474,7 @@ final class AnalizadorHtml
             $id = $e->getAttribute('id');
             $cuenta[$id] = ($cuenta[$id] ?? 0) + 1;
         }
-        return array_values(array_map('strval', array_keys(array_filter($cuenta, static fn (int $n): bool => $n > 1))));
+        return array_map('strval', array_keys(array_filter($cuenta, static fn (int $n): bool => $n > 1)));
     }
 
     /** @return list<array{etiqueta: string, lang: string}> */

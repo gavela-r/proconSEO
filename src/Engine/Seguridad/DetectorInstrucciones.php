@@ -139,7 +139,9 @@ final class DetectorInstrucciones
         }
 
         foreach ($xp->query('//script[contains(translate(@type, "LDJSON", "ldjson"), "ld+json")]') ?: [] as $script) {
-            $this->revisar('los datos estructurados (JSON-LD)', (string) $script->textContent, $hallazgos);
+            if ($script instanceof DOMElement) {
+                $this->revisar('los datos estructurados (JSON-LD)', $script->textContent, $hallazgos);
+            }
         }
 
         foreach ($xp->query('//text()[normalize-space()][not(ancestor::script) and not(ancestor::style) and not(ancestor::template)]') ?: [] as $texto) {
