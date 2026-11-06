@@ -15,13 +15,11 @@
   "fuentes": [
     {
       "nombre": "Google Search Central — Indexación centrada en dispositivos móviles",
-      "url": "https://developers.google.com/search/docs/crawling-indexing/mobile/mobile-sites-mobile-first-indexing",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/crawling-indexing/mobile/mobile-sites-mobile-first-indexing"
     },
     {
       "nombre": "Proconsi — Kit Digital: Sitio web",
-      "url": "https://www.proconsi.com/kit-digital/web/",
-      "fecha_verificacion": null
+      "url": "https://www.proconsi.com/kit-digital/web/"
     }
   ],
   "wcag": [],

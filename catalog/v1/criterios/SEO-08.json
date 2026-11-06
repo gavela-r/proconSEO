@@ -15,8 +15,7 @@
   "fuentes": [
     {
       "nombre": "Google Search Central — Consolidar URLs duplicadas (canonical)",
-      "url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls"
     }
   ],
   "wcag": [],

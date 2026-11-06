@@ -15,13 +15,11 @@
   "fuentes": [
     {
       "nombre": "W3C — WCAG 2.2",
-      "url": "https://www.w3.org/TR/WCAG22/",
-      "fecha_verificacion": null
+      "url": "https://www.w3.org/TR/WCAG22/"
     },
     {
       "nombre": "Real Decreto 1112/2018 — Accesibilidad de sitios web del sector público (declaración de accesibilidad)",
-      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2018-12699",
-      "fecha_verificacion": null
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2018-12699"
     }
   ],
   "wcag": [

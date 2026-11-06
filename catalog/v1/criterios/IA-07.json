@@ -15,18 +15,15 @@
   "fuentes": [
     {
       "nombre": "Google Search Central — Introducción a los datos estructurados",
-      "url": "https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data"
     },
     {
       "nombre": "Schema.org",
-      "url": "https://schema.org/",
-      "fecha_verificacion": null
+      "url": "https://schema.org/"
     },
     {
       "nombre": "Google Search Central — Datos estructurados de negocio local",
-      "url": "https://developers.google.com/search/docs/appearance/structured-data/local-business",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/appearance/structured-data/local-business"
     }
   ],
   "wcag": [],

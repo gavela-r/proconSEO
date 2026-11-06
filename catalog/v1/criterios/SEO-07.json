@@ -17,13 +17,11 @@
   "fuentes": [
     {
       "nombre": "Google Search Central — Enlaces rastreables",
-      "url": "https://developers.google.com/search/docs/crawling-indexing/links-crawlable",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/crawling-indexing/links-crawlable"
     },
     {
       "nombre": "Proconsi — Kit Digital: Sitio web",
-      "url": "https://www.proconsi.com/kit-digital/web/",
-      "fecha_verificacion": null
+      "url": "https://www.proconsi.com/kit-digital/web/"
     }
   ],
   "wcag": [],

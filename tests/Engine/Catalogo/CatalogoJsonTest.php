@@ -20,7 +20,7 @@ final class CatalogoJsonTest extends TestCase
         $catalogo = CatalogoJson::v1();
 
         self::assertInstanceOf(Catalogo::class, $catalogo);
-        self::assertSame('1.2.0', $catalogo->version());
+        self::assertSame('1.3.0', $catalogo->version());
     }
 
     public function testDevuelveTodasLasSubcomprobacionesSinRepetir(): void

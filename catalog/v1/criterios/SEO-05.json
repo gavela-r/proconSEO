@@ -15,13 +15,11 @@
   "fuentes": [
     {
       "nombre": "Google Search Central — Guía de SEO para principiantes",
-      "url": "https://developers.google.com/search/docs/fundamentals/seo-starter-guide",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/fundamentals/seo-starter-guide"
     },
     {
       "nombre": "W3C — WCAG 2.2",
-      "url": "https://www.w3.org/TR/WCAG22/",
-      "fecha_verificacion": null
+      "url": "https://www.w3.org/TR/WCAG22/"
     }
   ],
   "wcag": [],

@@ -16,13 +16,11 @@
   "fuentes": [
     {
       "nombre": "Google Search Central — Enlaces de título",
-      "url": "https://developers.google.com/search/docs/appearance/title-link",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/appearance/title-link"
     },
     {
       "nombre": "Google Search Central — Guía de SEO para principiantes",
-      "url": "https://developers.google.com/search/docs/fundamentals/seo-starter-guide",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/fundamentals/seo-starter-guide"
     }
   ],
   "wcag": [],

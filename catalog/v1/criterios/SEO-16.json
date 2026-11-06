@@ -15,13 +15,11 @@
   "fuentes": [
     {
       "nombre": "Google Search Central — Paginación y carga incremental",
-      "url": "https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading"
     },
     {
       "nombre": "Google Search Central — Navegación por facetas",
-      "url": "https://developers.google.com/search/docs/crawling-indexing/crawling-managing-faceted-navigation",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/crawling-indexing/crawling-managing-faceted-navigation"
     }
   ],
   "wcag": [],
