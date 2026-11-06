@@ -15,38 +15,31 @@
   "fuentes": [
     {
       "nombre": "RFC 9309 — Robots Exclusion Protocol",
-      "url": "https://www.rfc-editor.org/rfc/rfc9309",
-      "fecha_verificacion": null
+      "url": "https://www.rfc-editor.org/rfc/rfc9309"
     },
     {
       "nombre": "Google Search Central — Especificación de robots.txt",
-      "url": "https://developers.google.com/search/docs/crawling-indexing/robots/robots_txt",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/crawling-indexing/robots/robots_txt"
     },
     {
       "nombre": "Google Search Central — Rastreadores de Google",
-      "url": "https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers"
     },
     {
       "nombre": "Bing Webmaster Tools — Rastreadores de Bing",
-      "url": "https://www.bing.com/webmasters/help/which-crawlers-does-bing-use-8c184ec0",
-      "fecha_verificacion": null
+      "url": "https://www.bing.com/webmasters/help/which-crawlers-does-bing-use-8c184ec0"
     },
     {
       "nombre": "OpenAI — Rastreadores de OpenAI",
-      "url": "https://platform.openai.com/docs/bots",
-      "fecha_verificacion": null
+      "url": "https://platform.openai.com/docs/bots"
     },
     {
       "nombre": "Anthropic — Rastreadores de Anthropic",
-      "url": "https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler",
-      "fecha_verificacion": null
+      "url": "https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler"
     },
     {
       "nombre": "Perplexity — Rastreadores de Perplexity",
-      "url": "https://docs.perplexity.ai/guides/bots",
-      "fecha_verificacion": null
+      "url": "https://docs.perplexity.ai/guides/bots"
     }
   ],
   "wcag": [],

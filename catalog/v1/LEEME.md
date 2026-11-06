@@ -19,7 +19,7 @@ Cada análisis guarda la versión del catálogo que usó (RF-61). **Un fichero d
 | `mvp` | `si`, `parcial`, `psi` o `no` (columna MVP de la especificación) |
 | `ref_investigacion` | Referencias a la Investigación ejecutiva (C02, O5, T1…) |
 | `reutiliza` | Otros criterios cuyos datos aprovecha |
-| `fuentes` | Fuentes oficiales; `fecha_verificacion` se rellena al comprobarlas |
+| `fuentes` | Fuentes oficiales: nombre y URL (https) |
 | `wcag` | Solo en ACC: criterios WCAG con número, nombre, nivel, `version_wcag` (`2.1` si ya estaba en WCAG 2.1, `2.2` si es nuevo) y ficha de la Investigación |
 | `umbrales` | Valores normativos cuando los hay (Core Web Vitals, contraste…) |
 | `subcomprobaciones` | Lista de subcomprobaciones (abajo) |

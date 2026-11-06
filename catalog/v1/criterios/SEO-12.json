@@ -16,13 +16,11 @@
   "fuentes": [
     {
       "nombre": "Google Search Central — Imágenes en la Búsqueda de Google",
-      "url": "https://developers.google.com/search/docs/appearance/google-images",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/appearance/google-images"
     },
     {
       "nombre": "Google Search Central — Vídeos en la Búsqueda de Google",
-      "url": "https://developers.google.com/search/docs/appearance/video",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/appearance/video"
     }
   ],
   "wcag": [],

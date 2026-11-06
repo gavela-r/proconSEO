@@ -19,13 +19,11 @@
   "fuentes": [
     {
       "nombre": "web.dev — Core Web Vitals",
-      "url": "https://web.dev/articles/vitals",
-      "fecha_verificacion": null
+      "url": "https://web.dev/articles/vitals"
     },
     {
       "nombre": "Google PageSpeed Insights API v5",
-      "url": "https://developers.google.com/speed/docs/insights/v5/about",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/speed/docs/insights/v5/about"
     }
   ],
   "wcag": [],

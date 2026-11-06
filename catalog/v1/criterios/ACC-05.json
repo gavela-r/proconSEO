@@ -13,13 +13,11 @@
   "fuentes": [
     {
       "nombre": "W3C — WCAG 2.2",
-      "url": "https://www.w3.org/TR/WCAG22/",
-      "fecha_verificacion": null
+      "url": "https://www.w3.org/TR/WCAG22/"
     },
     {
       "nombre": "Google PageSpeed Insights API v5",
-      "url": "https://developers.google.com/speed/docs/insights/v5/about",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/speed/docs/insights/v5/about"
     }
   ],
   "wcag": [

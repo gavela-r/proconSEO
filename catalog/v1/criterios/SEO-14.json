@@ -17,18 +17,15 @@
   "fuentes": [
     {
       "nombre": "Google Search Central — Introducción a los datos estructurados",
-      "url": "https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data"
     },
     {
       "nombre": "Google Search Central — Datos estructurados de producto",
-      "url": "https://developers.google.com/search/docs/appearance/structured-data/product",
-      "fecha_verificacion": null
+      "url": "https://developers.google.com/search/docs/appearance/structured-data/product"
     },
     {
       "nombre": "Proconsi — Kit Digital: Comercio electrónico",
-      "url": "https://www.proconsi.com/kit-digital/comercio-electronico/",
-      "fecha_verificacion": null
+      "url": "https://www.proconsi.com/kit-digital/comercio-electronico/"
     }
   ],
   "wcag": [],

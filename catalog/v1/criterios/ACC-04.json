@@ -13,8 +13,7 @@
   "fuentes": [
     {
       "nombre": "W3C — WCAG 2.2",
-      "url": "https://www.w3.org/TR/WCAG22/",
-      "fecha_verificacion": null
+      "url": "https://www.w3.org/TR/WCAG22/"
     }
   ],
   "wcag": [

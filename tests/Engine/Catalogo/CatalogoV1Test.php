@@ -144,6 +144,9 @@ final class CatalogoV1Test extends TestCase
             self::assertNotEmpty($criterio['subcomprobaciones'], "$id: sin subcomprobaciones");
             self::assertNotEmpty($criterio['fuentes'], "$id: sin fuente oficial");
             foreach ($criterio['fuentes'] as $fuente) {
+                // RNF-05: nombre y enlace a la fuente oficial (sin fecha de verificación desde el catálogo 1.3.0).
+                self::assertSame(['nombre', 'url'], array_keys($fuente), "$id: campos de la fuente");
+                self::assertNotSame('', trim($fuente['nombre']), "$id: fuente sin nombre");
                 self::assertMatchesRegularExpression('#^https://#', $fuente['url'], "$id: fuente sin https");
             }
         }

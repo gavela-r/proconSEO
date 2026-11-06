@@ -488,7 +488,7 @@ Se ajustarán al probar en el servidor de Proconsi. Si un análisis llega a un l
 | RNF-02 | Responsive y usable en móvil, tablet y escritorio. |
 | RNF-03 | Trazabilidad: cada análisis guarda la versión del catálogo, el perfil, la configuración efectiva, el consumo y la fecha. |
 | RNF-04 | Reproducibilidad: misma configuración, mismas reglas. Las reglas se pueden actualizar sin alterar resultados anteriores. |
-| RNF-05 | Fuentes: cada regla que dependa de una plataforma o un estándar enlaza a su fuente oficial y fecha de verificación. |
+| RNF-05 | Fuentes: cada regla que dependa de una plataforma o un estándar enlaza a su fuente oficial. |
 | RNF-06 | Ampliable: los proveedores externos (IA, métricas, Search Console…) se conectan mediante interfaces, sin cambiar el núcleo. |
 | RNF-07 | Sin secretos en el repositorio. La configuración va en `.env`. |
 
