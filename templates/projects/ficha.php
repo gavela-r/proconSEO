@@ -121,7 +121,14 @@ $totalFases = count(Fase::cases());
                         <?php if ($recuento === ''): ?>
                             <span class="vacio"><?= $activo ? 'Aún no hay resultados' : 'Sin resultados guardados' ?></span>
                         <?php else: ?>
-                            <?= e($recuento) ?>
+                            <!-- Recuento por estado (no es una nota): una etiqueta con icono por estado. -->
+                            <ul class="recuento-etiquetas" aria-label="Resultados por estado">
+                                <?php foreach (['problema', 'decision_revisar', 'mejorable', 'correcto', 'no_verificable', 'no_aplicable'] as $valorEstado): ?>
+                                    <?php if (($a['recuento'][$valorEstado] ?? 0) > 0): ?>
+                                        <li><span class="estado estado--<?= e($valorEstado) ?>"><?= \ProconSEO\Results\Iconos::estado($valorEstado) ?><strong><?= e($a['recuento'][$valorEstado]) ?></strong> <?= e(\ProconSEO\Results\Etiquetas::estado($valorEstado)) ?></span></li>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </ul>
                             <?php if ($a['pendientes'] > 0): ?>
                                 <span class="secundario"><?= $a['pendientes'] === 1 ? '1 revisión pendiente' : e($a['pendientes']) . ' revisiones pendientes' ?></span>
                             <?php endif; ?>

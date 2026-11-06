@@ -31,7 +31,7 @@ $bloques = count($entrada['bloques']);
 ?>
 <article class="causa" aria-labelledby="causa-<?= e($entrada['codigo']) ?>">
     <div class="resultado__cabecera">
-        <span class="estado estado--<?= e($estado) ?>"><?= e(Etiquetas::estado($estado)) ?></span>
+        <span class="estado estado--<?= e($estado) ?>"><?= \ProconSEO\Results\Iconos::estado($estado) ?><?= e(Etiquetas::estado($estado)) ?></span>
         <?php if ($gravedad !== null): ?>
             <span class="gravedad gravedad--<?= e(Etiquetas::claseGravedad($principal)) ?>"><?= e($gravedad) ?></span>
         <?php endif; ?>

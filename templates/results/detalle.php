@@ -48,7 +48,7 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
 </nav>
 
 <div class="resultado__cabecera">
-    <span class="estado estado--<?= e($estado) ?>"><?= e(Etiquetas::estado($estado)) ?></span>
+    <span class="estado estado--<?= e($estado) ?>"><?= \ProconSEO\Results\Iconos::estado($estado) ?><?= e(Etiquetas::estado($estado)) ?></span>
     <?php if ($gravedad !== null): ?>
         <span class="gravedad gravedad--<?= e(Etiquetas::claseGravedad($r)) ?>"><?= e($gravedad) ?></span>
     <?php endif; ?>

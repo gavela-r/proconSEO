@@ -75,7 +75,9 @@ final class PlantillasProyectosTest extends TestCase
 
         $this->assertSinHtmlInyectado($html);
         self::assertStringContainsString('DATOS DE PRUEBA', $html);
-        self::assertStringContainsString('3 problemas · 1 correcto', $html);
+        self::assertStringContainsString('<strong>3</strong> Problema detectado', $html);
+        self::assertStringContainsString('<strong>1</strong> Correcto', $html);
+        self::assertStringContainsString('aria-hidden="true"', $html, 'El icono del estado es decorativo; el texto va al lado');
         self::assertStringContainsString('1 revisión pendiente', $html);
         self::assertStringContainsString('4 nov 2026, 10:42', $html, 'La fecha UTC se muestra en hora de España');
         self::assertDoesNotMatchRegularExpression('/\d+\s*%|\bnota\b\s*:|puntuaci/iu', strip_tags($html), 'Sin notas ni porcentajes');
