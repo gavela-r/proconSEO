@@ -43,6 +43,7 @@ $totalFases = count(Fase::cases());
         <a class="boton" href="/analisis/nuevo?proyecto=<?= e($id) ?>">Nuevo análisis</a>
         <a class="boton boton--secundario" href="/proyectos/<?= e($id) ?>/programados">Análisis programados</a>
         <a class="boton boton--secundario" href="/proyectos/<?= e($id) ?>/editar">Editar</a>
+        <a class="boton boton--secundario" href="/proyectos/<?= e($id) ?>/exportar/json" download>Exportar proyecto (JSON)</a>
     </div>
 </div>
 
