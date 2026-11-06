@@ -22,6 +22,19 @@ final class ResumenPaginaTest extends TestCase
         self::assertSame(['https://www.x.example/b'], $r->enlacesInternos);
     }
 
+    public function testLaHuellaDelTextoYElMenuSonOpcionales(): void
+    {
+        $antes = new ResumenPagina('https://www.x.example/a', 200, true);
+        self::assertSame([], $antes->huellaTexto);
+        self::assertSame(0, $antes->palabrasTexto);
+        self::assertSame([], $antes->menu);
+
+        $r = new ResumenPagina('https://www.x.example/a', 200, true, huellaTexto: [3, 1, 4], palabrasTexto: 250, menu: ['https://www.x.example/', 'https://www.x.example/contacto']);
+        self::assertSame([3, 1, 4], $r->huellaTexto);
+        self::assertSame(250, $r->palabrasTexto);
+        self::assertSame(['https://www.x.example/', 'https://www.x.example/contacto'], $r->menu);
+    }
+
     public function testLaSalidaDelMotorPuedeLlevarlo(): void
     {
         $resumen = new ResumenPagina('https://www.x.example/', 200, true);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ProconSEO\Engine\Comprobaciones;
 
+use DOMElement;
 use DOMXPath;
 use ProconSEO\Engine\Comprobacion;
 use ProconSEO\Engine\Entorno;
@@ -43,14 +44,14 @@ final class Enlazado implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'SEO-07.enlaces-rastreables' => $this->rastreables($e),
-            'SEO-07.enlaces-rotos' => $this->rotos($e),
-            'SEO-07.textos-ambiguos' => $this->ambiguos($e),
-            'SEO-07.paginas-minimas' => $this->paginasMinimas($e),
-            'SEO-08.contradiccion-tecnica' => $this->contradiccion($e),
+            'SEO-07.enlaces-rastreables' => $this->rastreables($entorno),
+            'SEO-07.enlaces-rotos' => $this->rotos($entorno),
+            'SEO-07.textos-ambiguos' => $this->ambiguos($entorno),
+            'SEO-07.paginas-minimas' => $this->paginasMinimas($entorno),
+            'SEO-08.contradiccion-tecnica' => $this->contradiccion($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }
@@ -67,6 +68,9 @@ final class Enlazado implements Comprobacion
         }
         $xp = new DOMXPath($doc->dom);
         foreach ($xp->query('//a[not(@href)][@onclick]|//*[not(self::a) and not(self::button) and not(self::input)][@onclick][not(ancestor::a)]') ?: [] as $el) {
+            if (!$el instanceof DOMElement) {
+                continue;
+            }
             $texto = trim((string) preg_replace('/\s+/u', ' ', $el->textContent));
             if ($texto !== '' && mb_strlen($texto) < 80) {
                 $noRastreables[] = '<' . $el->nodeName . ' onclick="…">' . $texto . '</' . $el->nodeName . '>';

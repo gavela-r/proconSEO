@@ -47,20 +47,20 @@ final class AccesibilidadEstructura implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'ACC-03.title-pagina' => $this->titulo($e),
-            'ACC-03.estructura-semantica' => $this->estructura($e),
-            'ACC-03.tablas-encabezados' => $this->tablas($e),
-            'ACC-03.declaracion-accesibilidad' => $this->declaracion($e),
-            'ACC-06.enlaces-nombre' => $this->enlacesNombre($e),
-            'ACC-06.enlaces-proposito' => $this->enlacesProposito($e),
-            'ACC-06.saltar-bloques' => $this->saltarBloques($e),
-            'ACC-06.tabindex-positivo' => $this->tabindex($e),
-            'ACC-10.lang-presente' => $this->langPresente($e),
-            'ACC-10.lang-valido' => $this->langValido($e),
-            'ACC-10.idioma-partes' => $this->idiomaPartes($e),
+            'ACC-03.title-pagina' => $this->titulo($entorno),
+            'ACC-03.estructura-semantica' => $this->estructura($entorno),
+            'ACC-03.tablas-encabezados' => $this->tablas($entorno),
+            'ACC-03.declaracion-accesibilidad' => $this->declaracion($entorno),
+            'ACC-06.enlaces-nombre' => $this->enlacesNombre($entorno),
+            'ACC-06.enlaces-proposito' => $this->enlacesProposito($entorno),
+            'ACC-06.saltar-bloques' => $this->saltarBloques($entorno),
+            'ACC-06.tabindex-positivo' => $this->tabindex($entorno),
+            'ACC-10.lang-presente' => $this->langPresente($entorno),
+            'ACC-10.lang-valido' => $this->langValido($entorno),
+            'ACC-10.idioma-partes' => $this->idiomaPartes($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }

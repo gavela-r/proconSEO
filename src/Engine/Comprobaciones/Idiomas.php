@@ -35,17 +35,17 @@ final class Idiomas implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
-        $alternativas = $e->documento()->alternativasIdioma;
+        $alternativas = $entorno->documento()->alternativasIdioma;
         if ($alternativas === []) {
-            return $e->resultado($id)->noAplicable('La página no declara versiones en otros idiomas (hreflang).');
+            return $entorno->resultado($id)->noAplicable('La página no declara versiones en otros idiomas (hreflang).');
         }
         return match ($id) {
-            'SEO-15.hreflang-codigos' => $this->codigos($e, $alternativas),
-            'SEO-15.hreflang-autorreferencia' => $this->autorreferencia($e, $alternativas),
-            'SEO-15.hreflang-destinos' => $this->destinos($e, $alternativas),
-            'SEO-15.hreflang-reciprocidad' => $this->reciprocidad($e, $alternativas),
+            'SEO-15.hreflang-codigos' => $this->codigos($entorno, $alternativas),
+            'SEO-15.hreflang-autorreferencia' => $this->autorreferencia($entorno, $alternativas),
+            'SEO-15.hreflang-destinos' => $this->destinos($entorno, $alternativas),
+            'SEO-15.hreflang-reciprocidad' => $this->reciprocidad($entorno, $alternativas),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }

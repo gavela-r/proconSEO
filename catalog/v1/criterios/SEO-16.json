@@ -7,7 +7,7 @@
   "explicacion_sencilla": "En tiendas con muchos filtros pueden generarse miles de direcciones casi iguales. Es poco relevante para las tiendas pequeñas del Kit Digital.",
   "modo": "automatico",
   "esfuerzo": "medio",
-  "mvp": "no",
+  "mvp": "parcial",
   "ref_investigacion": [
     "T16"
   ],
@@ -33,12 +33,12 @@
       "cuando_aplica": "Si hay listados paginados.",
       "condicion": null,
       "modo": "automatico",
-      "mvp": "no",
-      "motivo_no_mvp": "baja_prioridad",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
       "necesita": [
-        "otras_urls"
+        "pagina"
       ],
-      "alcance_minimo": "sitio_completo",
+      "alcance_minimo": "url_individual",
       "wcag": [],
       "kit_digital": [],
       "reutiliza": []

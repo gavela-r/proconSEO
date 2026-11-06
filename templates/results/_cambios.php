@@ -1,15 +1,18 @@
 <?php
 /**
- * Qué ha cambiado desde el análisis anterior de la misma dirección y alcance.
+ * Qué ha cambiado respecto a otro análisis del histórico del proyecto: por defecto, el anterior
+ * de la misma dirección y alcance; se puede elegir cualquier otro anterior.
  * Sin notas ni porcentajes: solo qué se ha arreglado, qué es nuevo y qué sigue.
  *
- * @var array<string, mixed> $anterior Fila del análisis anterior
- * @var \ProconSEO\Results\ComparacionAnalisis $comparacion
- * @var string|null $versionCatalogo Versión del catálogo de este análisis
+ * @var array<string, mixed> $analisis Este análisis
+ * @var array<string, mixed>|null $anterior El análisis con el que se compara
+ * @var \ProconSEO\Results\ComparacionAnalisis|null $comparacion
+ * @var list<array<string, mixed>> $candidatos Análisis anteriores del proyecto
  */
 
 use ProconSEO\Projects\Formato;
 use ProconSEO\Results\ComparacionAnalisis as C;
+use ProconSEO\Shared\Enum\Alcance;
 use ProconSEO\Shared\Enum\EstadoResultado;
 use ProconSEO\Shared\Enum\Gravedad;
 
@@ -30,24 +33,51 @@ $estado = static function (?array $r): string {
     return '<span class="estado estado--' . e($e?->value ?? '') . '">' . e($e?->etiqueta() ?? (string) $r['estado_vigente']) . '</span>'
         . ($g !== null ? ' <span class="gravedad gravedad--' . e($g->value) . '">' . e($g->etiqueta()) . '</span>' : '');
 };
-$recuento = $comparacion->recuento();
-$otraVersion = ($anterior['version_catalogo'] ?? null) !== null && $versionCatalogo !== null && $anterior['version_catalogo'] !== $versionCatalogo;
+$fecha = static fn (array $a): string => Formato::fecha($a['terminado_en'] ?? $a['creado_en']);
+$etiquetaAlcance = static fn (mixed $v): string => Alcance::tryFrom((string) $v)?->etiqueta() ?? (string) $v;
+$versionCatalogo = $analisis['version_catalogo'] ?? null;
+$elegidoId = $anterior === null ? 0 : (int) $anterior['id'];
+$otraDireccion = $anterior !== null && ($anterior['url_normalizada'] ?? null) !== ($analisis['url_normalizada'] ?? null);
+$otroAlcance = $anterior !== null && ($anterior['alcance'] ?? null) !== ($analisis['alcance'] ?? null);
+$otraVersion = $anterior !== null && ($anterior['version_catalogo'] ?? null) !== null && $versionCatalogo !== null && $anterior['version_catalogo'] !== $versionCatalogo;
+$recuento = $comparacion?->recuento() ?? [];
 ?>
 <section class="seccion" aria-labelledby="t-cambios">
-    <h2 id="t-cambios">Cambios desde el análisis anterior</h2>
+    <h2 id="t-cambios">Cambios desde un análisis anterior</h2>
+
+    <form class="cambios__elegir" method="get" action="/analisis/<?= e($analisis['id']) ?>#t-cambios">
+        <label for="comparar">Comparar con</label>
+        <select id="comparar" name="comparar">
+            <?php foreach ($candidatos as $c): ?>
+                <option value="<?= e($c['id']) ?>"<?= (int) $c['id'] === $elegidoId ? ' selected' : '' ?>>
+                    <?= e($fecha($c)) ?> · <?= e($etiquetaAlcance($c['alcance'])) ?> · <?= e($c['url_normalizada'] ?? $c['url_introducida']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <button class="boton boton--secundario boton--pequeno" type="submit">Comparar</button>
+    </form>
+
+    <?php if ($comparacion === null || $anterior === null): ?>
+        <p class="vacio">No hay un análisis anterior de esta misma dirección y con este alcance. Elige otro del histórico del proyecto para ver qué ha cambiado.</p>
+    <?php else: ?>
     <p class="seccion__ayuda">
-        Comparado con el <a href="/analisis/<?= e($anterior['id']) ?>">análisis del <?= e(Formato::fecha($anterior['terminado_en'] ?? $anterior['creado_en'])) ?></a>
-        de esta misma dirección, después de las revisiones humanas.
+        Comparado con el <a href="/analisis/<?= e($anterior['id']) ?>">análisis del <?= e($fecha($anterior)) ?></a>, después de las revisiones humanas.
     </p>
+    <?php if ($otraDireccion || $otroAlcance): ?>
+        <p class="aviso" role="note">
+            Ese análisis es de <?= $otraDireccion ? 'otra dirección (<span class="codigo">' . e($anterior['url_normalizada'] ?? $anterior['url_introducida']) . '</span>)' : '' ?><?= $otraDireccion && $otroAlcance ? ' y ' : '' ?><?= $otroAlcance ? 'otro alcance (' . e($etiquetaAlcance($anterior['alcance'])) . ')' : '' ?>.
+            Solo se comparan las comprobaciones de las páginas que coinciden en los dos.
+        </p>
+    <?php endif; ?>
 
     <?php if (!$comparacion->hayCambios() && $comparacion->comparadas === 0): ?>
         <p class="aviso" role="note">No se puede comparar: entre los dos análisis no hay ninguna comprobación que se haya podido hacer en ambos. No significa que no haya cambiado nada.</p>
     <?php elseif (!$comparacion->hayCambios()): ?>
-        <p class="vacio">No ha cambiado nada: lo que estaba bien sigue bien<?= $recuento[C::SIGUEN] > 0 ? ' y lo pendiente sigue pendiente' : '' ?>.</p>
+        <p class="vacio">No ha cambiado nada: lo que estaba bien sigue bien<?= ($recuento[C::SIGUEN] ?? 0) > 0 ? ' y lo pendiente sigue pendiente' : '' ?>.</p>
     <?php else: ?>
         <ul class="cambios__recuento">
             <?php foreach ($grupos as $clave => [$titulo]): ?>
-                <?php if ($recuento[$clave] > 0): ?>
+                <?php if (($recuento[$clave] ?? 0) > 0): ?>
                     <li><a href="#cambios-<?= e($clave) ?>"><strong><?= e($recuento[$clave]) ?></strong> <?= e(mb_strtolower($titulo)) ?></a></li>
                 <?php endif; ?>
             <?php endforeach; ?>
@@ -85,4 +115,5 @@ $otraVersion = ($anterior['version_catalogo'] ?? null) !== null && $versionCatal
             <li>Los dos análisis usan versiones distintas del catálogo (<?= e($anterior['version_catalogo']) ?> y <?= e($versionCatalogo) ?>): algún cambio puede deberse a que ahora se comprueba algo más o de otra forma.</li>
         <?php endif; ?>
     </ul>
+    <?php endif; ?>
 </section>

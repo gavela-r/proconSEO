@@ -50,8 +50,13 @@ return static function (Router $r): void {
         $id = (int) $p->parametro('id');
         $analisis = $repositorio->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
         $cat = $catalogo();
-        // Qué ha cambiado desde el análisis anterior de la misma dirección y alcance.
-        $anterior = $repositorio->analisisAnterior($analisis);
+        // Qué ha cambiado respecto a otro análisis del histórico: por defecto, el anterior de la misma
+        // dirección y alcance; con ?comparar={id}, cualquiera anterior del mismo proyecto.
+        $candidatos = $repositorio->analisisParaComparar($analisis);
+        $elegido = (int) $p->entrada('comparar', 0);
+        $anterior = $elegido > 0
+            ? (array_values(array_filter($candidatos, static fn (array $a): bool => (int) $a['id'] === $elegido))[0] ?? null)
+            : $repositorio->analisisAnterior($analisis);
         $comparacion = $anterior === null ? null : new ComparacionAnalisis(
             $repositorio->resultados((int) $anterior['id']),
             Informe::conTitulos($repositorio->resultados($id), $cat),
@@ -70,6 +75,7 @@ return static function (Router $r): void {
             ),
             'anterior' => $anterior,
             'comparacion' => $comparacion,
+            'candidatos' => $candidatos,
             'eventos' => $repositorio->eventosSeguridad($id),
             'conKitDigital' => CompromisosKitDigital::aplica($analisis['proyecto_tipo']),
         ]));
