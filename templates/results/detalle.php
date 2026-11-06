@@ -26,6 +26,7 @@ $r = $resultado;
 $estado = (string) $r['estado_vigente'];
 $gravedad = Etiquetas::gravedad($r);
 $wcag = Etiquetas::wcag($r);
+$normativa = Etiquetas::normativa($r);
 $esfuerzo = Esfuerzo::tryFrom((string) $r['esfuerzo']);
 $titulo = $ficha?->nombre ?? (string) $r['id_comprobacion'];
 $esPrueba = $r['es_dato_prueba'] || ($analisis !== null && ($analisis['es_dato_prueba'] || $analisis['proyecto_es_dato_prueba']));
@@ -57,6 +58,8 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
     <span class="chip"><?= e(Etiquetas::bloque((string) $r['bloque'])) ?></span>
     <?php if ($wcag !== null): ?>
         <span class="chip <?= Etiquetas::esNuevo22($r) ? 'chip--wcag22' : 'chip--wcag21' ?>"><?= e($wcag) ?></span>
+    <?php elseif ($normativa !== null): ?>
+        <span class="chip chip--normativa"><?= e($normativa) ?></span>
     <?php endif; ?>
     <?php if ($r['revision_pendiente']): ?>
         <span class="chip">Revisión humana pendiente</span>
@@ -186,6 +189,8 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
                 <dt>Comprobación</dt><dd class="codigo"><?= e($r['id_comprobacion']) ?></dd>
                 <?php if ($wcag !== null): ?>
                     <dt>WCAG</dt><dd><?= e($r['wcag_criterio']) ?> <?= e($r['wcag_nombre'] ?? '') ?> · <?= e($r['wcag_nivel'] ?? '') ?> (<?= Etiquetas::esNuevo22($r) ? 'nuevo en 2.2' : 'en 2.1' ?>)</dd>
+                <?php elseif ($normativa !== null): ?>
+                    <dt>Normativa</dt><dd><?= e(trim((string) $r['normativa'])) ?></dd>
                 <?php endif; ?>
                 <?php if ($r['modo'] !== null): ?>
                     <dt>Modo</dt><dd><?= e(ModoEvaluacion::tryFrom((string) $r['modo'])?->etiqueta() ?? $r['modo']) ?></dd>

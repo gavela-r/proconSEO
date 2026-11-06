@@ -141,6 +141,8 @@ $wcag = Etiquetas::wcag($r);
                 <span class="estado estado--<?= e($estadoActual) ?>"><?= e(Etiquetas::estado($estadoActual)) ?></span>
                 <?php if ($wcag !== null): ?>
                     <span class="chip <?= Etiquetas::esNuevo22($r) ? 'chip--wcag22' : 'chip--wcag21' ?>"><?= e($wcag) ?></span>
+                <?php elseif (($normativa = Etiquetas::normativa($r)) !== null): ?>
+                    <span class="chip chip--normativa"><?= e($normativa) ?></span>
                 <?php endif; ?>
             </div>
             <p><strong><?= e($r['titulo']) ?></strong></p>
