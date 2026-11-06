@@ -138,7 +138,7 @@ $wcag = Etiquetas::wcag($r);
         <section class="panel" aria-labelledby="t-original">
             <h2 id="t-original">Resultado que revisas</h2>
             <div class="resultado__cabecera">
-                <span class="estado estado--<?= e($estadoActual) ?>"><?= e(Etiquetas::estado($estadoActual)) ?></span>
+                <span class="estado estado--<?= e($estadoActual) ?>"><?= \ProconSEO\Results\Iconos::estado($estadoActual) ?><?= e(Etiquetas::estado($estadoActual)) ?></span>
                 <?php if ($wcag !== null): ?>
                     <span class="chip <?= Etiquetas::esNuevo22($r) ? 'chip--wcag22' : 'chip--wcag21' ?>"><?= e($wcag) ?></span>
                 <?php elseif (($normativa = Etiquetas::normativa($r)) !== null): ?>

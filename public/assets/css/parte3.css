@@ -198,3 +198,155 @@ details.plegable[open] > summary { margin-bottom: .5rem; }
 .glosario dt:target { background: var(--fondo-suave, #fff7d6); }
 .glosario dd { margin: 0; max-width: 70ch; }
 .glosario__variantes { font-weight: 400; color: var(--texto-suave); }
+
+/* =====================================================================
+ * Diseño Proconsi (propuesta de Stitch, adaptada)
+ * Marca: rojo #D02422 y carbón #202020. Estados con paleta propia y SIEMPRE con icono y texto.
+ * Sin fuentes ni iconos externos (CSP, SEG-10): fuentes del sistema e iconos SVG propios.
+ * Solo afecta a las pantallas de la Parte 3, que son las que cargan este fichero.
+ * ===================================================================== */
+
+:root {
+    --p3-marca: #d02422;
+    --p3-marca-oscura: #880817;
+    --p3-carbon: #202020;
+    --p3-fondo: #f5f5f5;
+    --p3-tarjeta: #ffffff;
+    --p3-borde: #e1e3e6;
+    --p3-texto-suave: #3f444b;
+    --p3-sombra: 0 1px 2px rgba(32, 32, 32, .06), 0 1px 1px rgba(32, 32, 32, .04);
+
+    --p3-correcto: #1e7b34;      --p3-correcto-fondo: #e8f4eb;
+    --p3-mejorable: #9a5b00;     --p3-mejorable-fondo: #fdf3e2;
+    --p3-problema: #b3261e;      --p3-problema-fondo: #fdecea;
+    --p3-decision: #6a3fb5;      --p3-decision-fondo: #f1ecfa;
+    --p3-noverif: #3d5a80;       --p3-noverif-fondo: #eaf0f7;
+    --p3-noaplica: #5f6670;      --p3-noaplica-fondo: #f0f1f3;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --p3-marca: #ff6b67;
+        --p3-marca-oscura: #ffb3b0;
+        --p3-carbon: #eceff3;
+        --p3-fondo: #121417;
+        --p3-tarjeta: #1d2126;
+        --p3-borde: #3a414a;
+        --p3-texto-suave: #b4bcc6;
+        --p3-sombra: none;
+        --p3-correcto: #6fd08c;      --p3-correcto-fondo: #183323;
+        --p3-mejorable: #f0b74a;     --p3-mejorable-fondo: #3a2c10;
+        --p3-problema: #ff8a80;      --p3-problema-fondo: #3d1a18;
+        --p3-decision: #c3a8ff;      --p3-decision-fondo: #2a2140;
+        --p3-noverif: #9cc0ea;       --p3-noverif-fondo: #1b2838;
+        --p3-noaplica: #b4bcc6;      --p3-noaplica-fondo: #262b31;
+    }
+}
+
+body { background: var(--p3-fondo); font-family: Roboto, system-ui, -apple-system, "Segoe UI", sans-serif; }
+main.contenedor { padding-top: 1.25rem; }
+h1 { font-weight: 800; letter-spacing: -.01em; color: var(--p3-carbon); }
+h2, h3 { font-weight: 700; color: var(--p3-carbon); }
+main a { color: var(--p3-marca-oscura); }
+
+/* Botones: principal en rojo de marca, secundario blanco con borde. Objetivo táctil de 44 px. */
+main .boton { background: var(--p3-marca); color: #fff; border-radius: 6px; box-shadow: var(--p3-sombra); }
+main .boton:hover { background: var(--p3-marca-oscura); }
+main .boton--secundario { background: var(--p3-tarjeta); color: var(--p3-carbon); border: 1px solid var(--p3-borde); }
+main .boton--secundario:hover { background: var(--p3-fondo); border-color: var(--p3-texto-suave); }
+main .boton--peligro { background: var(--p3-problema); color: #fff; }
+.boton--pequeno { min-height: 44px; }
+@media (prefers-color-scheme: dark) {
+    main .boton, main .boton--peligro { color: #121417; }
+    main .boton:hover { color: #121417; }
+    main .boton--secundario { color: var(--p3-carbon); }
+}
+
+/* Tarjetas blancas sobre fondo gris */
+.panel, .bloque, .filtros, .resultado, details.plegable, .tabla-desplazable, .formulario fieldset, .cabecera-pagina {
+    background: var(--p3-tarjeta);
+    border: 1px solid var(--p3-borde);
+    border-radius: 8px;
+    box-shadow: var(--p3-sombra);
+}
+.panel { padding: 1.25rem 1.5rem; }
+.panel h2 { font-size: .95rem; text-transform: uppercase; letter-spacing: .04em; }
+.filtros { padding: 1.25rem; }
+.filtros label { text-transform: uppercase; letter-spacing: .04em; font-size: .8rem; color: var(--p3-texto-suave); }
+.seccion > h2 { border-bottom: 0; padding-bottom: 0; }
+.cabecera-pagina { padding: 1.25rem 1.5rem; }
+.cabecera-pagina p { color: var(--p3-texto-suave); }
+
+/* Avisos: datos de prueba en ámbar, como en la propuesta */
+.aviso--prueba { background: var(--p3-mejorable-fondo); border-left-color: var(--p3-mejorable); color: var(--p3-carbon); }
+.aviso--error { background: var(--p3-problema-fondo); border-left-color: var(--p3-problema); }
+.aviso--info { background: var(--p3-noverif-fondo); border-left-color: var(--p3-noverif); }
+
+/* Estados: icono y texto, fondo suave y color propio (WCAG 1.4.1: nunca solo color) */
+.estado { display: inline-flex; align-items: center; gap: .35rem; padding: .15rem .6rem; border-radius: 6px; border: 1px solid currentColor; font-weight: 700; font-size: .85rem; line-height: 1.3; }
+.estado .icono { flex: none; }
+.estado--correcto { color: var(--p3-correcto); background: var(--p3-correcto-fondo); }
+.estado--mejorable { color: var(--p3-mejorable); background: var(--p3-mejorable-fondo); }
+.estado--problema { color: var(--p3-problema); background: var(--p3-problema-fondo); }
+.estado--decision_revisar { color: var(--p3-decision); background: var(--p3-decision-fondo); }
+.estado--no_verificable { color: var(--p3-noverif); background: var(--p3-noverif-fondo); }
+.estado--no_aplicable { color: var(--p3-noaplica); background: var(--p3-noaplica-fondo); }
+
+/* Chips neutros y gravedad (siempre con el texto «Gravedad: …») */
+.chip { border-radius: 6px; background: var(--p3-fondo); border-color: var(--p3-borde); color: var(--p3-texto-suave); padding: .15rem .55rem; }
+.chip--prueba { background: var(--p3-mejorable-fondo); border-color: var(--p3-mejorable); color: var(--p3-mejorable); }
+.chip--wcag21 { background: var(--p3-noverif-fondo); border-color: var(--p3-noverif); color: var(--p3-noverif); }
+.chip--normativa { background: var(--p3-decision-fondo); border-color: var(--p3-decision); color: var(--p3-decision); }
+.gravedad { border-radius: 6px; padding: .15rem .55rem; background: var(--p3-tarjeta); border: 1px solid var(--p3-problema); color: var(--p3-problema); }
+.gravedad--critico { background: var(--p3-problema); color: #fff; }
+.gravedad--alto { background: var(--p3-tarjeta); }
+.gravedad--medio { background: var(--p3-tarjeta); border-color: var(--p3-mejorable); color: var(--p3-mejorable); }
+.gravedad--bajo { background: var(--p3-tarjeta); border-color: var(--p3-noaplica); color: var(--p3-noaplica); }
+@media (prefers-color-scheme: dark) { .gravedad--critico { color: #121417; } }
+
+/* Resumen por bloque: cada estado con resultados es una fila con su color */
+.bloque { padding: 1.25rem; }
+.recuento li { border-top: 0; padding: .15rem 0; }
+.recuento .estado { border-color: transparent; background: transparent; font-weight: 600; }
+.recuento a { border: 1px solid transparent; border-radius: 6px; padding: .2rem .35rem; min-height: 44px; }
+.recuento a:has(.estado--problema) { background: var(--p3-problema-fondo); border-color: var(--p3-problema); }
+.recuento a:has(.estado--mejorable) { background: var(--p3-mejorable-fondo); border-color: var(--p3-mejorable); }
+.recuento a:has(.estado--decision_revisar) { background: var(--p3-decision-fondo); border-color: var(--p3-decision); }
+.recuento a:has(.estado--correcto) { background: var(--p3-correcto-fondo); border-color: var(--p3-correcto); }
+.recuento a:has(.estado--no_verificable) { background: var(--p3-noverif-fondo); border-color: var(--p3-noverif); }
+.recuento a:has(.estado--no_aplicable) { background: var(--p3-noaplica-fondo); border-color: var(--p3-noaplica); }
+.recuento li > .estado { padding-left: .45rem; font-weight: 500; }
+
+/* Resultados: barra lateral de color según estado (además del texto del estado) */
+.resultado { border-left-width: 4px; padding: 1rem 1.25rem; }
+.resultado--problema { border-left-color: var(--p3-problema); }
+.resultado--mejorable { border-left-color: var(--p3-mejorable); }
+.resultado--decision_revisar { border-left-color: var(--p3-decision); }
+.resultado--correcto { border-left-color: var(--p3-correcto); }
+.resultado--no_verificable { border-left-color: var(--p3-noverif); }
+.resultado--no_aplicable { border-left-color: var(--p3-noaplica); }
+.causa { background: var(--p3-tarjeta); border: 1px solid var(--p3-problema); border-left: 4px solid var(--p3-problema); border-radius: 8px; box-shadow: var(--p3-sombra); }
+.causa__arreglo { background: var(--p3-fondo); border: 1px solid var(--p3-borde); border-radius: 6px; padding: .75rem 1rem; }
+
+/* Pestañas: subrayado rojo en la activa */
+.pestanas { border-bottom: 1px solid var(--p3-borde); }
+.pestanas a { color: var(--p3-texto-suave); border: 0; border-bottom: 3px solid transparent; border-radius: 0; margin-bottom: -1px; font-weight: 600; }
+.pestanas a[aria-current="page"] { color: var(--p3-marca-oscura); border: 0; border-bottom: 3px solid var(--p3-marca); background: transparent; }
+
+/* Tablas: cabecera en mayúsculas sobre gris */
+.tabla-desplazable table th { background: var(--p3-fondo); text-transform: uppercase; letter-spacing: .04em; font-size: .78rem; color: var(--p3-texto-suave); padding: .75rem 1rem; }
+.tabla-desplazable table td { padding: .9rem 1rem; border-bottom-color: var(--p3-borde); }
+@media (max-width: 47.99rem) {
+    .tabla-desplazable { background: transparent; border: 0; box-shadow: none; }
+    .tabla-apilable tr { background: var(--p3-tarjeta); border-color: var(--p3-borde); border-radius: 8px; box-shadow: var(--p3-sombra); }
+}
+
+/* Evidencias: bloque de código oscuro, como en la propuesta */
+.evidencia pre { background: #1e1e1e; color: #e6e6e6; border-color: #1e1e1e; border-radius: 6px; padding: .9rem 1rem; }
+@media (prefers-color-scheme: dark) { .evidencia pre { background: #0d0f12; border-color: var(--p3-borde); } }
+
+/* Recuento del histórico como etiquetas por estado */
+.recuento-etiquetas { display: flex; flex-wrap: wrap; gap: .35rem; list-style: none; margin: 0 0 .25rem; padding: 0; }
+
+/* Foco siempre visible, también sobre el rojo */
+main .boton:focus-visible, .recuento a:focus-visible, .pestanas a:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }

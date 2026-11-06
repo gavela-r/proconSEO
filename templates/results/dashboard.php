@@ -106,11 +106,11 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
                         <li>
                             <?php if ($n > 0): ?>
                                 <a href="<?= e($enlace(['bloque' => $bloque, 'estado' => $e->value])) ?>">
-                                    <span class="estado estado--<?= e($e->value) ?>"><?= e($e->etiqueta()) ?></span>
+                                    <span class="estado estado--<?= e($e->value) ?>"><?= \ProconSEO\Results\Iconos::estado($e->value) ?><?= e($e->etiqueta()) ?></span>
                                     <span class="numero"><?= e($n) ?><span class="solo-lectores"> · ver estos resultados</span></span>
                                 </a>
                             <?php else: ?>
-                                <span class="estado estado--<?= e($e->value) ?>"><?= e($e->etiqueta()) ?></span>
+                                <span class="estado estado--<?= e($e->value) ?>"><?= \ProconSEO\Results\Iconos::estado($e->value) ?><?= e($e->etiqueta()) ?></span>
                                 <span class="numero cero">0</span>
                             <?php endif; ?>
                         </li>
