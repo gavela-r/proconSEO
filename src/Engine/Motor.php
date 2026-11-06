@@ -6,6 +6,7 @@ namespace ProconSEO\Engine;
 
 use ProconSEO\Engine\Catalogo\CatalogoJson;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadAria;
+use ProconSEO\Engine\Comprobaciones\AccesibilidadEntrada;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadEstructura;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadFormularios;
 use ProconSEO\Engine\Comprobaciones\AccesibilidadImagenes;
@@ -115,6 +116,7 @@ final class Motor implements MotorAnalisis, ConsolidadorSitio
             new AccesibilidadEstructura(),
             new AccesibilidadFormularios(),
             new AccesibilidadAria(),
+            new AccesibilidadEntrada(),
             new AccesibilidadMeta(),
             new PageSpeed(),
             new ComprobacionesSitio(),
