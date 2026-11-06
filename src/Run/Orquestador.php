@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace ProconSEO\Run;
 
 use Closure;
+use ProconSEO\Engine\Entorno;
 use ProconSEO\Engine\Extraccion\Robots\AnalizadorRobots;
+use ProconSEO\Engine\Extraccion\Url;
+use ProconSEO\Engine\Motor;
+use ProconSEO\Engine\ProveedorConMemoria;
 use ProconSEO\Fetch\Ambito;
 use ProconSEO\Fetch\ClienteHttpSeguro;
 use ProconSEO\Fetch\DestinoRechazado;
@@ -16,6 +20,7 @@ use ProconSEO\Shared\Contract\ConsolidadorSitio;
 use ProconSEO\Shared\Contract\ContextoAnalisis;
 use ProconSEO\Shared\Contract\InformePageSpeed;
 use ProconSEO\Shared\Contract\MotorAnalisis;
+use ProconSEO\Shared\Contract\ProveedorRecursos;
 use ProconSEO\Shared\Contract\RecursoDescargado;
 use ProconSEO\Shared\Contract\SalidaMotor;
 use ProconSEO\Shared\Contract\SenalSeguridad;
@@ -150,6 +155,7 @@ final class Orquestador
                 perfil: $perfil,
                 pageSpeed: $pageSpeed,
             );
+            $this->adelantar($proveedor, $contexto($pagina), $limitesRastreo->maxUrlsContexto);
             $salidas = [$this->motor->ejecutar($contexto($pagina, $informesPageSpeed), $proveedor, $progreso, $progreso)];
             $this->registrarBloqueos($id, $cliente);
             $cancelado = $progreso->estaCancelado();
@@ -343,7 +349,18 @@ final class Orquestador
             return [[], false, 'no se pudo leer robots.txt y no se recorrió el sitio.'];
         }
 
-        $rastreador = new Rastreador($cliente, $proveedor, $ambito->hosts(), $limitesRastreo, $reglas, self::AGENTE,
+        // Lo que ya descargaron las comprobaciones (por ejemplo, al revisar los enlaces del menú) no se vuelve a pedir.
+        $paginas = new class ($proveedor, $cliente) implements ProveedorRecursos {
+            public function __construct(private readonly ProveedorAcotado $memoria, private readonly ProveedorRecursos $cliente)
+            {
+            }
+
+            public function obtener(string $url, string $motivo, ?string $idComprobacion = null): RecursoDescargado
+            {
+                return $this->memoria->enMemoria($url) ?? $this->cliente->obtener($url, $motivo, $idComprobacion);
+            }
+        };
+        $rastreador = new Rastreador($paginas, $proveedor, $ambito->hosts(), $limitesRastreo, $reglas, self::AGENTE,
             $limites->maxBytesHtml, $limites->maxBytesSitemap);
         $progresoPagina = new ProgresoPorPagina($progreso, $limitesRastreo->maxPaginas);
         $progresoPagina->siguiente(); // la primera página ya está analizada
@@ -354,6 +371,7 @@ final class Orquestador
             $this->repositorio->actualizarFase($id, Fase::Descubrimiento, EstadoFase::EnCurso, count($salidas) + 2, $limitesRastreo->maxPaginas, mb_substr('Analizando ' . $otra->urlFinal, 0, 500));
 
             $proveedor->nuevaPagina($otra);
+            $this->adelantar($proveedor, $contexto($otra), $limitesRastreo->maxUrlsContexto);
             $salida = $this->motor->ejecutar($contexto($otra), $proveedor, $progresoPagina, $progreso);
             $this->registrarBloqueos($id, $cliente);
 
@@ -383,6 +401,42 @@ final class Orquestador
         $this->terminar($id, Fase::Descubrimiento, $cancelado || $limite !== null ? EstadoFase::Parcial : EstadoFase::Terminada, $mensaje);
 
         return [$salidas, $cancelado, $limite];
+    }
+
+    /**
+     * Antes de que el motor analice una página, se descarga a la vez lo que va a pedir seguro:
+     * sus primeros enlaces internos (enlaces rotos) y las variantes http/https y con/sin www
+     * (SEO-01 y SEO-02). Es la misma lista que calcula el motor; si algún día cambia, lo que
+     * no coincida simplemente se pide como siempre, de una en una.
+     */
+    private function adelantar(ProveedorAcotado $proveedor, ContextoAnalisis $contexto, int $maxEnlaces): void
+    {
+        $pagina = $contexto->paginaPrincipal;
+        if (!$this->motor instanceof Motor || $contexto->alcance === Alcance::UrlIndividual || !$pagina->esCorrecto()) {
+            return;
+        }
+        try {
+            $enlaces = (new Entorno($contexto, new ProveedorConMemoria($proveedor), $this->motor->catalogo()))->enlacesInternos();
+        } catch (Throwable) {
+            return;
+        }
+        $peticiones = array_map(static fn (string $u): array => [$u, 'enlace interno de la página analizada', 'SEO-07.enlaces-rotos'],
+            array_slice($enlaces, 0, $maxEnlaces));
+
+        $final = Url::sinFragmento($pagina->urlFinal);
+        $partes = parse_url($final);
+        $host = $partes['host'] ?? '';
+        $resto = ($partes['path'] ?? '/') . (isset($partes['query']) ? '?' . $partes['query'] : '');
+        $otroHost = str_starts_with($host, 'www.') ? substr($host, 4) : 'www.' . $host;
+        foreach (['http', 'https'] as $esquema) {
+            foreach ([$host, $otroHost] as $h) {
+                $url = $esquema . '://' . $h . $resto;
+                if ($url !== $final) {
+                    $peticiones[] = [$url, 'variante de la URL analizada', 'SEO-02.variantes-host'];
+                }
+            }
+        }
+        $proveedor->adelantar($peticiones);
     }
 
     /** @var array<int, true> índices del registro ya anotados como evento */

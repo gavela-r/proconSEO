@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ProconSEO\Run;
 
 use ProconSEO\Engine\Extraccion\Robots\ReglasRobots;
+use ProconSEO\Fetch\ClienteHttpSeguro;
 use ProconSEO\Shared\Contract\ProveedorRecursos;
 use ProconSEO\Shared\Contract\RecursoDescargado;
 use ProconSEO\Shared\Enum\ResultadoDescarga;
@@ -19,15 +20,21 @@ use ProconSEO\Shared\Enum\ResultadoDescarga;
  * - no pide nada que el robots.txt del sitio prohíba a nuestro user-agent: se devuelve
  *   «fuera de ámbito» con el motivo, sin conectarse.
  *
- * En el sitio completo, al pasar a otra página se olvidan las páginas HTML de la anterior
- * (no cabría todo el sitio en memoria); robots.txt, sitemaps y demás se conservan.
+ * En el sitio completo las páginas HTML también se recuerdan: el menú de cada página enlaza a
+ * las mismas, y sin memoria se volverían a pedir en todas. Para no llenar la memoria, se guardan
+ * como mucho MAX_BYTES_HTML; pasado eso se olvidan las más antiguas. robots.txt, sitemaps y
+ * demás se conservan siempre.
  */
 final class ProveedorAcotado implements ProveedorRecursos
 {
     /** @var array<string, RecursoDescargado> Se conservan todo el análisis */
     private array $permanentes = [];
-    /** @var array<string, RecursoDescargado> Páginas HTML de la página que se está analizando */
-    private array $temporales = [];
+    /** Lo más que ocupan las páginas HTML recordadas (64 MB). */
+    public const MAX_BYTES_HTML = 64 * 1024 * 1024;
+
+    /** @var array<string, RecursoDescargado> Páginas HTML recordadas, de la más antigua a la más reciente */
+    private array $html = [];
+    private int $bytesHtml = 0;
     private int $nuevas = 0;
     private int $totalNuevas = 0;
     /** @var array<string, array{recurso: RecursoDescargado, motivo: string, comprobacion: ?string}> */
@@ -41,11 +48,15 @@ final class ProveedorAcotado implements ProveedorRecursos
         private readonly ?int $maxNuevasPorPagina = null,
         private readonly string $alcance = '',
     ) {
+        if ($proveedor instanceof ClienteHttpSeguro) {
+            // Las redirecciones que acaban en algo ya descargado no lo vuelven a pedir.
+            $proveedor->usarMemoria($this->enMemoria(...));
+        }
     }
 
     public function obtener(string $url, string $motivo, ?string $idComprobacion = null): RecursoDescargado
     {
-        $guardado = $this->permanentes[$url] ?? $this->temporales[$url] ?? null;
+        $guardado = $this->enMemoria($url);
         if ($guardado !== null) {
             return $guardado;
         }
@@ -59,13 +70,27 @@ final class ProveedorAcotado implements ProveedorRecursos
         $this->totalNuevas++;
 
         $recurso = $this->proveedor->obtener($url, $motivo, $idComprobacion);
+        $this->guardar($url, $recurso);
+
+        return $recurso;
+    }
+
+    private function guardar(string $url, RecursoDescargado $recurso): void
+    {
         if (self::esHtml($recurso)) {
-            $this->temporales[$url] = $recurso;
+            $this->recordarHtml($url, $recurso);
         } else {
             $this->permanentes[$url] = $recurso;
         }
 
-        return $recurso;
+        // Si llegó tras redirigir, la URL final ya está descargada: se recuerda también como si
+        // se hubiera pedido directamente (sin las redirecciones, que no son suyas).
+        $final = $recurso->urlFinal;
+        if ($final !== $url && $recurso->redirecciones !== [] && $recurso->esCorrecto() && $this->enMemoria($final) === null) {
+            $this->guardar($final, new RecursoDescargado($final, $final, $recurso->resultado, $recurso->estadoHttp, [],
+                $recurso->cabeceras, $recurso->tipoContenido, $recurso->cuerpo, $recurso->truncado, $recurso->bytes,
+                $recurso->tlsVerificado, $recurso->motivo, $recurso->descargadoEn));
+        }
     }
 
     /**
@@ -85,11 +110,60 @@ final class ProveedorAcotado implements ProveedorRecursos
         $this->permanentes[$recurso->urlSolicitada] ??= $recurso;
     }
 
-    /** Empieza otra página del sitio: tope a cero y fuera las páginas HTML de la anterior. */
+    /** Empieza otra página del sitio: el tope de URLs extra vuelve a cero. */
     public function nuevaPagina(RecursoDescargado $pagina): void
     {
         $this->nuevas = 0;
-        $this->temporales = [$pagina->urlSolicitada => $pagina];
+        $this->recordarHtml($pagina->urlSolicitada, $pagina);
+    }
+
+    /**
+     * Descarga a la vez lo que las comprobaciones van a pedir enseguida (los enlaces internos y
+     * las variantes de la página), para que luego lo encuentren en memoria. Solo es una forma de
+     * ir más rápido: pasa por el mismo cliente seguro, no pide lo que robots.txt prohíbe ni lo ya
+     * descargado, y no cuenta en el tope porque son URLs que el motor iba a pedir igualmente.
+     *
+     * @param list<array{0: string, 1: string, 2: ?string}> $peticiones URL, motivo y comprobación
+     */
+    public function adelantar(array $peticiones): void
+    {
+        if (!$this->proveedor instanceof ClienteHttpSeguro) {
+            return;
+        }
+        $faltan = [];
+        foreach ($peticiones as $p) {
+            if (!isset($faltan[$p[0]]) && $this->enMemoria($p[0]) === null && !$this->prohibidaPorRobots($p[0])) {
+                $faltan[$p[0]] = $p;
+            }
+        }
+        if ($faltan === []) {
+            return;
+        }
+        $faltan = array_values($faltan);
+        foreach ($this->proveedor->obtenerVarias($faltan) as $i => $recurso) {
+            $this->guardar($faltan[$i][0], $recurso);
+        }
+    }
+
+    /** Lo ya descargado para esa URL, sin pedir nada ni contar en el tope. */
+    public function enMemoria(string $url): ?RecursoDescargado
+    {
+        return $this->permanentes[$url] ?? $this->html[$url] ?? null;
+    }
+
+    private function recordarHtml(string $url, RecursoDescargado $recurso): void
+    {
+        if (isset($this->html[$url])) {
+            $this->bytesHtml -= strlen($this->html[$url]->cuerpo);
+            unset($this->html[$url]);
+        }
+        $this->html[$url] = $recurso;
+        $this->bytesHtml += strlen($recurso->cuerpo);
+        while ($this->bytesHtml > self::MAX_BYTES_HTML && count($this->html) > 1) {
+            $antigua = array_key_first($this->html);
+            $this->bytesHtml -= strlen($this->html[$antigua]->cuerpo);
+            unset($this->html[$antigua]);
+        }
     }
 
     /**

@@ -471,7 +471,7 @@ Se ajustarán al probar en el servidor de Proconsi. Si un análisis llega a un l
 | Tiempo por petición | 15 s | Evita esperar a servidores colgados |
 | Tiempo total del análisis | 2 min (URL individual y con contexto) · 30 min (sitio completo) | Al llegar al tope se cierra como "parcial" |
 | Reintentos | 2, esperando 2 s y luego 4 s | Para fallos puntuales de red |
-| Ritmo | 1 petición por segundo al mismo sitio | Para no saturar la web analizada |
+| Ritmo | 3 peticiones por segundo al mismo sitio (perfil v3; antes 1) | Para no saturar la web analizada. Con 1 por segundo, un sitio completo de 200 páginas pasaba de 30 minutos; las herramientas profesionales usan de 3 a 5 |
 | Análisis a la vez | 2 | Protege el servidor de Proconsi |
 | Puertos permitidos | 80 y 443 | Los de las webs normales |
 | Idioma | `es-ES` | Clientes de Proconsi |

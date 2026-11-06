@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ProconSEO\Fetch;
 
 use DateTimeImmutable;
+use Closure;
+use Fiber;
 use ProconSEO\Fetch\Http\PeticionHttp;
 use ProconSEO\Fetch\Http\RespuestaHttp;
 use ProconSEO\Fetch\Http\TransporteHttp;
@@ -22,6 +24,9 @@ use ProconSEO\Shared\Enum\ResultadoDescarga;
  * - verifica TLS y aplica los límites de tamaño, tiempo, redirecciones y reintentos (SEG-03/05);
  * - respeta el ritmo por host y las respuestas 429 sin cambiar de identidad (Anexo A.2);
  * - nunca lanza excepciones por fallos de red o de seguridad: los devuelve en el resultado.
+ *
+ * obtenerVarias() descarga varias URLs a la vez con exactamente las mismas reglas: cada descarga
+ * sigue el mismo código que obtener() y solo se agrupa el momento de enviar (y de esperar).
  */
 final class ClienteHttpSeguro implements ProveedorRecursos
 {
@@ -30,8 +35,14 @@ final class ClienteHttpSeguro implements ProveedorRecursos
 
     private int $bytesConsumidos = 0;
 
-    /** @var array<string, float> host => instante de la última petición */
-    private array $ultimaPeticionPorHost = [];
+    /** @var array<string, list<float>> host => instantes de inicio de las últimas peticiones */
+    private array $iniciosPorHost = [];
+
+    /** Si se está dentro de obtenerVarias(): enviar y esperar se ceden al planificador. */
+    private bool $enParalelo = false;
+
+    /** @var (Closure(string): ?RecursoDescargado)|null Lo ya descargado en este análisis */
+    private ?Closure $memoria = null;
 
     /** @var list<array{recurso: RecursoDescargado, motivo: string, comprobacion: ?string}> */
     private array $registro = [];
@@ -48,6 +59,93 @@ final class ClienteHttpSeguro implements ProveedorRecursos
     public function obtener(string $url, string $motivo, ?string $idComprobacion = null): RecursoDescargado
     {
         return $this->descargar($url, $motivo, $idComprobacion, $this->limitePara($url));
+    }
+
+    /**
+     * Varias descargas a la vez. Cada una pasa por las mismas validaciones, redirecciones,
+     * reintentos y límites que obtener(); el ritmo por host se respeta igual (como mucho N
+     * peticiones empiezan en cada segundo). El orden del resultado es el de la petición.
+     *
+     * @param list<array{0: string, 1: string, 2?: ?string}> $peticiones URL, motivo y comprobación
+     * @return list<RecursoDescargado>
+     */
+    public function obtenerVarias(array $peticiones): array
+    {
+        if ($this->enParalelo) {
+            return array_map(fn (array $p): RecursoDescargado => $this->obtener($p[0], $p[1], $p[2] ?? null), $peticiones);
+        }
+
+        /** @var array<int, Fiber> $fibras */
+        $fibras = [];
+        foreach ($peticiones as $i => $p) {
+            $fibras[$i] = new Fiber(fn (): RecursoDescargado => $this->obtener($p[0], $p[1], $p[2] ?? null));
+        }
+        /** @var array<int, RecursoDescargado> $resultados */
+        $resultados = [];
+        /** @var array<int, array{0: string, 1: PeticionHttp|float}> $pendientes */
+        $pendientes = [];
+        $avanzar = static function (int $i, mixed $valor, bool $empezar) use ($fibras, &$pendientes, &$resultados): void {
+            $fibra = $fibras[$i];
+            /** @var array{0: string, 1: PeticionHttp|float}|null $cedido */
+            $cedido = $empezar ? $fibra->start() : $fibra->resume($valor);
+            if ($fibra->isTerminated()) {
+                /** @var RecursoDescargado $recurso */
+                $recurso = $fibra->getReturn();
+                $resultados[$i] = $recurso;
+                unset($pendientes[$i]);
+            } elseif ($cedido !== null) {
+                $pendientes[$i] = $cedido;
+            }
+        };
+
+        $this->enParalelo = true;
+        try {
+            foreach (array_keys($fibras) as $i) {
+                $avanzar($i, null, true);
+            }
+            while ($pendientes !== []) {
+                $envios = [];
+                $esperas = [];
+                foreach ($pendientes as $i => $p) {
+                    if ($p[1] instanceof PeticionHttp) {
+                        $envios[$i] = $p[1];
+                    } else {
+                        $esperas[$i] = $p[1];
+                    }
+                }
+                if ($envios !== []) {
+                    $respuestas = $this->transporte->enviarVarias(array_values($envios));
+                    foreach (array_keys($envios) as $k => $i) {
+                        $avanzar($i, $respuestas[$k], false);
+                    }
+                    continue;
+                }
+                // Nadie listo para enviar: se espera hasta el primero que lo esté.
+                $hasta = min($esperas);
+                $this->reloj->esperar($hasta - $this->reloj->ahora());
+                foreach ($esperas as $i => $cuando) {
+                    if ($cuando <= $hasta) {
+                        $avanzar($i, null, false);
+                    }
+                }
+            }
+        } finally {
+            $this->enParalelo = false;
+        }
+        ksort($resultados);
+
+        return array_values($resultados);
+    }
+
+    /**
+     * Si una redirección lleva a una URL ya descargada en este análisis, se usa esa descarga en
+     * vez de volver a pedirla. La redirección se valida igual; solo se ahorra la última petición.
+     *
+     * @param Closure(string): ?RecursoDescargado $memoria
+     */
+    public function usarMemoria(Closure $memoria): void
+    {
+        $this->memoria = $memoria;
     }
 
     public function descargar(string $url, string $motivo, ?string $idComprobacion, int $maxBytes): RecursoDescargado
@@ -122,6 +220,14 @@ final class ClienteHttpSeguro implements ProveedorRecursos
                     'Bucle de redirecciones.', $respuesta->estado);
             }
 
+            $conocida = $this->memoria === null ? null : $this->yaDescargada($normalizada);
+            if ($conocida !== null && $conocida->estadoHttp !== null
+                && count($redirecciones) + count($conocida->redirecciones) <= $this->limites->maxRedirecciones) {
+                return new RecursoDescargado($urlInicial, $conocida->urlFinal, $conocida->resultado, $conocida->estadoHttp,
+                    [...$redirecciones, ...$conocida->redirecciones], $conocida->cabeceras, $conocida->tipoContenido, $conocida->cuerpo,
+                    $conocida->truncado, $conocida->bytes, $conocida->tlsVerificado, $conocida->motivo, $conocida->descargadoEn);
+            }
+
             $url = $normalizada;
         }
     }
@@ -155,7 +261,7 @@ final class ClienteHttpSeguro implements ProveedorRecursos
             }
 
             $this->respetarRitmo($destino->url->host);
-            $respuesta = $this->transporte->enviar(new PeticionHttp(
+            $respuesta = $this->enviar(new PeticionHttp(
                 $destino,
                 min($maxBytes, $disponible),
                 $this->limites->segundosConexion,
@@ -174,7 +280,7 @@ final class ClienteHttpSeguro implements ProveedorRecursos
 
             if ($respuesta->error !== null) {
                 if ($quedanReintentos) {
-                    $this->reloj->esperar($this->espera($intento));
+                    $this->esperar($this->espera($intento));
                     ++$intento;
                     continue;
                 }
@@ -190,13 +296,13 @@ final class ClienteHttpSeguro implements ProveedorRecursos
                     return $this->fallo($url, $destino->url->url(), ResultadoDescarga::Limitado429, [],
                         'El servidor ha limitado las peticiones (429).' . ($retryAfter !== null ? " Pide esperar {$retryAfter} s." : ''), 429);
                 }
-                $this->reloj->esperar($espera);
+                $this->esperar($espera);
                 ++$intento;
                 continue;
             }
 
             if (in_array($respuesta->estado, [500, 502, 503, 504], true) && $quedanReintentos) {
-                $this->reloj->esperar($this->espera($intento));
+                $this->esperar($this->espera($intento));
                 ++$intento;
                 continue;
             }
@@ -205,14 +311,72 @@ final class ClienteHttpSeguro implements ProveedorRecursos
         }
     }
 
+    /**
+     * Con R peticiones por segundo, como mucho N = R (redondeado hacia abajo, mínimo 1) empiezan
+     * en cada ventana de N/R segundos. Con R = 1 es una cada segundo; con R = 3, hasta 3 a la vez y
+     * la cuarta un segundo después de la primera. El hueco se reserva antes de esperar, para que
+     * las descargas en paralelo no lo compartan.
+     */
     private function respetarRitmo(string $host): void
     {
-        $intervalo = $this->limites->peticionesPorSegundoHost > 0 ? 1 / $this->limites->peticionesPorSegundoHost : 0;
-        $ultima = $this->ultimaPeticionPorHost[$host] ?? null;
-        if ($ultima !== null) {
-            $this->reloj->esperar($ultima + $intervalo - $this->reloj->ahora());
+        $ritmo = $this->limites->peticionesPorSegundoHost;
+        if ($ritmo <= 0) {
+            return;
         }
-        $this->ultimaPeticionPorHost[$host] = $this->reloj->ahora();
+        $n = max(1, (int) floor($ritmo));
+        $inicios = $this->iniciosPorHost[$host] ?? [];
+        $inicio = $this->reloj->ahora();
+        if (count($inicios) >= $n) {
+            // Solo se guardan las $n últimas: la primera es la que abre la ventana.
+            $inicio = max($inicio, ($inicios[0] ?? $inicio) + (float) $n / $ritmo);
+        }
+        $inicios[] = $inicio;
+        $this->iniciosPorHost[$host] = array_slice($inicios, -$n);
+        $this->esperar($inicio - $this->reloj->ahora());
+    }
+
+    /**
+     * Lo ya descargado para esa URL, solo si hoy pasaría las mismas comprobaciones que una
+     * petición nueva (IP real permitida y host autorizado). Si no, se pide como siempre y falla
+     * por el motivo de siempre.
+     */
+    private function yaDescargada(string $url): ?RecursoDescargado
+    {
+        try {
+            $destino = $this->validador->validar($url);
+        } catch (DestinoRechazado) {
+            return null;
+        }
+        if (!$this->ambito->permite($destino->url) || $this->memoria === null) {
+            return null;
+        }
+
+        return ($this->memoria)($url);
+    }
+
+    private function enviar(PeticionHttp $peticion): RespuestaHttp
+    {
+        if ($this->enParalelo && Fiber::getCurrent() !== null) {
+            /** @var RespuestaHttp $respuesta */
+            $respuesta = Fiber::suspend(['enviar', $peticion]);
+
+            return $respuesta;
+        }
+
+        return $this->transporte->enviar($peticion);
+    }
+
+    private function esperar(float $segundos): void
+    {
+        if ($segundos <= 0) {
+            return;
+        }
+        if ($this->enParalelo && Fiber::getCurrent() !== null) {
+            Fiber::suspend(['esperar', $this->reloj->ahora() + $segundos]);
+
+            return;
+        }
+        $this->reloj->esperar($segundos);
     }
 
     private function espera(int $intento): float
