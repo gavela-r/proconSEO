@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use ProconSEO\Results\ComparacionAnalisis;
 use ProconSEO\Results\CompromisosKitDigital;
 use ProconSEO\Results\FiltroResultados;
 use ProconSEO\Results\Informe;
@@ -37,6 +38,13 @@ return static function (Router $r): void {
         $repositorio = $repo();
         $id = (int) $p->parametro('id');
         $analisis = $repositorio->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+        $cat = $catalogo();
+        // Qué ha cambiado desde el análisis anterior de la misma dirección y alcance.
+        $anterior = $repositorio->analisisAnterior($analisis);
+        $comparacion = $anterior === null ? null : new ComparacionAnalisis(
+            $repositorio->resultados((int) $anterior['id']),
+            Informe::conTitulos($repositorio->resultados($id), $cat),
+        );
 
         return Respuesta::html(Vista::render('results/dashboard', [
             'titulo' => 'Resultados del análisis',
@@ -46,9 +54,11 @@ return static function (Router $r): void {
                 $repositorio->resultados($id),
                 $repositorio->recursos($id),
                 $repositorio->fases($id),
-                $catalogo(),
+                $cat,
                 FiltroResultados::desdeConsulta($p->consulta), // RF-23
             ),
+            'anterior' => $anterior,
+            'comparacion' => $comparacion,
             'eventos' => $repositorio->eventosSeguridad($id),
             'conKitDigital' => CompromisosKitDigital::aplica($analisis['proyecto_tipo']),
         ]));

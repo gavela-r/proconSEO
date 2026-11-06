@@ -57,6 +57,27 @@ final class RepositorioResultadosTest extends TestCase
         self::assertNull($this->repo->analisis(PHP_INT_MAX >> 33));
     }
 
+    public function testAnalisisAnteriorDeLaMismaDireccionYAlcance(): void
+    {
+        $perfil = (int) $this->bd->query('SELECT id FROM perfiles_ejecucion ORDER BY id LIMIT 1')->fetchColumn();
+        $nuevo = function (string $url, string $alcance, string $estado) use ($perfil): int {
+            $this->bd->prepare('INSERT INTO analisis (proyecto_id, url_introducida, url_normalizada, alcance, perfil_id, estado) VALUES (?, ?, ?, ?, ?, ?)')
+                ->execute([$this->proyectoId, $url, $url, $alcance, $perfil, $estado]);
+
+            return (int) $this->bd->lastInsertId();
+        };
+        $primero = $nuevo('https://ejemplo.es/', 'url_individual', 'parcial');
+        $nuevo('https://ejemplo.es/', 'url_individual', 'cancelado');
+        $nuevo('https://ejemplo.es/', 'sitio_completo', 'completado');
+        $nuevo('https://otra.es/', 'url_individual', 'completado');
+        $actual = $nuevo('https://ejemplo.es/', 'url_individual', 'completado');
+
+        $anterior = $this->repo->analisisAnterior((array) $this->repo->analisis($actual));
+
+        self::assertSame($primero, (int) ($anterior['id'] ?? 0), 'Ni el cancelado, ni otro alcance, ni otra dirección');
+        self::assertNull($this->repo->analisisAnterior((array) $this->repo->analisis($primero)));
+    }
+
     public function testResultadosConEstadoVigenteCausaYEvidencias(): void
     {
         $this->bd->prepare("INSERT INTO grupos_causa (analisis_id, codigo, descripcion) VALUES (?, 'C-001', 'Causa de prueba')")->execute([$this->analisisId]);
