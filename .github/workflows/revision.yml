@@ -43,6 +43,8 @@ jobs:
           coverage: none
       - run: composer install --no-interaction --no-progress
       - run: php bin/migrar.php
+      # La misma comprobación que hará sistemas en el servidor, sobre esta instalación desde cero.
+      - run: php bin/comprobar.php
       - run: vendor/bin/phpunit
 
   seguridad:
