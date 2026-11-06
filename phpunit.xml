@@ -9,6 +9,11 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <!-- Algunas pruebas crean a propósito datos grandes (por ejemplo, una bomba gzip de 50 MB) para
+             comprobar los límites. Con los 128 MB por defecto de PHP en Windows, la batería entera no cabe. -->
+        <ini name="memory_limit" value="512M"/>
+    </php>
     <source>
         <include>
             <directory>src</directory>
