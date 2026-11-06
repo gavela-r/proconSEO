@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use ProconSEO\Run\Fabrica;
+use ProconSEO\Run\Programaciones;
 use ProconSEO\Run\RegistroAuditoria;
 use ProconSEO\Shared\BaseDatos;
 use ProconSEO\Shared\Enum\Alcance;
@@ -118,4 +119,83 @@ return static function (Router $r): void {
 
     // Sin JavaScript: el formulario de cancelar funciona igual.
     $r->post('/analisis/{id}/cancelar', static fn (Peticion $p): Respuesta => Respuesta::redirigir('/analisis/' . $cancelar($p) . '/progreso'));
+
+    // Análisis programados de un proyecto.
+    $programados = static function (int $proyectoId, array $valores = [], ?string $error = null, int $estado = 200): Respuesta {
+        $fabrica = new Fabrica();
+        $proyecto = $fabrica->repositorio()->proyecto($proyectoId)
+            ?? throw new ErrorDominio('no_encontrado', 'El proyecto no existe.', 404);
+
+        return Respuesta::html(Vista::render('run/programados', [
+            'titulo' => 'Análisis programados',
+            'estilos' => ['/assets/css/run.css'],
+            'proyecto' => $proyecto,
+            'programaciones' => $fabrica->programaciones()->deProyecto($proyectoId),
+            'alcances' => Alcance::opciones(),
+            'periodos' => Programaciones::PERIODOS,
+            'valores' => $valores + ['url' => (string) ($proyecto['url_principal'] ?? ''), 'alcance' => Alcance::UrlIndividual->value, 'cada_dias' => 7],
+            'error' => $error,
+        ]), $estado);
+    };
+
+    $r->get('/proyectos/{id}/programados', static fn (Peticion $p): Respuesta => $programados((int) $p->parametro('id')));
+
+    $r->post('/proyectos/{id}/programados', static function (Peticion $p) use ($programados): Respuesta {
+        $proyectoId = (int) $p->parametro('id');
+        $valores = [
+            'url' => (string) $p->entrada('url', ''),
+            'alcance' => (string) $p->entrada('alcance', ''),
+            'cada_dias' => (int) $p->entrada('cada_dias', 0),
+            'hosts_extra' => (string) $p->entrada('hosts_extra', ''),
+        ];
+        try {
+            (new Fabrica())->programaciones()->crear($proyectoId, $valores['url'], $valores['alcance'], $valores['cada_dias'], $valores['hosts_extra']);
+        } catch (ErrorDominio $e) {
+            return $programados($proyectoId, $valores, $e->getMessage(), $e->estadoHttp);
+        }
+
+        return Respuesta::redirigir("/proyectos/{$proyectoId}/programados");
+    });
+
+    $cambiarProgramacion = static function (Peticion $p, string $accion): Respuesta {
+        $programaciones = (new Fabrica())->programaciones();
+        $id = (int) $p->parametro('id');
+        $programacion = $programaciones->obtener($id) ?? throw new ErrorDominio('no_encontrado', 'La programación no existe.', 404);
+        match ($accion) {
+            'pausar' => $programaciones->activar($id, false),
+            'reanudar' => $programaciones->activar($id, true),
+            default => $programaciones->borrar($id),
+        };
+
+        return Respuesta::redirigir('/proyectos/' . (int) $programacion['proyecto_id'] . '/programados');
+    };
+    foreach (['pausar', 'reanudar', 'borrar'] as $accion) {
+        $r->post('/programados/{id}/' . $accion, static fn (Peticion $p): Respuesta => $cambiarProgramacion($p, $accion));
+    }
+
+    // Avisos de los análisis programados.
+    $r->get('/avisos', static function (Peticion $p): Respuesta {
+        $avisos = (new Fabrica())->avisos();
+        $soloSinLeer = $p->entrada('todos', '') !== '1';
+
+        return Respuesta::html(Vista::render('run/avisos', [
+            'titulo' => 'Avisos',
+            'estilos' => ['/assets/css/run.css'],
+            'avisos' => $avisos->lista($soloSinLeer),
+            'sinLeer' => $avisos->sinLeer(),
+            'soloSinLeer' => $soloSinLeer,
+        ]));
+    });
+
+    $r->post('/avisos/leidos', static function (): Respuesta {
+        (new Fabrica())->avisos()->marcarTodosLeidos();
+
+        return Respuesta::redirigir('/avisos');
+    });
+
+    $r->post('/avisos/{id}/leido', static function (Peticion $p): Respuesta {
+        (new Fabrica())->avisos()->marcarLeido((int) $p->parametro('id'));
+
+        return Respuesta::redirigir('/avisos');
+    });
 };
