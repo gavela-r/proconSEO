@@ -34,6 +34,10 @@ $totalFases = count(Fase::cases());
     </ol>
 </nav>
 
+<?php if ($borrado ?? false): ?>
+    <p class="aviso aviso--info" role="status"><strong>Análisis borrado.</strong> Se han eliminado sus resultados, evidencias, revisiones y capturas.</p>
+<?php endif; ?>
+
 <div class="cabecera-pagina">
     <div>
         <h1><?= e($proyecto['nombre']) ?></h1>
@@ -123,7 +127,14 @@ $totalFases = count(Fase::cases());
                         <?php endif; ?>
                     </td>
                     <td data-etiqueta="Acciones">
-                        <a class="boton boton--pequeno<?= $activo ? '' : ' boton--secundario' ?>" href="/analisis/<?= e($a['id']) ?><?= $activo ? '/progreso' : '' ?>"><?= $activo ? 'Ver progreso' : 'Ver resultados' ?></a>
+                        <div class="acciones">
+                            <a class="boton boton--pequeno<?= $activo ? '' : ' boton--secundario' ?>" href="/analisis/<?= e($a['id']) ?><?= $activo ? '/progreso' : '' ?>"><?= $activo ? 'Ver progreso' : 'Ver resultados' ?></a>
+                            <?php if ($activo): ?>
+                                <span class="secundario">No se puede borrar mientras está en marcha.</span>
+                            <?php else: ?>
+                                <a class="boton boton--pequeno boton--secundario" href="/analisis/<?= e($a['id']) ?>/borrar">Borrar<span class="solo-lectores"> el análisis del <?= e(Formato::fecha((string) $a['creado_en'])) ?></span></a>
+                            <?php endif; ?>
+                        </div>
                     </td>
                 </tr>
             <?php endforeach; ?>
