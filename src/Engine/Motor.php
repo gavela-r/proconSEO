@@ -18,6 +18,7 @@ use ProconSEO\Engine\Comprobaciones\DatosEstructurados;
 use ProconSEO\Engine\Comprobaciones\DirectivasIndexacion;
 use ProconSEO\Engine\Comprobaciones\Enlazado;
 use ProconSEO\Engine\Comprobaciones\Idiomas;
+use ProconSEO\Engine\Comprobaciones\IdiomaTexto;
 use ProconSEO\Engine\Comprobaciones\Metadatos;
 use ProconSEO\Engine\Comprobaciones\Multimedia;
 use ProconSEO\Engine\Comprobaciones\PageSpeed;
@@ -110,6 +111,7 @@ final class Motor implements MotorAnalisis, ConsolidadorSitio
             new DatosEstructurados(),
             new CanonicalSitemap(),
             new Idiomas(),
+            new IdiomaTexto(),
             new Acciones(),
             new AccesibilidadImagenes(),
             new AccesibilidadEstructura(),
