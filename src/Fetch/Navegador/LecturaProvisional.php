@@ -116,7 +116,7 @@ final class LecturaProvisional
                 $evidencias[] = $motivo . ': ' . count($lista) . '. Ej.: «' . (string) $lista[0]['texto'] . '» (' . (string) $lista[0]['selector'] . ')';
             }
             $resultados[] = self::resultado('ACC-05.contraste-sobre-imagen', 'Contraste del texto sobre imágenes o efectos', EstadoResultado::NoVerificable, null,
-                "{$total} textos no se pueden medir de forma automática porque su fondo no es un color liso: hay que revisarlos a mano.", $evidencias);
+                ($total === 1 ? 'Un texto no se puede medir' : "{$total} textos no se pueden medir") . " de forma automática porque su fondo no es un color liso: hay que revisarlos a mano.", $evidencias);
         }
         $extra = [];
         if (($c['tapados'] ?? 0) > 0) {

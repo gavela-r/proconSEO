@@ -37,7 +37,7 @@ final class NavegadorAisladoTest extends TestCase
         <style>
           body { margin: 0; background: #ffffff; color: #222222; font: 16px sans-serif; }
           .flojo { color: #aaaaaa; }
-          #sin-foco:focus { outline: none; }
+          #sin-foco:focus, .menu a:focus { outline: none; }
           a:focus { outline: 3px solid #e30613; }
           .ancho { width: 900px; height: 20px; background: #eeeeee; }
         </style></head>
@@ -45,6 +45,7 @@ final class NavegadorAisladoTest extends TestCase
           <p>Texto con buen contraste en la página de prueba.</p>
           <p class="flojo">Texto gris claro que no llega al mínimo.</p>
           <p class="cdn">Texto pintado con el CSS del CDN.</p>
+          <nav class="menu"><a href="/menu">Menu sin foco</a></nav>
           <a href="/otra">Enlace con foco</a>
           <button id="sin-foco">Botón sin foco visible</button>
           <div class="ancho">Caja demasiado ancha</div>
@@ -154,6 +155,7 @@ final class NavegadorAisladoTest extends TestCase
         $r = self::resultados();
         self::assertSame(EstadoResultado::Problema, $r['ACC-06.foco-visible']['estado']);
         self::assertStringContainsString('sin-foco', implode(' ', $r['ACC-06.foco-visible']['evidencias']));
+        self::assertStringContainsString('Menu sin foco', implode(' ', $r['ACC-06.foco-visible']['evidencias']), 'outline: none sin otro cambio visible');
         self::assertStringNotContainsString('Enlace con foco', implode(' ', $r['ACC-06.foco-visible']['evidencias']));
         self::assertSame(EstadoResultado::Correcto, $r['ACC-06.trampa-teclado']['estado']);
     }

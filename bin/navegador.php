@@ -9,6 +9,7 @@ declare(strict_types=1);
  *   php bin/navegador.php https://www.ejemplo.es/
  *   php bin/navegador.php https://www.ejemplo.es/ --json     mediciones en bruto
  *   php bin/navegador.php https://www.ejemplo.es/ --peticiones   además, qué se descargó y qué no
+ *   php bin/navegador.php https://www.ejemplo.es/ --html     página para abrir en el navegador (en storage/navegador/)
  *
  * Necesita Chrome o Edge instalado (o NAVEGADOR_RUTA en .env). El navegador no tiene red propia:
  * todo lo descarga ClienteHttpSeguro con las mismas validaciones que el resto del análisis.
@@ -20,6 +21,7 @@ use ProconSEO\Fetch\DestinoRechazado;
 use ProconSEO\Fetch\Http\TransporteCurl;
 use ProconSEO\Fetch\LimitesDescarga;
 use ProconSEO\Fetch\Navegador\FiltroPeticiones;
+use ProconSEO\Fetch\Navegador\InformeHtml;
 use ProconSEO\Fetch\Navegador\LecturaProvisional;
 use ProconSEO\Fetch\Navegador\NavegadorAislado;
 use ProconSEO\Fetch\Navegador\ProcesoNavegador;
@@ -70,6 +72,18 @@ $navegador = new NavegadorAislado(
     new FiltroPeticiones($ambito, $validadorUrl),
 );
 $pagina = $navegador->analizar($destino->url());
+
+if (in_array('--html', $argv, true)) {
+    // En storage/, que no se sube a GitHub.
+    $carpeta = $raiz . '/storage/navegador';
+    if (!is_dir($carpeta)) {
+        mkdir($carpeta, 0775, true);
+    }
+    $fichero = $carpeta . '/' . preg_replace('/[^a-z0-9.-]+/i', '-', $destino->host) . '-' . date('Ymd-His') . '.html';
+    file_put_contents($fichero, InformeHtml::generar($pagina, LecturaProvisional::leer($pagina)));
+    echo 'Informe: ' . realpath($fichero) . PHP_EOL;
+    exit($pagina->esCorrecta() ? 0 : 1);
+}
 
 if ($json) {
     echo json_encode([

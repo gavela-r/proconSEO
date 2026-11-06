@@ -130,8 +130,13 @@
     const estiloFoco = (e) => {
         terminarAnimaciones(e);
         const s = getComputedStyle(e);
-        return [s.outlineStyle, s.outlineWidth, s.outlineColor, s.outlineOffset, s.boxShadow, s.backgroundColor,
-            s.color, s.borderTopColor, s.borderBottomColor, s.borderBottomWidth, s.textDecorationLine].join('|');
+        // Solo lo que se ve: un contorno oculto (outline: none) puede cambiar de grosor o de
+        // desplazamiento sin que nadie lo note, y un borde de 0 px puede cambiar de color.
+        const contorno = s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0
+            ? [s.outlineStyle, s.outlineWidth, s.outlineColor, s.outlineOffset].join(' ') : 'sin contorno';
+        const bordes = ['Top', 'Right', 'Bottom', 'Left'].map((l) => (s['border' + l + 'Style'] !== 'none' && parseFloat(s['border' + l + 'Width']) > 0
+            ? [s['border' + l + 'Style'], s['border' + l + 'Width'], s['border' + l + 'Color']].join(' ') : '-'));
+        return [contorno, ...bordes, s.boxShadow, s.backgroundColor, s.color, s.textDecorationLine, s.textDecorationColor].join('|');
     };
     const foco = { pasos: [], anterior: null };
     pf.empezarFoco = () => {
