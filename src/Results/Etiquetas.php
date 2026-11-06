@@ -60,6 +60,20 @@ final class Etiquetas
         return implode(' · ', $partes);
     }
 
+    /**
+     * "Normativa: Real Decreto 1112/2018" cuando el resultado sale de una norma y no de un criterio WCAG
+     * (p. ej. la declaración de accesibilidad). Si tiene referencia WCAG, se muestra esa y esto devuelve null.
+     */
+    public static function normativa(array $resultado): ?string
+    {
+        $normativa = $resultado['normativa'] ?? null;
+        if (self::wcag($resultado) !== null || !is_string($normativa) || trim($normativa) === '') {
+            return null;
+        }
+
+        return 'Normativa: ' . trim($normativa);
+    }
+
     public static function esNuevo22(array $resultado): bool
     {
         return ($resultado['wcag_version'] ?? null) === '2.2'

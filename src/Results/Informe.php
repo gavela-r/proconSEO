@@ -280,6 +280,10 @@ final class Informe
             $r['wcag_nivel'] = $ficha->wcagNivel;
             $r['wcag_version'] = $ficha->wcagVersion;
         }
+        // Igual con la normativa (p. ej. Real Decreto 1112/2018) de las comprobaciones que no son WCAG.
+        if ($ficha !== null && ($r['wcag_criterio'] ?? null) === null && ($r['normativa'] ?? null) === null && isset($ficha->extra['normativa'])) {
+            $r['normativa'] = (string) $ficha->extra['normativa'];
+        }
 
         return $r + [
             'titulo' => $ficha?->nombre ?? (string) $r['id_comprobacion'],

@@ -40,6 +40,7 @@
 .chip--prueba { border-color: var(--estado-mejorable); color: var(--estado-mejorable); }
 .chip--wcag21 { border-color: var(--primario); color: var(--primario); }
 .chip--wcag22 { border-style: dashed; }
+.chip--normativa { border-color: var(--estado-decision); color: var(--estado-decision); }
 
 /* Gravedad: siempre con texto ("Gravedad: crítica"), el color solo refuerza. */
 .gravedad { display: inline-block; padding: .05rem .5rem; border-radius: var(--radio); font-size: .8rem; font-weight: 700; color: #fff; }

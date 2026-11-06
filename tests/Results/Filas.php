@@ -41,6 +41,7 @@ final class Filas
             'wcag_nombre' => null,
             'wcag_nivel' => null,
             'wcag_version' => null,
+            'normativa' => null,
             'gravedad' => null,
             'esfuerzo' => 'bajo',
             'grupo_causa_id' => null,
