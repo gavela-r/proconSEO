@@ -23,13 +23,13 @@ final class Acciones implements Comprobacion
         return ['IA-11.acciones-nombre-rol' => Cobertura::ParcialmenteImplementada];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         if ($id !== 'IA-11.acciones-nombre-rol') {
             throw new RuntimeException("Subcomprobación desconocida: $id");
         }
-        $doc = $e->documento();
-        $v = $e->resultado($id);
+        $doc = $entorno->documento();
+        $v = $entorno->resultado($id);
         $formularios = array_filter($doc->formularios, static fn (array $f): bool => $f['metodo'] !== 'ninguno');
         if ($doc->botones === [] && $formularios === []) {
             return $v->noAplicable('La página no tiene botones ni formularios.');
@@ -42,7 +42,7 @@ final class Acciones implements Comprobacion
         }
         $lista = array_map(static fn (array $b): string => '<' . $b['etiqueta'] . ($b['tipo'] !== null ? ' type="' . $b['tipo'] . '"' : '') . '> sin texto ni aria-label', $sinNombre);
         return $v->elemento($lista[0])
-            ->evidencia($e->evidencia(TipoEvidencia::FragmentoHtml, implode("\n", $lista)))
+            ->evidencia($entorno->evidencia(TipoEvidencia::FragmentoHtml, implode("\n", $lista)))
             ->consecuencia('Un asistente con IA o un lector de pantalla no puede saber qué hace un botón sin nombre (enviar, comprar, abrir el chat…).')
             ->correccion('Dar a cada botón un texto visible o, si solo tiene un icono, un aria-label que diga la acción («Abrir chat», «Añadir al carrito»).')
             ->problema(Gravedad::Medio);

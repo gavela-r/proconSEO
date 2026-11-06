@@ -52,15 +52,15 @@ final class DatosEstructurados implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'IA-07.jsonld-sintaxis' => $this->sintaxis($e),
-            'IA-07.microdata-rdfa' => $this->microdataRdfa($e),
-            'IA-07.tipos-schema' => $this->tiposSchema($e),
-            'IA-07.negocio-local' => $this->negocioLocal($e),
-            'SEO-14.elegibilidad-enriquecidos' => $this->elegibilidad($e),
-            'SEO-14.producto-marcado' => $this->producto($e),
+            'IA-07.jsonld-sintaxis' => $this->sintaxis($entorno),
+            'IA-07.microdata-rdfa' => $this->microdataRdfa($entorno),
+            'IA-07.tipos-schema' => $this->tiposSchema($entorno),
+            'IA-07.negocio-local' => $this->negocioLocal($entorno),
+            'SEO-14.elegibilidad-enriquecidos' => $this->elegibilidad($entorno),
+            'SEO-14.producto-marcado' => $this->producto($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }
@@ -113,7 +113,7 @@ final class DatosEstructurados implements Comprobacion
             $datos = $b['datos'];
             $contexto = is_array($datos) && !array_is_list($datos) ? ($datos['@context'] ?? null) : null;
             $textoContexto = is_string($contexto) ? $contexto : json_encode($contexto);
-            if (is_array($datos) && !array_is_list($datos) && !str_contains(strtolower((string) $textoContexto), 'schema.org')) {
+            if (!array_is_list($datos) && !str_contains(strtolower((string) $textoContexto), 'schema.org')) {
                 $avisos[] = 'Bloque sin @context de schema.org.';
             }
         }

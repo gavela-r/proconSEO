@@ -49,12 +49,12 @@ final class RespuestaUtilizable implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'IA-03.respuesta-http' => $this->respuesta($e),
-            'IA-03.bloqueo-acceso' => $this->bloqueo($e),
-            'IA-03.contenido-html-inicial' => $this->contenido($e),
+            'IA-03.respuesta-http' => $this->respuesta($entorno),
+            'IA-03.bloqueo-acceso' => $this->bloqueo($entorno),
+            'IA-03.contenido-html-inicial' => $this->contenido($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }
@@ -110,7 +110,7 @@ final class RespuestaUtilizable implements Comprobacion
                 ->decisionRevisar();
         }
         if ($muro !== null) {
-            return $v->valor('La página responde ' . $codigo . ' pero muestra ' . $muro . '.')
+            return $v->valor('La página responde ' . (string) $codigo . ' pero muestra ' . $muro . '.')
                 ->evidencia($e->evidencia(TipoEvidencia::Texto, 'Señal encontrada en el HTML: ' . $muro))
                 ->conclusion(TipoConclusion::Inferencia)
                 ->consecuencia('Los robots pueden recibir el desafío en lugar del contenido.')
@@ -118,7 +118,7 @@ final class RespuestaUtilizable implements Comprobacion
                 ->decisionRevisar();
         }
         $e->exigePagina();
-        return $v->valor('HTTP ' . $codigo . ' sin señales de bloqueo ni de CAPTCHA.')->correcto();
+        return $v->valor('HTTP ' . (string) $codigo . ' sin señales de bloqueo ni de CAPTCHA.')->correcto();
     }
 
     private function contenido(Entorno $e): BorradorResultado

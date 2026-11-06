@@ -46,18 +46,18 @@ final class EstadoTecnico implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'SEO-01.estado-http' => $this->estadoHttp($e),
-            'SEO-01.https' => $this->https($e),
-            'SEO-01.contenido-mixto' => $this->contenidoMixto($e),
-            'SEO-01.formulario-sin-cifrar' => $this->formularioSinCifrar($e),
-            'SEO-01.rastreable' => $this->rastreable($e),
-            'SEO-01.indexable' => $this->indexable($e),
-            'SEO-01.soft-404' => $this->soft404($e),
-            'SEO-01.noindex-desarrollo' => $this->noindexDesarrollo($e),
-            'SEO-01.cms-detectado' => $this->cms($e),
+            'SEO-01.estado-http' => $this->estadoHttp($entorno),
+            'SEO-01.https' => $this->https($entorno),
+            'SEO-01.contenido-mixto' => $this->contenidoMixto($entorno),
+            'SEO-01.formulario-sin-cifrar' => $this->formularioSinCifrar($entorno),
+            'SEO-01.rastreable' => $this->rastreable($entorno),
+            'SEO-01.indexable' => $this->indexable($entorno),
+            'SEO-01.soft-404' => $this->soft404($entorno),
+            'SEO-01.noindex-desarrollo' => $this->noindexDesarrollo($entorno),
+            'SEO-01.cms-detectado' => $this->cms($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }
@@ -81,7 +81,7 @@ final class EstadoTecnico implements Comprobacion
         return $v
             ->consecuencia($codigo >= 500
                 ? 'Con un error del servidor, Google no puede indexar la página y, si se repite, la retira de los resultados.'
-                : 'Google no indexa una URL que responde ' . $codigo . ' y retira la que ya tuviera.')
+                : 'Google no indexa una URL que responde ' . (string) $codigo . ' y retira la que ya tuviera.')
             ->correccion($codigo === 404 || $codigo === 410
                 ? 'Si la página se ha movido, redirigir con 301 a la nueva dirección; si la URL es la correcta, restaurar la página.'
                 : 'Revisar los registros del servidor y corregir el fallo.')
@@ -129,7 +129,7 @@ final class EstadoTecnico implements Comprobacion
             return $v->valor('HTTPS con certificado válido; la versión HTTP redirige a HTTPS (' . $primerSalto['estado'] . ').')->correcto();
         }
         if ($r->esCorrecto() && $r->estadoHttp !== null && $r->estadoHttp < 300 && Url::esquema($r->urlFinal) === 'http') {
-            return $v->valor('La versión HTTP (' . $http . ') responde ' . $r->estadoHttp . ' sin redirigir a HTTPS.')
+            return $v->valor('La versión HTTP (' . $http . ') responde ' . (string) $r->estadoHttp . ' sin redirigir a HTTPS.')
                 ->consecuencia('Quien entra por http:// navega sin cifrar y Google puede ver dos versiones de la misma página.')
                 ->correccion('Redirigir con 301 todas las URLs http:// a su versión https://.')
                 ->problema(Gravedad::Medio);
@@ -193,7 +193,7 @@ final class EstadoTecnico implements Comprobacion
     {
         $p = $e->permisoRobots('Googlebot');
         $v = $e->resultado('SEO-01.rastreable')
-            ->valor('Googlebot: ' . ($p['permitido'] ? 'permitido' : 'bloqueado') . ($p['regla'] !== null ? ' (línea ' . $p['linea'] . ', «' . $p['regla'] . '»)' : ''));
+            ->valor('Googlebot: ' . ($p['permitido'] ? 'permitido' : 'bloqueado') . ($p['regla'] !== null ? ' (línea ' . (string) $p['linea'] . ', «' . $p['regla'] . '»)' : ''));
         if ($p['permitido']) {
             return $v->correcto();
         }
@@ -201,7 +201,7 @@ final class EstadoTecnico implements Comprobacion
             return $v->limitacion('Coincide con el objetivo declarado de no indexar.')->correcto();
         }
         return $v
-            ->evidencia($e->evidencia(TipoEvidencia::Texto, 'robots.txt línea ' . $p['linea'] . ': ' . $p['regla'], $e->robots()['recurso']->urlSolicitada))
+            ->evidencia($e->evidencia(TipoEvidencia::Texto, 'robots.txt línea ' . (string) $p['linea'] . ': ' . $p['regla'], $e->robots()['recurso']->urlSolicitada))
             ->consecuencia('Google no puede leer la página: no la mostrará con su contenido en los resultados.')
             ->correccion('Si no es intencionado, quitar o acotar la regla Disallow de robots.txt.')
             ->revisionHumana('Bloquear el rastreo puede ser deliberado.')
@@ -234,7 +234,7 @@ final class EstadoTecnico implements Comprobacion
         foreach (self::SENALES_ERROR as $senal) {
             if (str_contains($titulares, $senal)) {
                 return $v
-                    ->valor('Responde ' . $e->pagina()->estadoHttp . ' pero el título o el encabezado dicen «' . $senal . '».')
+                    ->valor('Responde ' . (string) $e->pagina()->estadoHttp . ' pero el título o el encabezado dicen «' . $senal . '».')
                     ->elemento(mb_substr($titulares, 0, 300))
                     ->evidencia($e->evidencia(TipoEvidencia::Texto, 'Título y encabezados: ' . $titulares))
                     ->conclusion(TipoConclusion::Inferencia)
@@ -247,7 +247,7 @@ final class EstadoTecnico implements Comprobacion
         if (mb_strlen($doc->texto) < RespuestaUtilizable::TEXTO_MINIMO) {
             return $v->noVerificable('La página tiene muy poco texto en el HTML inicial: no se puede descartar que sea una página de error.');
         }
-        return $v->valor('Responde ' . $e->pagina()->estadoHttp . ' con contenido propio y sin textos de error en el título ni en los encabezados.')
+        return $v->valor('Responde ' . (string) $e->pagina()->estadoHttp . ' con contenido propio y sin textos de error en el título ni en los encabezados.')
             ->conclusion(TipoConclusion::Inferencia)
             ->limitacion('Solo se revisan el título y los encabezados, sin navegador.')
             ->correcto();
@@ -265,7 +265,7 @@ final class EstadoTecnico implements Comprobacion
         try {
             $p = $e->permisoRobots('Googlebot');
             if (!$p['permitido']) {
-                $motivos[] = 'robots.txt bloquea a Googlebot (línea ' . $p['linea'] . ', «' . $p['regla'] . '»)';
+                $motivos[] = 'robots.txt bloquea a Googlebot (línea ' . (string) $p['linea'] . ', «' . $p['regla'] . '»)';
             }
         } catch (NoVerificable) {
             $robotsVerificado = false;

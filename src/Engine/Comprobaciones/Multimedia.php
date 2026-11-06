@@ -49,18 +49,18 @@ final class Multimedia implements Comprobacion
         ];
     }
 
-    public function evaluar(string $id, Entorno $e): BorradorResultado
+    public function evaluar(string $id, Entorno $entorno): BorradorResultado
     {
         return match ($id) {
-            'SEO-12.imagenes-rastreables' => $this->rastreables($e),
-            'SEO-12.imagenes-alt' => $this->alt($e),
-            'SEO-12.imagenes-formato' => $this->formato($e),
-            'SEO-12.video-detectado' => $this->videoDetectado($e),
-            'SEO-12.video-miniatura' => $this->miniatura($e),
-            'SEO-12.video-datos' => $this->videoDatos($e),
-            'IA-10.contexto-imagenes' => $this->contextoImagenes($e),
-            'IA-10.contexto-video' => $this->contextoVideo($e),
-            'IA-10.horarios-texto' => $this->horarios($e),
+            'SEO-12.imagenes-rastreables' => $this->rastreables($entorno),
+            'SEO-12.imagenes-alt' => $this->alt($entorno),
+            'SEO-12.imagenes-formato' => $this->formato($entorno),
+            'SEO-12.video-detectado' => $this->videoDetectado($entorno),
+            'SEO-12.video-miniatura' => $this->miniatura($entorno),
+            'SEO-12.video-datos' => $this->videoDatos($entorno),
+            'IA-10.contexto-imagenes' => $this->contextoImagenes($entorno),
+            'IA-10.contexto-video' => $this->contextoVideo($entorno),
+            'IA-10.horarios-texto' => $this->horarios($entorno),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }
