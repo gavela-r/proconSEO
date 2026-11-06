@@ -25,6 +25,7 @@ use ProconSEO\Engine\Comprobaciones\Multimedia;
 use ProconSEO\Engine\Comprobaciones\PageSpeed;
 use ProconSEO\Engine\Comprobaciones\EstadoTecnico;
 use ProconSEO\Engine\Comprobaciones\PermisoRobots;
+use ProconSEO\Engine\Comprobaciones\ProductoCoherente;
 use ProconSEO\Engine\Comprobaciones\Redirecciones;
 use ProconSEO\Engine\Comprobaciones\RespuestaUtilizable;
 use ProconSEO\Engine\Seguridad\DetectorInstrucciones;
@@ -110,6 +111,7 @@ final class Motor implements MotorAnalisis, ConsolidadorSitio
             new Enlazado(),
             new Multimedia(),
             new DatosEstructurados(),
+            new ProductoCoherente(),
             new CanonicalSitemap(),
             new Idiomas(),
             new IdiomaTexto(),
