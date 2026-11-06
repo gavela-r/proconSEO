@@ -44,7 +44,7 @@ final class RepositorioResultados
     public function analisisAnterior(array $analisis): ?array
     {
         $consulta = $this->bd->prepare(
-            "SELECT id, estado, creado_en, terminado_en, version_catalogo
+            "SELECT id, estado, creado_en, terminado_en, version_catalogo, url_normalizada, url_introducida, alcance
              FROM analisis
              WHERE proyecto_id = ? AND url_normalizada = ? AND alcance = ? AND id < ?
                AND estado IN ('completado', 'parcial')
@@ -55,6 +55,27 @@ final class RepositorioResultados
         $fila = $consulta->fetch();
 
         return $fila === false ? null : $fila;
+    }
+
+    /**
+     * Análisis terminados del mismo proyecto anteriores a este, del más reciente al más antiguo,
+     * para elegir con cuál comparar. Pueden ser de otra dirección o alcance: la pantalla lo avisa.
+     *
+     * @param array<string, mixed> $analisis Fila de analisis()
+     * @return list<array<string, mixed>>
+     */
+    public function analisisParaComparar(array $analisis, int $limite = 100): array
+    {
+        $consulta = $this->bd->prepare(
+            "SELECT id, estado, creado_en, terminado_en, version_catalogo, url_normalizada, url_introducida, alcance
+             FROM analisis
+             WHERE proyecto_id = ? AND id < ? AND estado IN ('completado', 'parcial')
+             ORDER BY id DESC
+             LIMIT " . max(1, min(500, $limite))
+        );
+        $consulta->execute([$analisis['proyecto_id'], $analisis['id']]);
+
+        return $consulta->fetchAll();
     }
 
     /**
