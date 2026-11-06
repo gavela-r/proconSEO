@@ -35,6 +35,7 @@
         "demo": "@php bin/migrar.php --demo",
         "servidor": "@php -S localhost:8090 -t public",
         "worker": "@php bin/worker.php",
+        "comprobar": "@php bin/comprobar.php",
         "interruptor": "@php bin/interruptor.php",
         "auditoria": "@php bin/auditoria.php",
         "psalm": "psalm --no-progress && psalm --taint-analysis --ignore-baseline --no-progress",
