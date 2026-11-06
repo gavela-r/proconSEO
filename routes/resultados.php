@@ -6,6 +6,7 @@ use ProconSEO\Results\BorradoAnalisis;
 use ProconSEO\Results\ComparacionAnalisis;
 use ProconSEO\Results\CompromisosKitDigital;
 use ProconSEO\Results\FiltroResultados;
+use ProconSEO\Results\Glosario;
 use ProconSEO\Results\Informe;
 use ProconSEO\Results\RepositorioResultados;
 use ProconSEO\Review\CapturaSegura;
@@ -35,6 +36,13 @@ return static function (Router $r): void {
             return null;
         }
     };
+
+    // Glosario de los términos técnicos que aparecen en los resultados.
+    $r->get('/glosario', static fn (): Respuesta => Respuesta::html(Vista::render('results/glosario', [
+        'titulo' => 'Glosario',
+        'estilos' => $estilos,
+        'glosario' => Glosario::comun(),
+    ])));
 
     // Dashboard del análisis en el orden de la especificación (4.4, RF-20, RF-21).
     $r->get('/analisis/{id}', static function (Peticion $p) use ($repo, $catalogo, $estilos): Respuesta {
