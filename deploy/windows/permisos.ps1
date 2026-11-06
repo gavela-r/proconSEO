@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Permisos de carpetas de proconSEO (SEG-13, docs/despliegue.md, sección 5).
 

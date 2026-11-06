@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Actualiza proconSEO a la última versión de main (docs/despliegue.md, sección 10).
 

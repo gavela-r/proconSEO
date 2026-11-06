@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Cortafuegos de salida de proconSEO con Windows Defender Firewall (SEG-12, docs/despliegue.md, sección 7).
 

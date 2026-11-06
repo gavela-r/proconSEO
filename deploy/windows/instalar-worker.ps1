@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Deja el worker de proconSEO como tarea programada de Windows: arranca con el servidor,
     se reinicia si falla y funciona aunque nadie haya iniciado sesión (docs/despliegue.md, sección 8).
