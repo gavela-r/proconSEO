@@ -46,7 +46,7 @@ extension=intl
 extension=mbstring
 extension=openssl
 extension=pdo_mysql
-extension=gd        ; opcional, para las capturas de las revisiones
+extension=gd        ; para las capturas de las revisiones humanas
 ```
 
 `dom`, `json` y `zlib` ya vienen activadas en PHP para Windows.
