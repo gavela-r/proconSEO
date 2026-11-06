@@ -60,6 +60,16 @@ final class Fabrica
         return new LanzadorAnalisis($this->repositorio(), $this->validador(), $this->catalogo(), $this->interruptor(), $this->auditoria());
     }
 
+    public function programaciones(): Programaciones
+    {
+        return new Programaciones($this->bd(), $this->lanzador());
+    }
+
+    public function avisos(): Avisos
+    {
+        return new Avisos($this->bd(), $this->catalogo());
+    }
+
     public function auditoria(): RegistroAuditoria
     {
         return new RegistroAuditoria($this->bd());

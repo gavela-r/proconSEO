@@ -36,3 +36,10 @@ legend { font-weight: 600; padding: 0 .25rem; }
     .fase { grid-template-columns: 1fr; }
     .fase__estado { text-align: left; }
 }
+
+/* Análisis programados y avisos */
+.programaciones, .avisos { list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: .75rem; }
+.programacion, .aviso-item { border: 1px solid var(--borde); border-left: 4px solid var(--primario); border-radius: var(--radio); padding: .75rem 1rem; }
+.programacion--pausada, .aviso-item--leido { border-left-color: var(--borde); }
+.programacion p, .aviso-item p { margin: .25rem 0; }
+.etiqueta-nuevo { display: inline-block; margin-left: .5rem; padding: .05rem .5rem; border-radius: var(--radio); background: var(--estado-problema); color: #fff; font-size: .8rem; font-weight: 700; }
