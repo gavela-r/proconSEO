@@ -78,11 +78,10 @@
       "cuando_aplica": "Solo en páginas de producto.",
       "condicion": "producto",
       "modo": "automatico",
-      "mvp": "no",
-      "motivo_no_mvp": "navegador",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
       "necesita": [
-        "pagina",
-        "navegador"
+        "pagina"
       ],
       "alcance_minimo": "url_individual",
       "wcag": [],
@@ -98,11 +97,10 @@
       "cuando_aplica": "Solo en páginas de producto.",
       "condicion": "producto",
       "modo": "automatico",
-      "mvp": "no",
-      "motivo_no_mvp": "navegador",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
       "necesita": [
-        "pagina",
-        "navegador"
+        "pagina"
       ],
       "alcance_minimo": "url_individual",
       "wcag": [],

@@ -103,11 +103,10 @@
       "cuando_aplica": "Siempre que la página se haya podido descargar.",
       "condicion": null,
       "modo": "automatico",
-      "mvp": "no",
-      "motivo_no_mvp": "ia",
+      "mvp": "parcial",
+      "motivo_no_mvp": null,
       "necesita": [
-        "pagina",
-        "ia"
+        "pagina"
       ],
       "alcance_minimo": "url_individual",
       "wcag": [
