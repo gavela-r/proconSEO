@@ -46,7 +46,7 @@ Requisitos: PHP 8.2 o superior (con curl, dom, intl, json, mbstring, openssl, pd
 7. En otra terminal, `composer worker`. Sin el worker, los análisis se quedan en cola y los programados no se lanzan.
 8. Tests: `composer test`
 
-Para instalarlo en el servidor de Proconsi: [docs/despliegue.md](docs/despliegue.md).
+Para instalarlo en el servidor de Proconsi (Windows, red local): [docs/despliegue.md](docs/despliegue.md). Costes, servidor necesario y tiempos: [docs/costes-y-rendimiento.md](docs/costes-y-rendimiento.md).
 
 **Windows y HTTPS.** PHP en Windows no trae la lista de autoridades de certificación, así que rechaza todos los HTTPS (es lo seguro). Descarga `cacert.pem` de https://curl.se/ca/cacert.pem, comprueba su huella SHA-256 con https://curl.se/ca/cacert.pem.sha256 y apunta a él en `php.ini`:
 

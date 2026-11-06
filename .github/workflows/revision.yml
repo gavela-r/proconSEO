@@ -64,3 +64,31 @@ jobs:
         run: vendor/bin/psalm --no-progress --output-format=github
       - name: Psalm (inyección SQL, XSS y otros datos sin limpiar)
         run: vendor/bin/psalm --taint-analysis --ignore-baseline --no-progress --output-format=github
+
+  windows:
+    # El servidor de Proconsi es Windows: se prueba ahí también. GitHub no ofrece MySQL como
+    # servicio en Windows, así que los tests que necesitan base de datos se saltan aquí (los
+    # hace el trabajo de Linux de arriba).
+    name: Windows (sin base de datos)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, dom, gd, intl, json, mbstring, openssl, pdo_mysql
+          coverage: none
+      - run: composer install --no-interaction --no-progress
+      - name: Tests
+        run: vendor/bin/phpunit
+      - name: Scripts de PowerShell y web.config sin errores de sintaxis
+        shell: pwsh
+        run: |
+          $mal = 0
+          foreach ($f in Get-ChildItem deploy/windows/*.ps1) {
+            $t = $null; $e = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$t, [ref]$e)
+            foreach ($x in $e) { Write-Output "::error file=$($f.Name),line=$($x.Extent.StartLineNumber)::$($x.Message)"; $mal++ }
+          }
+          [xml](Get-Content public/web.config -Raw) | Out-Null
+          if ($mal -gt 0) { exit 1 }
