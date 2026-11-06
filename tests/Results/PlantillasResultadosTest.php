@@ -210,12 +210,16 @@ final class PlantillasResultadosTest extends TestCase
             'informe' => new Informe($ahora, [], [], null),
             'eventos' => [],
             'conKitDigital' => false,
-            'anterior' => ['id' => 7, 'estado' => 'completado', 'creado_en' => '2026-10-01 10:00:00', 'terminado_en' => '2026-10-01 10:05:00', 'version_catalogo' => '1.1.0'],
+            'anterior' => $anterior = ['id' => 7, 'estado' => 'completado', 'creado_en' => '2026-10-01 10:00:00', 'terminado_en' => '2026-10-01 10:05:00', 'version_catalogo' => '1.1.0', 'url_normalizada' => 'https://ejemplo.es/', 'url_introducida' => 'https://ejemplo.es/', 'alcance' => 'url_individual'],
             'comparacion' => new \ProconSEO\Results\ComparacionAnalisis($antes, $ahora),
+            'candidatos' => [$anterior, ['id' => 3, 'estado' => 'completado', 'creado_en' => '2026-08-01 10:00:00', 'terminado_en' => null, 'version_catalogo' => '1.0.0', 'url_normalizada' => 'https://ejemplo.es/' . self::MALICIOSO, 'url_introducida' => 'https://ejemplo.es/', 'alcance' => 'sitio_completo']],
         ], false);
 
         $this->assertSinHtmlInyectado($html);
-        self::assertStringContainsString('Cambios desde el análisis anterior', $html);
+        self::assertStringContainsString('Cambios desde un análisis anterior', $html);
+        self::assertStringContainsString('<option value="7" selected>', $html, 'Se puede elegir con cuál comparar');
+        self::assertStringContainsString('<option value="3"', $html);
+        self::assertStringNotContainsString('otra dirección', $html, 'Es la misma dirección');
         self::assertStringContainsString('href="/analisis/7"', $html);
         self::assertStringContainsString('Arreglados (1)', $html);
         self::assertStringContainsString('Nuevos (1)', $html);
@@ -228,13 +232,16 @@ final class PlantillasResultadosTest extends TestCase
     public function testSiNadaSePudoComprobarNoDiceQueNoHayaCambiado(): void
     {
         $nv = [Filas::resultado(['estado' => 'no_verificable'])];
+        $anterior = ['id' => 7, 'creado_en' => '2026-10-01 10:00:00', 'terminado_en' => null, 'version_catalogo' => null, 'url_normalizada' => 'https://otra.es/', 'url_introducida' => 'https://otra.es/', 'alcance' => 'url_individual'];
         $html = Vista::render('results/_cambios', [
-            'anterior' => ['id' => 7, 'creado_en' => '2026-10-01 10:00:00', 'terminado_en' => null, 'version_catalogo' => null],
+            'analisis' => Filas::analisis(),
+            'anterior' => $anterior,
             'comparacion' => new \ProconSEO\Results\ComparacionAnalisis($nv, $nv),
-            'versionCatalogo' => null,
+            'candidatos' => [$anterior],
         ], false);
 
         self::assertStringContainsString('No se puede comparar', $html);
+        self::assertStringContainsString('otra dirección', $html, 'Avisa de que es otra dirección');
         self::assertStringNotContainsString('No ha cambiado nada', $html);
     }
 

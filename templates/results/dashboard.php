@@ -9,6 +9,7 @@
  * @var bool $conKitDigital
  * @var array<string, mixed>|null $anterior
  * @var \ProconSEO\Results\ComparacionAnalisis|null $comparacion
+ * @var list<array<string, mixed>> $candidatos Análisis anteriores del proyecto con los que se puede comparar
  */
 
 use ProconSEO\Projects\Formato;
@@ -125,9 +126,9 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
     </div>
 </section>
 
-<?php if (($comparacion ?? null) !== null && ($anterior ?? null) !== null): ?>
+<?php if (($candidatos ?? []) !== []): ?>
     <!-- Cambios desde el análisis anterior de la misma dirección -->
-    <?= Vista::render('results/_cambios', ['anterior' => $anterior, 'comparacion' => $comparacion, 'versionCatalogo' => $analisis['version_catalogo']], false) ?>
+    <?= Vista::render('results/_cambios', ['analisis' => $analisis, 'anterior' => $anterior ?? null, 'comparacion' => $comparacion ?? null, 'candidatos' => $candidatos], false) ?>
 <?php endif; ?>
 
 <!-- Filtros y búsqueda por texto (RF-23). Sin JavaScript: es un formulario GET normal. -->
