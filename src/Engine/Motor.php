@@ -29,6 +29,7 @@ use ProconSEO\Engine\Comprobaciones\PermisoRobots;
 use ProconSEO\Engine\Comprobaciones\ProductoCoherente;
 use ProconSEO\Engine\Comprobaciones\Redirecciones;
 use ProconSEO\Engine\Comprobaciones\RespuestaUtilizable;
+use ProconSEO\Engine\Extraccion\HuellaPagina;
 use ProconSEO\Engine\Seguridad\DetectorInstrucciones;
 use ProconSEO\Shared\Contract\BorradorResultado;
 use ProconSEO\Shared\Contract\ConsolidadorSitio;
@@ -204,6 +205,7 @@ final class Motor implements MotorAnalisis, ConsolidadorSitio
         }
         try {
             $doc = $entorno->documento();
+            $palabras = HuellaPagina::palabras(HuellaPagina::textoPrincipal($doc->dom));
             $corto = static fn (array $textos, int $largo): array => array_map(static fn (string $t): string => mb_substr($t, 0, $largo), array_slice($textos, 0, 5));
             return new ResumenPagina(
                 url: $entorno->url(),
@@ -213,6 +215,9 @@ final class Motor implements MotorAnalisis, ConsolidadorSitio
                 descripciones: $corto($doc->metasPorNombre('description'), 500),
                 canonical: $doc->canonicos[0] ?? null,
                 enlacesInternos: array_slice($entorno->enlacesInternos(), 0, ResumenPagina::MAXIMO_ENLACES),
+                huellaTexto: HuellaPagina::huella($palabras),
+                palabrasTexto: count($palabras),
+                menu: HuellaPagina::menu($doc->dom, $doc->urlBase, $entorno->esInterna(...), ResumenPagina::MAXIMO_MENU),
             );
         } catch (Throwable) {
             // Sin resumen, la página no entra en las comparaciones del sitio; no rompe el análisis.

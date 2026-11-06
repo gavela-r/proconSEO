@@ -6,20 +6,22 @@ namespace ProconSEO\Engine\Comprobaciones;
 
 use ProconSEO\Engine\Comprobacion;
 use ProconSEO\Engine\Entorno;
+use ProconSEO\Engine\Extraccion\HuellaPagina;
 use ProconSEO\Engine\NoVerificable;
 use ProconSEO\Engine\Valoracion;
 use ProconSEO\Shared\Contract\BorradorResultado;
 use ProconSEO\Shared\Contract\ResumenPagina;
 use ProconSEO\Shared\Enum\Alcance;
 use ProconSEO\Shared\Enum\Cobertura;
+use ProconSEO\Shared\Enum\Gravedad;
 use ProconSEO\Shared\Enum\TipoConclusion;
 use ProconSEO\Shared\Enum\TipoEvidencia;
 use RuntimeException;
 
 /**
  * Comprobaciones que comparan las páginas de un sitio completo entre sí (ConsolidadorSitio):
- * SEO-03.title-duplicado, SEO-04.description-duplicada, IA-08.enlazado-interno y
- * SEO-08.parametros-variantes.
+ * SEO-03.title-duplicado, SEO-04.description-duplicada, IA-08.enlazado-interno,
+ * SEO-08.parametros-variantes, SEO-08.contenido-duplicado y ACC-11.navegacion-coherente.
  *
  * - En cada página (evaluar) no se pueden valorar: con sitio completo se dejan para el final y,
  *   con otro alcance, quedan no_verificable por el alcance.
@@ -32,14 +34,24 @@ final class ComprobacionesSitio implements Comprobacion
     private const MAXIMO_GRUPOS = 20;
     private const MAXIMO_URLS = 10;
 
+    /** Palabras de texto principal que necesita una página para comparar su contenido. */
+    public const MINIMO_PALABRAS = 80;
+
+    /** Parte del texto compartida (estimada) a partir de la cual dos páginas dicen casi lo mismo. */
+    public const SIMILITUD_DUPLICADO = 0.85;
+
     public function subcomprobaciones(): array
     {
         return [
             'SEO-03.title-duplicado' => Cobertura::Implementada,
             'SEO-04.description-duplicada' => Cobertura::Implementada,
             'IA-08.enlazado-interno' => Cobertura::Implementada,
-            // El contenido igual se aproxima con el mismo title: comparar el texto necesita IA (SEO-08.contenido-duplicado).
+            // El contenido igual se aproxima con el mismo title; el texto lo compara SEO-08.contenido-duplicado.
             'SEO-08.parametros-variantes' => Cobertura::ParcialmenteImplementada,
+            // Sin IA: se comparan trozos de 5 palabras; las paráfrasis no se detectan.
+            'SEO-08.contenido-duplicado' => Cobertura::ParcialmenteImplementada,
+            // Sin navegador: se compara el orden en el HTML del primer menú, no el orden visual.
+            'ACC-11.navegacion-coherente' => Cobertura::ParcialmenteImplementada,
         ];
     }
 
@@ -66,6 +78,8 @@ final class ComprobacionesSitio implements Comprobacion
             'SEO-04.description-duplicada' => $this->repetidos($e->resultado($id), $resumenes, $e, 'description', static fn (ResumenPagina $r): ?string => $r->descripciones[0] ?? null),
             'IA-08.enlazado-interno' => $this->enlazado($e->resultado($id), $resumenes, $e),
             'SEO-08.parametros-variantes' => $this->variantes($e->resultado($id), $resumenes, $e),
+            'SEO-08.contenido-duplicado' => $this->contenidoDuplicado($e->resultado($id), $resumenes, $e),
+            'ACC-11.navegacion-coherente' => $this->navegacion($e->resultado($id), $resumenes, $e),
             default => throw new RuntimeException("Subcomprobación desconocida: $id"),
         };
     }
@@ -278,7 +292,7 @@ final class ComprobacionesSitio implements Comprobacion
             return $v->noAplicable('Ninguna página analizada tiene parámetros en la URL.');
         }
         $v->conclusion(TipoConclusion::Inferencia)
-            ->limitacion(self::limiteAnalizadas(count($resumenes)) . ' Que sean la misma página se deduce de que tienen la misma ruta y el mismo title; comparar el texto necesita IA (SEO-08.contenido-duplicado).');
+            ->limitacion(self::limiteAnalizadas(count($resumenes)) . ' Que sean la misma página se deduce de que tienen la misma ruta y el mismo title; el texto lo compara SEO-08.contenido-duplicado.');
         if ($problemas === []) {
             return $v->valor("$conParametros URL(s) con parámetros; todas declaran su canonical o noindex, o no se parecen a otra.")->correcto();
         }
@@ -288,5 +302,136 @@ final class ComprobacionesSitio implements Comprobacion
             ->consecuencia('Google puede indexar varias direcciones para el mismo contenido y repartir entre ellas la relevancia, o mostrar la versión con parámetros.')
             ->correccion('Declarar en cada variante con parámetros un canonical a la URL limpia, o no enlazar las variantes.')
             ->mejorable();
+    }
+
+    /**
+     * Páginas con casi el mismo texto principal (sin cabecera, menú ni pie), estimado con la
+     * huella MinHash de cada una.
+     *
+     * @param list<ResumenPagina> $resumenes
+     */
+    private function contenidoDuplicado(Valoracion $v, array $resumenes, Entorno $e): BorradorResultado
+    {
+        $paginas = array_values(array_filter(self::comparables($resumenes),
+            static fn (ResumenPagina $r): bool => $r->palabrasTexto >= self::MINIMO_PALABRAS && $r->huellaTexto !== []));
+        if (count($paginas) < 2) {
+            throw new NoVerificable('Hacen falta al menos dos páginas indexables con ' . self::MINIMO_PALABRAS . ' palabras de texto o más para comparar su contenido; hay ' . count($paginas) . '.');
+        }
+
+        // Grupos de páginas casi iguales (si A se parece a B y B a C, van juntas).
+        $grupo = array_keys($paginas);
+        $raiz = static function (int $i) use (&$grupo): int {
+            while ($grupo[$i] !== $i) {
+                $i = $grupo[$i];
+            }
+            return $i;
+        };
+        $maximo = [];
+        foreach ($paginas as $i => $a) {
+            foreach ($paginas as $j => $b) {
+                if ($j <= $i) {
+                    continue;
+                }
+                $similitud = HuellaPagina::similitud($a->huellaTexto, $b->huellaTexto);
+                if ($similitud >= self::SIMILITUD_DUPLICADO) {
+                    $grupo[$raiz($j)] = $raiz($i);
+                    $maximo[$i] = max($maximo[$i] ?? 0.0, $similitud);
+                    $maximo[$j] = max($maximo[$j] ?? 0.0, $similitud);
+                }
+            }
+        }
+        $grupos = [];
+        foreach (array_keys($maximo) as $i) {
+            $grupos[$raiz($i)][] = $i;
+        }
+        usort($grupos, static fn (array $x, array $y): int => count($y) <=> count($x));
+
+        $v->conclusion(TipoConclusion::Inferencia)
+            ->limitacion(self::limiteAnalizadas(count($resumenes)) . ' Se compara el texto principal (sin cabecera, menú ni pie) por trozos de 5 palabras, sin IA: dos textos que dicen lo mismo con otras palabras no se detectan. Las páginas con menos de ' . self::MINIMO_PALABRAS . ' palabras no se comparan.');
+        if ($grupos === []) {
+            return $v->valor(count($paginas) . ' páginas comparadas; ninguna tiene casi el mismo texto que otra.')->correcto();
+        }
+
+        $lineas = [];
+        foreach (array_slice($grupos, 0, self::MAXIMO_GRUPOS) as $n => $indices) {
+            $lineas[] = 'Grupo ' . ($n + 1) . ' (' . count($indices) . ' páginas):';
+            foreach (array_slice($indices, 0, self::MAXIMO_URLS) as $i) {
+                $lineas[] = '  ' . $paginas[$i]->url . ' (' . (int) round($maximo[$i] * 100.0) . ' % del texto en común)';
+            }
+            if (count($indices) > self::MAXIMO_URLS) {
+                $lineas[] = '  … y ' . (count($indices) - self::MAXIMO_URLS) . ' más';
+            }
+        }
+        $afectadas = array_sum(array_map('count', $grupos));
+        return $v->valor(count($grupos) . " grupo(s) de páginas con casi el mismo texto: $afectadas de " . count($paginas) . ' páginas comparadas.')
+            ->elemento($paginas[$grupos[0][0]]->url)
+            ->explicacion('Varias páginas dicen prácticamente lo mismo.')
+            ->evidencia($e->evidencia(TipoEvidencia::Texto, implode("\n", $lineas)))
+            ->consecuencia('Google elige una de ellas para mostrar y deja las demás fuera de los resultados; ninguna destaca para su búsqueda concreta.')
+            ->correccion('Escribir un texto propio para cada página (qué tiene de distinto ese servicio, producto o ciudad), unir las que sean la misma, o declarar en las copias un canonical a la principal.')
+            ->correccionCms([
+                'wordpress' => 'Suele pasar con páginas duplicadas desde una plantilla: reescribir el texto de cada una o redirigir las sobrantes con un plugin de redirecciones.',
+                'prestashop' => 'Revisar las descripciones de productos casi iguales (por ejemplo, tallas o colores) y usar combinaciones en vez de productos separados.',
+            ])
+            ->mejorable();
+    }
+
+    /**
+     * WCAG 3.2.3: el menú que se repite en varias páginas mantiene el mismo orden. Añadir o
+     * quitar opciones en alguna página no es un fallo; cambiar el orden de las comunes, sí.
+     *
+     * @param list<ResumenPagina> $resumenes
+     */
+    private function navegacion(Valoracion $v, array $resumenes, Entorno $e): BorradorResultado
+    {
+        $paginas = [];
+        foreach ($resumenes as $r) {
+            $url = self::normalizar($r->url);
+            if ($r->estadoHttp !== null && $r->estadoHttp >= 200 && $r->estadoHttp < 300 && count($r->menu) >= 2 && !isset($paginas[$url])) {
+                $paginas[$url] = ['url' => $r->url, 'menu' => array_map(self::normalizar(...), $r->menu)];
+            }
+        }
+        if (count($paginas) < 2) {
+            throw new NoVerificable('Hacen falta al menos dos páginas con menú para compararlas; hay ' . count($paginas) . '.');
+        }
+
+        // El orden de referencia es el menú que más se repite.
+        $veces = [];
+        foreach ($paginas as $p) {
+            $clave = implode("\n", $p['menu']);
+            $veces[$clave] = ($veces[$clave] ?? 0) + 1;
+        }
+        arsort($veces);
+        $referencia = explode("\n", array_key_first($veces));
+
+        $distintas = [];
+        foreach ($paginas as $p) {
+            $comunes = array_values(array_intersect($p['menu'], $referencia));
+            $esperado = array_values(array_intersect($referencia, $p['menu']));
+            if ($comunes !== $esperado) {
+                $distintas[] = $p;
+            }
+        }
+
+        $v->limitacion(self::limiteAnalizadas(count($resumenes)) . ' Se compara el orden en el HTML del primer menú de cada página (<nav>); sin navegador no se ve si el CSS lo cambia de sitio.');
+        if ($distintas === []) {
+            return $v->valor('El menú mantiene el mismo orden en las ' . count($paginas) . ' páginas con menú.')->correcto();
+        }
+
+        $nombre = static fn (string $url): string => parse_url($url, PHP_URL_PATH) ?: '/';
+        $lineas = ['Orden habitual: ' . implode(' · ', array_map($nombre, array_slice($referencia, 0, 15)))];
+        foreach (array_slice($distintas, 0, self::MAXIMO_GRUPOS) as $p) {
+            $lineas[] = $p['url'] . ': ' . implode(' · ', array_map($nombre, array_slice(array_values(array_intersect($p['menu'], $referencia)), 0, 15)));
+        }
+        return $v->valor(count($distintas) . ' de ' . count($paginas) . ' páginas tienen el menú en otro orden.')
+            ->elemento($distintas[0]['url'])
+            ->explicacion('El menú cambia de orden de una página a otra.')
+            ->evidencia($e->evidencia(TipoEvidencia::Texto, implode("\n", $lineas)))
+            ->consecuencia('Quien usa un lector de pantalla o tiene dificultades cognitivas se aprende el menú; si cambia de orden, se pierde y tiene que volver a recorrerlo entero.')
+            ->correccion('Usar el mismo menú, en el mismo orden, en todas las páginas. Se pueden añadir o quitar opciones según la sección, pero las comunes deben ir siempre en el mismo orden.')
+            ->correccionCms([
+                'wordpress' => 'Revisar en Apariencia > Menús que todas las plantillas usen el mismo menú (a veces la portada o la tienda tienen uno propio).',
+            ])
+            ->problema(Gravedad::Medio);
     }
 }
