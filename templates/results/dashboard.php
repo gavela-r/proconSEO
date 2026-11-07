@@ -91,6 +91,25 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
     <?php endif; ?>
 <?php else: ?>
 
+<!-- Índice de la página: con un sitio completo la página es larga y hay que poder saltar a cada parte. -->
+<nav class="indice" aria-label="En esta página">
+    <ul class="indice__secciones">
+        <li><a href="#t-resumen">Resumen</a></li>
+        <li><a href="#resultados">Filtrar</a></li>
+        <li><a href="#t-bloqueos">Bloqueos <span class="indice__n"><?= e(count($informe->bloqueos) + count($informe->recursosBloqueados)) ?></span></a></li>
+        <li><a href="#t-incidencias">Qué corregir <span class="indice__n"><?= e(count($informe->incidencias)) ?></span></a></li>
+        <li><a href="#t-correctos">Está bien <span class="indice__n"><?= e(count($informe->correctos) + count($informe->noAplicables)) ?></span></a></li>
+        <li><a href="#t-noverif">Sin comprobar <span class="indice__n"><?= e(count($informe->noVerificables)) ?></span></a></li>
+        <li><a href="#t-limites">Límites</a></li>
+    </ul>
+    <ul class="indice__bloques" aria-label="Ver solo un bloque">
+        <?php foreach (Bloque::cases() as $b): ?>
+            <li><a href="<?= e($enlace(['bloque' => $b->value])) ?>"<?= $filtro->bloque === $b ? ' aria-current="true"' : '' ?>>Solo <?= e($b->etiqueta()) ?></a></li>
+        <?php endforeach; ?>
+        <?php if ($filtrando): ?><li><a href="<?= e($enlace([])) ?>">Todo</a></li><?php endif; ?>
+    </ul>
+</nav>
+
 <!-- 2. Resumen por bloque y cobertura -->
 <section class="seccion" aria-labelledby="t-resumen">
     <h2 id="t-resumen">Resumen</h2>
@@ -117,14 +136,35 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
                     <?php endforeach; ?>
                 </ul>
                 <p class="bloque__cobertura">
-                    <?= e($plural($datos['total'], 'comprobación', 'comprobaciones')) ?>
+                    <?php if ($datos['comprobaciones'] === $datos['total']): ?>
+                        <?= e($plural($datos['total'], 'comprobación', 'comprobaciones')) ?>
+                    <?php else: ?>
+                        <?= e($plural($datos['total'], 'resultado', 'resultados')) ?> de <?= e($plural($datos['comprobaciones'], 'comprobación', 'comprobaciones')) ?> en varias páginas
+                    <?php endif; ?>
                     · <?= $datos['no_implementadas'] === 0 ? 'todas implementadas' : e($plural($datos['no_implementadas'], 'aún no implementada', 'aún no implementadas')) ?>
                     <?php if ($datos['pendientes'] > 0): ?> · <?= e($plural($datos['pendientes'], 'revisión pendiente', 'revisiones pendientes')) ?><?php endif; ?>
                 </p>
             </article>
         <?php endforeach; ?>
     </div>
+    <?php
+    // Seguimiento por hallazgo (comprobación), no por resultado: el mismo fallo en 40 páginas es uno.
+    $porSeguimiento = \ProconSEO\Results\Prioridades::seguimiento($informe);
+    $textosSeguimiento = ['pendiente' => ['pendiente', 'pendientes'], 'en_curso' => ['en curso', 'en curso'], 'corregido' => ['corregido', 'corregidos'], 'aceptado' => ['aceptado', 'aceptados']];
+    ?>
+    <?php if (array_diff(array_keys($porSeguimiento), ['pendiente']) !== []): ?>
+        <p class="seguimiento-resumen"><strong>Seguimiento de los hallazgos:</strong>
+            <?php foreach ($textosSeguimiento as $clave => [$uno, $varios]): ?>
+                <?php if (isset($porSeguimiento[$clave])): ?>
+                    <?php $n = $porSeguimiento[$clave]; ?>
+                    <a href="<?= e($enlace(['seguimiento' => $clave])) ?>"><?= e($n . ' ' . ($n === 1 ? $uno : $varios)) ?></a>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </p>
+    <?php endif; ?>
 </section>
+
+<?= Vista::render('results/_prioridades', ['prioridades' => \ProconSEO\Results\Prioridades::desde($informe)], false) ?>
 
 <?php if (($candidatos ?? []) !== []): ?>
     <!-- Cambios desde el análisis anterior de la misma dirección -->
@@ -164,15 +204,44 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
             <?php endforeach; ?>
         </select>
     </div>
+    <div>
+        <label for="f-responsable">Responsable</label>
+        <select id="f-responsable" name="responsable">
+            <option value="">Todos</option>
+            <?php foreach (\ProconSEO\Results\Responsable::ETIQUETAS as $valor => $texto): ?>
+                <option value="<?= e($valor) ?>"<?= $filtro->responsable === $valor ? ' selected' : '' ?>><?= e($texto) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div>
+        <label for="f-seguimiento">Seguimiento</label>
+        <select id="f-seguimiento" name="seguimiento">
+            <option value="">Todos</option>
+            <?php foreach (\ProconSEO\Results\FiltroResultados::SEGUIMIENTOS as $valor => $texto): ?>
+                <option value="<?= e($valor) ?>"<?= $filtro->seguimiento === $valor ? ' selected' : '' ?>><?= e($texto) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div>
+        <label for="f-nivel">Nivel WCAG</label>
+        <select id="f-nivel" name="nivel">
+            <option value="">Todos</option>
+            <?php foreach (\ProconSEO\Results\FiltroResultados::NIVELES as $valor => $texto): ?>
+                <option value="<?= e($valor) ?>"<?= $filtro->nivel === $valor ? ' selected' : '' ?>><?= e($texto) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
     <?php if (count($informe->urls) > 1): ?>
         <div>
             <label for="f-url">Página o recurso</label>
-            <select id="f-url" name="url">
-                <option value="">Todas</option>
+            <!-- Con muchas páginas un desplegable no se puede usar: se escribe parte de la dirección (/blog/) y se sugieren las que hay. -->
+            <input id="f-url" name="url" type="search" list="f-url-lista" maxlength="2048" placeholder="Toda o parte: /blog/" aria-describedby="f-url-ayuda" value="<?= e($filtro->url ?? '') ?>">
+            <span class="ayuda" id="f-url-ayuda"><?= e(count($informe->urls)) ?> páginas o recursos</span>
+            <datalist id="f-url-lista">
                 <?php foreach ($informe->urls as $u): ?>
-                    <option value="<?= e($u) ?>"<?= $filtro->url === $u ? ' selected' : '' ?>><?= e($u) ?></option>
+                    <option value="<?= e($u) ?>"></option>
                 <?php endforeach; ?>
-            </select>
+            </datalist>
         </div>
     <?php endif; ?>
     <label class="opcion"><input type="checkbox" name="pendiente" value="1"<?= $filtro->pendiente ? ' checked' : '' ?>><span>Solo con revisión pendiente</span></label>
@@ -197,17 +266,30 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
     <p class="seccion__ayuda">Lo que impide que la web se pueda descargar o aparecer en los buscadores. Va primero porque, mientras siga, lo demás importa menos.</p>
 
     <?php if ($informe->recursosBloqueados !== []): ?>
-        <p>La herramienta no pudo descargar:</p>
-        <ul>
-            <?php foreach ($informe->recursosBloqueados as $rec): ?>
-                <li>
-                    <span class="codigo"><?= e($rec['url']) ?></span> —
-                    <?= e(ResultadoDescarga::tryFrom((string) $rec['resultado'])?->etiqueta() ?? $rec['resultado']) ?>
-                    <?= $rec['estado_http'] !== null ? '(HTTP ' . e($rec['estado_http']) . ')' : '' ?>
-                    <?= $rec['motivo'] !== null ? '· ' . e($rec['motivo']) : '' ?>
-                </li>
+        <?php
+        $lineaRecurso = static fn (array $rec): string => '<span class="codigo">' . e($rec['url']) . '</span> — '
+            . e(ResultadoDescarga::tryFrom((string) $rec['resultado'])?->etiqueta() ?? $rec['resultado'])
+            . ($rec['estado_http'] !== null ? ' (HTTP ' . e($rec['estado_http']) . ')' : '')
+            . ($rec['motivo'] !== null ? ' · ' . e($rec['motivo']) : '');
+        $primeros = array_slice($informe->recursosBloqueados, 0, 8);
+        $resto = array_slice($informe->recursosBloqueados, 8);
+        ?>
+        <p>La herramienta no pudo descargar <?= e($plural(count($informe->recursosBloqueados), 'recurso', 'recursos')) ?>:</p>
+        <ul class="lista-recursos">
+            <?php foreach ($primeros as $rec): ?>
+                <li><?= $lineaRecurso($rec) ?></li>
             <?php endforeach; ?>
         </ul>
+        <?php if ($resto !== []): ?>
+            <details class="plegable">
+                <summary>Ver los otros <?= e(count($resto)) ?></summary>
+                <ul class="lista-recursos">
+                    <?php foreach ($resto as $rec): ?>
+                        <li><?= $lineaRecurso($rec) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </details>
+        <?php endif; ?>
         <p class="ayuda">Lo que dependía de estos recursos aparece como «No verificable»: no se dan por buenos ni por malos.</p>
     <?php endif; ?>
 
@@ -242,15 +324,13 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
     <h2 id="t-correctos">3. Lo que está bien o no aplica
         <span class="contador"><?= e($plural(count($informe->correctos), 'correcto', 'correctos')) ?> · <?= e($plural(count($informe->noAplicables), 'no aplicable', 'no aplicables')) ?></span>
     </h2>
+    <p class="seccion__ayuda">Una fila por comprobación: si está bien en 30 páginas, sale una vez con las 30.</p>
     <?php foreach (['correctos' => $informe->correctos, 'no aplicables' => $informe->noAplicables] as $nombre => $lista): ?>
         <?php if ($lista !== []): ?>
+            <?php $grupos = \ProconSEO\Results\Informe::agrupar($lista); ?>
             <details class="plegable">
-                <summary>Ver <?= count($lista) === 1 ? 'el 1 ' . e(rtrim($nombre, 's')) : 'los ' . e(count($lista)) . ' ' . e($nombre) ?></summary>
-                <ul class="resultados">
-                    <?php foreach ($lista as $r): ?>
-                        <li><?= Vista::render('results/_resultado', ['r' => $r], false) ?></li>
-                    <?php endforeach; ?>
-                </ul>
+                <summary>Ver <?= count($lista) === 1 ? 'el 1 ' . e(rtrim($nombre, 's')) : 'los ' . e(count($lista)) . ' ' . e($nombre) ?> (<?= e($plural(count($grupos), 'comprobación', 'comprobaciones')) ?>)</summary>
+                <?= Vista::render('results/_tabla_grupos', ['grupos' => $grupos, 'motivo' => $nombre === 'no aplicables' ? ['titulo' => 'Por qué no aplica', 'campo' => 'explicacion_sencilla'] : null], false) ?>
             </details>
         <?php endif; ?>
     <?php endforeach; ?>
@@ -265,11 +345,26 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
     <?php if ($informe->noVerificables === []): ?>
         <p class="vacio"><?= $filtrando ? 'Ningún no verificable coincide con los filtros.' : 'Ningún resultado de este análisis ha quedado como no verificable.' ?></p>
     <?php else: ?>
-        <ul class="resultados">
-            <?php foreach ($informe->noVerificables as $r): ?>
-                <li><?= Vista::render('results/_resultado', ['r' => $r], false) ?></li>
-            <?php endforeach; ?>
-        </ul>
+        <?php
+        // Primero lo que espera a una persona (tarjetas con su botón); el resto, en una tabla con el porqué.
+        $gruposNv = \ProconSEO\Results\Informe::agrupar($informe->noVerificables);
+        $porRevisar = array_values(array_filter($gruposNv, static fn (array $g): bool => (bool) $g['principal']['revision_pendiente']));
+        $sinRevisar = array_values(array_filter($gruposNv, static fn (array $g): bool => !$g['principal']['revision_pendiente']));
+        ?>
+        <?php if ($porRevisar !== []): ?>
+            <h3 class="subtitulo">Esperan a que una persona lo revise <span class="contador"><?= e($plural(count($porRevisar), 'comprobación', 'comprobaciones')) ?></span></h3>
+            <ul class="resultados">
+                <?php foreach ($porRevisar as $g): ?>
+                    <li><?= Vista::render('results/_resultado', ['r' => $g['principal'], 'repetidos' => $g['paginas'] > 1 ? $g['resultados'] : null], false) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+        <?php if ($sinRevisar !== []): ?>
+            <details class="plegable"<?= $porRevisar === [] ? ' open' : '' ?>>
+                <summary>Lo demás que no se pudo comprobar (<?= e($plural(count($sinRevisar), 'comprobación', 'comprobaciones')) ?>)</summary>
+                <?= Vista::render('results/_tabla_grupos', ['grupos' => $sinRevisar, 'motivo' => ['titulo' => 'Por qué no se pudo', 'campo' => 'limitacion']], false) ?>
+            </details>
+        <?php endif; ?>
     <?php endif; ?>
 </section>
 
@@ -286,6 +381,18 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
             <li>
                 <strong>Fase «<?= e(Fase::tryFrom((string) $f['fase'])?->etiqueta() ?? $f['fase']) ?>»: <?= e(mb_strtolower(EstadoFase::tryFrom((string) $f['estado'])?->etiqueta() ?? (string) $f['estado'])) ?>.</strong>
                 <?= $f['mensaje'] !== null ? e($f['mensaje']) : '' ?>
+            </li>
+        <?php endforeach; ?>
+        <?php foreach ($informe->fueraDeAmbito as $fuera): ?>
+            <li>
+                <strong>No se siguieron <?= e($plural($fuera['total'], 'enlace', 'enlaces')) ?> a <span class="codigo"><?= e($fuera['host']) ?></span></strong>, porque no está entre los sitios autorizados del análisis.
+                No es un error: se dejó fuera a propósito. Si es la misma web (por ejemplo, con y sin «www»), añádelo a los sitios autorizados del proyecto y vuelve a analizar.
+                <details class="plegable plegable--dentro">
+                    <summary>Ejemplos</summary>
+                    <ul>
+                        <?php foreach ($fuera['ejemplos'] as $u): ?><li class="codigo"><?= e($u) ?></li><?php endforeach; ?>
+                    </ul>
+                </details>
             </li>
         <?php endforeach; ?>
         <?php foreach ($informe->recursosNoEncontrados as $rec): ?>
@@ -306,8 +413,8 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
         <details class="plegable">
             <summary><?= e($plural(count($informe->noImplementadas), 'comprobación que la herramienta todavía no hace', 'comprobaciones que la herramienta todavía no hace')) ?></summary>
             <ul class="resultados">
-                <?php foreach ($informe->noImplementadas as $r): ?>
-                    <li><?= Vista::render('results/_resultado', ['r' => $r], false) ?></li>
+                <?php foreach (\ProconSEO\Results\Informe::agrupar($informe->noImplementadas) as $g): ?>
+                    <li><?= Vista::render('results/_resultado', ['r' => $g['principal'], 'repetidos' => $g['paginas'] > 1 ? $g['resultados'] : null], false) ?></li>
                 <?php endforeach; ?>
             </ul>
         </details>

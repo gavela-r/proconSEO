@@ -9,6 +9,7 @@
  * @var array<string, mixed>|null $analisis
  * @var list<array<string, mixed>> $evidencias
  * @var list<array<string, mixed>> $revisiones
+ * @var list<array<string, mixed>> $otrasPaginas la misma comprobación en otras páginas del análisis
  */
 
 use ProconSEO\Projects\Formato;
@@ -31,6 +32,15 @@ $esfuerzo = Esfuerzo::tryFrom((string) $r['esfuerzo']);
 $titulo = $ficha?->nombre ?? (string) $r['id_comprobacion'];
 $esPrueba = $r['es_dato_prueba'] || ($analisis !== null && ($analisis['es_dato_prueba'] || $analisis['proyecto_es_dato_prueba']));
 $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) === '';
+/** @var list<array<string, mixed>> $otrasPaginas */
+$otrasPaginas = is_array($otrasPaginas ?? null) ? $otrasPaginas : [];
+// Anterior y siguiente: las páginas con esta misma comprobación, por orden de dirección.
+$recorrido = array_merge($otrasPaginas, [$r]);
+usort($recorrido, static fn (array $a, array $b): int => [(string) $a['url_recurso'], (int) $a['id']] <=> [(string) $b['url_recurso'], (int) $b['id']]);
+$posicion = (int) array_search((int) $r['id'], array_map(static fn (array $o): int => (int) $o['id'], $recorrido), true);
+$previo = $posicion > 0 ? $recorrido[$posicion - 1] : null;
+$siguiente = $recorrido[$posicion + 1] ?? null;
+$mismoEstado = count(array_filter($otrasPaginas, static fn (array $o): bool => $o['estado_vigente'] === $r['estado_vigente']));
 ?>
 <?php if ($esPrueba): ?>
     <?= Vista::render('layout/aviso_prueba', [], false) ?>
@@ -66,7 +76,7 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
     <?php endif; ?>
 </div>
 <?php if ($revisado ?? false): ?>
-    <p class="aviso aviso--info" role="status"><strong>Revisión guardada.</strong> El resultado original se conserva y la revisión aparece en el historial.</p>
+    <p class="aviso aviso--info" role="status"><strong>Revisión guardada.</strong> El resultado original se conserva y la revisión aparece en el historial.<?php if (($enBloque ?? 0) > 0): ?> También se ha aplicado a <?= e($enBloque) ?> páginas más con el mismo resultado.<?php endif; ?></p>
 <?php endif; ?>
 <h1><?= e($titulo) ?></h1>
 <p class="explicacion"><?= \ProconSEO\Results\Glosario::comun()->enlazar($r['explicacion_sencilla']) ?></p>
@@ -96,9 +106,43 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
                         <?php if ($ev['url_recurso'] !== null): ?><span class="codigo"><?= e($ev['url_recurso']) ?></span><?php endif; ?>
                         <span>capturada el <?= e(Formato::fecha((string) $ev['capturado_en'])) ?></span>
                         <?php if ($ev['truncado']): ?><span>· recortada</span><?php endif; ?>
+                        <?php if ($ev['contenido'] !== null): ?>
+                            <button type="button" class="boton boton--secundario boton--pequeno evidencia__copiar" data-copiar="#ev-<?= e($ev['codigo']) ?>">Copiar<span class="solo-lectores"> la evidencia <?= e($ev['codigo']) ?></span></button>
+                        <?php endif; ?>
                     </div>
-                    <?php if ($ev['contenido'] !== null): ?>
-                        <pre><code><?= e($ev['contenido']) ?></code></pre>
+                    <?php $contrastes = $ev['contenido'] !== null ? \ProconSEO\Results\LecturaContraste::filas((string) $ev['contenido']) : []; ?>
+                    <?php if ($contrastes !== []): ?>
+                        <?php
+                        $n = \ProconSEO\Results\LecturaContraste::numero(...);
+                        $muestra = static function (string $color): string {
+                            $seguro = \ProconSEO\Results\LecturaContraste::colorSeguro($color);
+
+                            return $seguro === null ? '' : '<svg class="muestra-color" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><rect x=".5" y=".5" width="15" height="15" rx="2" fill="' . e($seguro) . '" stroke="#5c6470"/></svg>';
+                        };
+                        ?>
+                        <div class="tabla-desplazable">
+                            <table class="tabla-contraste">
+                                <caption class="solo-lectores">Textos con contraste insuficiente</caption>
+                                <thead><tr><th scope="col">Elemento</th><th scope="col">Texto</th><th scope="col">Fondo</th><th scope="col">Contraste</th><th scope="col">Exigido</th></tr></thead>
+                                <tbody>
+                                    <?php foreach ($contrastes as $c): ?>
+                                        <tr>
+                                            <th scope="row"><span class="codigo"><?= e($c['selector']) ?></span><span class="tabla-contraste__nota"><?= e($n($c['tamano'])) ?> px<?= $c['negrita'] ? ', negrita' : '' ?><?= $c['veces'] > 1 ? ' · ' . e($c['veces']) . ' veces' : '' ?></span></th>
+                                            <td><?= $muestra($c['texto']) ?> <span class="codigo"><?= e($c['texto']) ?></span></td>
+                                            <td><?= $muestra($c['fondo']) ?> <span class="codigo"><?= e($c['fondo']) ?></span></td>
+                                            <td><strong><?= e($n($c['contraste'])) ?>:1</strong></td>
+                                            <td><?= e($n($c['exigido'])) ?>:1</td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <details class="plegable plegable--dentro">
+                            <summary>Ver la evidencia original de Google (en inglés)</summary>
+                            <pre id="ev-<?= e($ev['codigo']) ?>"><code><?= e($ev['contenido']) ?></code></pre>
+                        </details>
+                    <?php elseif ($ev['contenido'] !== null): ?>
+                        <pre id="ev-<?= e($ev['codigo']) ?>"><code><?= e($ev['contenido']) ?></code></pre>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
@@ -126,6 +170,23 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
                     <h3>En el gestor de contenidos</h3>
                     <p><?= e($r['correccion_cms']) ?></p>
                 <?php endif; ?>
+                <?php
+                // Texto listo para pegar en Jira, Trello o un correo. Sin integraciones: no sale nada
+                // de la herramienta (SEG-10, SEG-17); solo se copia al portapapeles.
+                $tarea = array_filter([
+                    '[' . (($estado === 'problema' ? \ProconSEO\Shared\Enum\Gravedad::tryFrom((string) $r['gravedad'])?->etiqueta() : null) ?? Etiquetas::estado($estado)) . '] ' . $titulo . ($r['url_recurso'] !== null ? ' — ' . $r['url_recurso'] : ''),
+                    $sinTexto($r['explicacion_sencilla']) ? null : 'Qué pasa: ' . trim((string) $r['explicacion_sencilla']),
+                    $sinTexto($r['elemento']) ? null : 'Dónde: ' . trim((string) $r['elemento']),
+                    $sinTexto($r['correccion']) ? null : 'Cómo corregirlo: ' . trim((string) $r['correccion']),
+                    $sinTexto($r['correccion_cms']) ? null : 'En el gestor de contenidos: ' . trim((string) $r['correccion_cms']),
+                    'Detectado con proconSEO' . ($analisis !== null ? ' el ' . Formato::fecha((string) $analisis['creado_en']) : '') . ' (' . $r['id_comprobacion'] . ').',
+                ]);
+                ?>
+                <p class="tarea">
+                    <button type="button" class="boton boton--secundario boton--pequeno" data-copiar="#tarea-<?= e($r['id']) ?>">Copiar como tarea</button>
+                    <span class="meta">Para pegarla en Jira, Trello o un correo.</span>
+                </p>
+                <span hidden id="tarea-<?= e($r['id']) ?>" data-texto="<?= e(implode("\n", $tarea)) ?>"></span>
             </section>
         <?php endif; ?>
 
@@ -139,6 +200,40 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
                 <p><strong>Necesita revisión humana<?= $r['motivo_revision'] !== null ? ':' : '.' ?></strong> <?= e($r['motivo_revision'] ?? '') ?></p>
             <?php endif; ?>
         </section>
+
+        <?php if ($otrasPaginas !== []): ?>
+            <section class="seccion" aria-labelledby="t-otras">
+                <h2 id="t-otras">En otras páginas</h2>
+                <p>
+                    Esta comprobación se ha hecho en <?= e(count($otrasPaginas) + 1) ?> páginas.
+                    <?php if ($mismoEstado > 0): ?>
+                        En <?= e($mismoEstado) ?> más está igual (<?= e(mb_strtolower(Etiquetas::estado($estado))) ?>)<?= in_array($estado, ['problema', 'mejorable', 'decision_revisar'], true) ? ': si comparten plantilla, se arregla una vez' : '' ?>.
+                    <?php else: ?>
+                        En las demás tiene otro estado.
+                    <?php endif; ?>
+                </p>
+                <nav class="recorrido" aria-label="Esta comprobación en otras páginas">
+                    <?php if ($previo !== null): ?><a href="/resultados/<?= e($previo['id']) ?>" rel="prev">← Página anterior<span class="solo-lectores">: <?= e($previo['url_recurso'] ?? '') ?></span></a><?php endif; ?>
+                    <span class="recorrido__posicion"><?= e($posicion + 1) ?> de <?= e(count($recorrido)) ?></span>
+                    <?php if ($siguiente !== null): ?><a href="/resultados/<?= e($siguiente['id']) ?>" rel="next">Página siguiente<span class="solo-lectores">: <?= e($siguiente['url_recurso'] ?? '') ?></span> →</a><?php endif; ?>
+                </nav>
+                <details class="repeticion__paginas">
+                    <summary>Ver las <?= e(count($recorrido)) ?> páginas con su estado</summary>
+                    <ul class="otras-paginas">
+                        <?php foreach ($recorrido as $o): ?>
+                            <li>
+                                <span class="estado estado--<?= e($o['estado_vigente']) ?>"><?= \ProconSEO\Results\Iconos::estado((string) $o['estado_vigente']) ?><?= e(Etiquetas::estado((string) $o['estado_vigente'])) ?></span>
+                                <?php if ((int) $o['id'] === (int) $r['id']): ?>
+                                    <span class="codigo" aria-current="page"><?= e($o['url_recurso'] ?? '') ?> (esta)</span>
+                                <?php else: ?>
+                                    <a class="codigo" href="/resultados/<?= e($o['id']) ?>"><?= e($o['url_recurso'] ?? '') ?></a>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </details>
+            </section>
+        <?php endif; ?>
 
         <?php if ($ficha !== null): ?>
             <section class="seccion" aria-labelledby="t-criterio">
@@ -181,6 +276,17 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
             <p><a class="boton" href="/resultados/<?= e($r['id']) ?>/revisar">Revisar este resultado</a></p>
             <p class="ayuda">El resultado original nunca se modifica: cada revisión se guarda aparte, con su autor y su justificación.</p>
         </section>
+
+        <?php if (in_array($estado, ['problema', 'mejorable', 'decision_revisar'], true) && $analisis !== null): ?>
+            <?= Vista::render('results/_seguimiento', [
+                'r' => $r,
+                'seguimiento' => $seguimiento ?? null,
+                'historial' => $historialSeguimiento ?? [],
+                'error' => $errorSeguimiento ?? null,
+                'valores' => $valoresSeguimiento ?? [],
+                'guardado' => $seguimientoGuardado ?? false,
+            ], false) ?>
+        <?php endif; ?>
 
         <section class="panel panel--separado" aria-labelledby="t-tecnico">
             <h2 id="t-tecnico">Datos técnicos</h2>

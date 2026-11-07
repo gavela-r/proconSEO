@@ -8,6 +8,7 @@ use ProconSEO\Results\RepositorioResultados;
 use ProconSEO\Review\CapturaSegura;
 use ProconSEO\Review\DatosRevision;
 use ProconSEO\Review\RepositorioRevisiones;
+use ProconSEO\Review\RevisionEnBloque;
 use ProconSEO\Run\Fabrica;
 use ProconSEO\Run\RegistroAuditoria;
 use ProconSEO\Shared\BaseDatos;
@@ -46,7 +47,13 @@ return static function (Router $r): void {
         ];
     };
 
-    $formulario = static function (Peticion $p, array $valores = [], array $errores = [], int $estado = 200) use ($resultado, $estilos): Respuesta {
+    // La misma comprobación, con el mismo estado y sin revisar, en las otras páginas del análisis:
+    // a esas se les puede aplicar la misma revisión de una vez (p. ej. 28 páginas con la misma plantilla).
+    $iguales = static function (array $fila): array {
+        return RevisionEnBloque::iguales((new RepositorioResultados(BaseDatos::conexion()))->resultados((int) $fila['analisis_id']), $fila);
+    };
+
+    $formulario = static function (Peticion $p, array $valores = [], array $errores = [], int $estado = 200) use ($resultado, $estilos, $iguales): Respuesta {
         [$fila, $analisis, $evidencias, $revisiones] = $resultado($p);
 
         return Respuesta::html(Vista::render('results/revision', [
@@ -61,27 +68,38 @@ return static function (Router $r): void {
             'decisiones' => DecisionRevision::opciones(),
             'estados' => EstadoResultado::opciones(),
             'maxCaptura' => CapturaSegura::MAX_BYTES,
+            'iguales' => count($iguales($fila)),
         ]), $estado);
     };
 
     $r->get('/resultados/{id}/revisar', static fn (Peticion $p): Respuesta => $formulario($p));
 
     // Solo inserta: el resultado original nunca se modifica (RF-42).
-    $r->post('/resultados/{id}/revisiones', static function (Peticion $p) use ($resultado, $formulario, $capturas): Respuesta {
+    $r->post('/resultados/{id}/revisiones', static function (Peticion $p) use ($resultado, $formulario, $capturas, $iguales): Respuesta {
         [$fila, $analisis] = $resultado($p);
         $valores = array_map(
             static fn (mixed $v): string => is_string($v) ? $v : '',
-            array_intersect_key($p->cuerpo, array_flip(['revisor', 'motivo', 'decision', 'nuevo_estado', 'justificacion', 'evidencia_texto'])),
+            array_intersect_key($p->cuerpo, array_flip(['revisor', 'motivo', 'decision', 'nuevo_estado', 'justificacion', 'evidencia_texto', 'aplicar_iguales'])),
         );
 
         // $_FILES no pasa por Peticion (Parte 0): se lee aquí y se valida en CapturaSegura.
         $fichero = $_FILES['captura'] ?? null;
         $almacen = $capturas();
         $captura = null;
+        $enBloque = 0;
         try {
             $captura = $almacen->guardar($fichero, 'analisis-' . (int) $fila['analisis_id']);
             $datos = DatosRevision::desdeFormulario($p->cuerpo, (string) $fila['estado_vigente'], $captura !== null);
-            $revisionId = (new RepositorioRevisiones(BaseDatos::conexion()))->guardar((int) $fila['id'], (int) $fila['analisis_id'], $datos, $captura);
+            $revisiones = new RepositorioRevisiones(BaseDatos::conexion());
+            $revisionId = $revisiones->guardar((int) $fila['id'], (int) $fila['analisis_id'], $datos, $captura);
+            // Revisar en bloque: la misma decisión y justificación en las otras páginas iguales y sin revisar.
+            // Cada una lleva su propia revisión (el original nunca se toca); la captura solo va en la primera.
+            if ($p->entrada('aplicar_iguales') === '1') {
+                foreach ($iguales($fila) as $otra) {
+                    $revisiones->guardar((int) $otra['id'], (int) $fila['analisis_id'], $datos, null);
+                    $enBloque++;
+                }
+            }
         } catch (ErroresFormulario $e) {
             $borrar = $captura !== null ? $almacen->rutaAbsoluta($captura['ruta']) : null;
             if ($borrar !== null) {
@@ -110,10 +128,11 @@ return static function (Router $r): void {
             Fabrica::ipOrigen(),
             null,
             null,
-            "Revisión {$revisionId} de {$fila['id_comprobacion']}: {$datos->decision->value}" . ($datos->nuevoEstado !== null ? " → {$datos->nuevoEstado->value}" : ''),
+            "Revisión {$revisionId} de {$fila['id_comprobacion']}: {$datos->decision->value}" . ($datos->nuevoEstado !== null ? " → {$datos->nuevoEstado->value}" : '')
+                . ($enBloque > 0 ? " (y en {$enBloque} páginas más con el mismo resultado)" : ''),
         );
 
-        return Respuesta::redirigir('/resultados/' . (int) $fila['id'] . '?revisado=1#t-revision');
+        return Respuesta::redirigir('/resultados/' . (int) $fila['id'] . '?revisado=1' . ($enBloque > 0 ? '&en_bloque=' . $enBloque : '') . '#t-revision');
     });
 
     // Captura añadida por un revisor. Se sirve desde fuera de public/ y solo si es una captura guardada por la aplicación.
