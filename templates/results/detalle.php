@@ -96,9 +96,43 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
                         <?php if ($ev['url_recurso'] !== null): ?><span class="codigo"><?= e($ev['url_recurso']) ?></span><?php endif; ?>
                         <span>capturada el <?= e(Formato::fecha((string) $ev['capturado_en'])) ?></span>
                         <?php if ($ev['truncado']): ?><span>· recortada</span><?php endif; ?>
+                        <?php if ($ev['contenido'] !== null): ?>
+                            <button type="button" class="boton boton--secundario boton--pequeno evidencia__copiar" data-copiar="#ev-<?= e($ev['codigo']) ?>">Copiar<span class="solo-lectores"> la evidencia <?= e($ev['codigo']) ?></span></button>
+                        <?php endif; ?>
                     </div>
-                    <?php if ($ev['contenido'] !== null): ?>
-                        <pre><code><?= e($ev['contenido']) ?></code></pre>
+                    <?php $contrastes = $ev['contenido'] !== null ? \ProconSEO\Results\LecturaContraste::filas((string) $ev['contenido']) : []; ?>
+                    <?php if ($contrastes !== []): ?>
+                        <?php
+                        $n = \ProconSEO\Results\LecturaContraste::numero(...);
+                        $muestra = static function (string $color): string {
+                            $seguro = \ProconSEO\Results\LecturaContraste::colorSeguro($color);
+
+                            return $seguro === null ? '' : '<svg class="muestra-color" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><rect x=".5" y=".5" width="15" height="15" rx="2" fill="' . e($seguro) . '" stroke="#5c6470"/></svg>';
+                        };
+                        ?>
+                        <div class="tabla-desplazable">
+                            <table class="tabla-contraste">
+                                <caption class="solo-lectores">Textos con contraste insuficiente</caption>
+                                <thead><tr><th scope="col">Elemento</th><th scope="col">Texto</th><th scope="col">Fondo</th><th scope="col">Contraste</th><th scope="col">Exigido</th></tr></thead>
+                                <tbody>
+                                    <?php foreach ($contrastes as $c): ?>
+                                        <tr>
+                                            <th scope="row"><span class="codigo"><?= e($c['selector']) ?></span><span class="tabla-contraste__nota"><?= e($n($c['tamano'])) ?> px<?= $c['negrita'] ? ', negrita' : '' ?><?= $c['veces'] > 1 ? ' · ' . e($c['veces']) . ' veces' : '' ?></span></th>
+                                            <td><?= $muestra($c['texto']) ?> <span class="codigo"><?= e($c['texto']) ?></span></td>
+                                            <td><?= $muestra($c['fondo']) ?> <span class="codigo"><?= e($c['fondo']) ?></span></td>
+                                            <td><strong><?= e($n($c['contraste'])) ?>:1</strong></td>
+                                            <td><?= e($n($c['exigido'])) ?>:1</td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <details class="plegable plegable--dentro">
+                            <summary>Ver la evidencia original de Google (en inglés)</summary>
+                            <pre id="ev-<?= e($ev['codigo']) ?>"><code><?= e($ev['contenido']) ?></code></pre>
+                        </details>
+                    <?php elseif ($ev['contenido'] !== null): ?>
+                        <pre id="ev-<?= e($ev['codigo']) ?>"><code><?= e($ev['contenido']) ?></code></pre>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
@@ -126,6 +160,23 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
                     <h3>En el gestor de contenidos</h3>
                     <p><?= e($r['correccion_cms']) ?></p>
                 <?php endif; ?>
+                <?php
+                // Texto listo para pegar en Jira, Trello o un correo. Sin integraciones: no sale nada
+                // de la herramienta (SEG-10, SEG-17); solo se copia al portapapeles.
+                $tarea = array_filter([
+                    '[' . (($estado === 'problema' ? \ProconSEO\Shared\Enum\Gravedad::tryFrom((string) $r['gravedad'])?->etiqueta() : null) ?? Etiquetas::estado($estado)) . '] ' . $titulo . ($r['url_recurso'] !== null ? ' — ' . $r['url_recurso'] : ''),
+                    $sinTexto($r['explicacion_sencilla']) ? null : 'Qué pasa: ' . trim((string) $r['explicacion_sencilla']),
+                    $sinTexto($r['elemento']) ? null : 'Dónde: ' . trim((string) $r['elemento']),
+                    $sinTexto($r['correccion']) ? null : 'Cómo corregirlo: ' . trim((string) $r['correccion']),
+                    $sinTexto($r['correccion_cms']) ? null : 'En el gestor de contenidos: ' . trim((string) $r['correccion_cms']),
+                    'Detectado con proconSEO' . ($analisis !== null ? ' el ' . Formato::fecha((string) $analisis['creado_en']) : '') . ' (' . $r['id_comprobacion'] . ').',
+                ]);
+                ?>
+                <p class="tarea">
+                    <button type="button" class="boton boton--secundario boton--pequeno" data-copiar="#tarea-<?= e($r['id']) ?>">Copiar como tarea</button>
+                    <span class="meta">Para pegarla en Jira, Trello o un correo.</span>
+                </p>
+                <span hidden id="tarea-<?= e($r['id']) ?>" data-texto="<?= e(implode("\n", $tarea)) ?>"></span>
             </section>
         <?php endif; ?>
 
@@ -181,6 +232,17 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
             <p><a class="boton" href="/resultados/<?= e($r['id']) ?>/revisar">Revisar este resultado</a></p>
             <p class="ayuda">El resultado original nunca se modifica: cada revisión se guarda aparte, con su autor y su justificación.</p>
         </section>
+
+        <?php if (in_array($estado, ['problema', 'mejorable', 'decision_revisar'], true) && $analisis !== null): ?>
+            <?= Vista::render('results/_seguimiento', [
+                'r' => $r,
+                'seguimiento' => $seguimiento ?? null,
+                'historial' => $historialSeguimiento ?? [],
+                'error' => $errorSeguimiento ?? null,
+                'valores' => $valoresSeguimiento ?? [],
+                'guardado' => $seguimientoGuardado ?? false,
+            ], false) ?>
+        <?php endif; ?>
 
         <section class="panel panel--separado" aria-labelledby="t-tecnico">
             <h2 id="t-tecnico">Datos técnicos</h2>
