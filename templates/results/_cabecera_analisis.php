@@ -35,7 +35,8 @@ $url = $analisis['url_final'] ?? $analisis['url_normalizada'] ?? $analisis['url_
     </div>
     <div class="acciones">
         <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/pdf" download>Exportar PDF</a>
-        <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/csv" download>Exportar CSV (Excel)</a>
+        <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/csv-hallazgos" download title="Una fila por hallazgo, con sus páginas: para repartir el trabajo">CSV por hallazgo</a>
+        <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/csv" download title="Una fila por resultado, con todo el detalle">CSV completo</a>
         <a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/exportar/json" download>Exportar JSON</a>
     </div>
 </div>

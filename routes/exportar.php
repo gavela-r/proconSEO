@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use ProconSEO\Export\DatosExportacion;
 use ProconSEO\Export\ExportadorCsv;
+use ProconSEO\Export\ExportadorCsvHallazgos;
 use ProconSEO\Export\ExportadorJson;
 use ProconSEO\Export\ExportadorPdf;
 use ProconSEO\Projects\Formato;
@@ -47,6 +48,16 @@ return static function (Router $r): void {
         $d = $analisis($p);
 
         return $descarga(ExportadorCsv::generar($d), 'text/csv; charset=utf-8', DatosExportacion::nombreFichero($d, 'csv'));
+    });
+
+    // CSV por hallazgo: una fila por comprobación y estado, con sus páginas. Para repartir el trabajo.
+    $r->get('/analisis/{id}/exportar/csv-hallazgos', static function (Peticion $p) use ($analisis, $catalogo, $descarga): Respuesta {
+        $d = $analisis($p);
+        $id = (int) $d['analisis']['id'];
+        $resultados = Informe::conTitulos((new RepositorioResultados(BaseDatos::conexion()))->resultados($id), $catalogo());
+        $nombre = (string) preg_replace('/\.csv$/', '-hallazgos.csv', DatosExportacion::nombreFichero($d, 'csv'));
+
+        return $descarga(ExportadorCsvHallazgos::generar($resultados, (bool) $d['datos_de_prueba']), 'text/csv; charset=utf-8', $nombre);
     });
 
     $r->get('/analisis/{id}/exportar/json', static function (Peticion $p) use ($analisis, $descarga): Respuesta {

@@ -72,6 +72,8 @@ $totalFases = count(Fase::cases());
     </dl>
 </section>
 
+<?= \ProconSEO\Shared\Vista::render('results/_evolucion', ['evolucion' => new \ProconSEO\Results\Evolucion($historial)], false) ?>
+
 <section class="seccion" aria-labelledby="t-historico">
     <h2 id="t-historico">Histórico de análisis
         <?php if (count($historial) > 0): ?>
