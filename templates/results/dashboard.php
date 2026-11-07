@@ -124,6 +124,21 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
             </article>
         <?php endforeach; ?>
     </div>
+    <?php
+    // Seguimiento por hallazgo (comprobación), no por resultado: el mismo fallo en 40 páginas es uno.
+    $porSeguimiento = \ProconSEO\Results\Prioridades::seguimiento($informe);
+    $textosSeguimiento = ['pendiente' => ['pendiente', 'pendientes'], 'en_curso' => ['en curso', 'en curso'], 'corregido' => ['corregido', 'corregidos'], 'aceptado' => ['aceptado', 'aceptados']];
+    ?>
+    <?php if (array_diff(array_keys($porSeguimiento), ['pendiente']) !== []): ?>
+        <p class="seguimiento-resumen"><strong>Seguimiento de los hallazgos:</strong>
+            <?php foreach ($textosSeguimiento as $clave => [$uno, $varios]): ?>
+                <?php if (isset($porSeguimiento[$clave])): ?>
+                    <?php $n = $porSeguimiento[$clave]; ?>
+                    <a href="<?= e($enlace(['seguimiento' => $clave])) ?>"><?= e($n . ' ' . ($n === 1 ? $uno : $varios)) ?></a>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </p>
+    <?php endif; ?>
 </section>
 
 <?= Vista::render('results/_prioridades', ['prioridades' => \ProconSEO\Results\Prioridades::desde($informe)], false) ?>
@@ -172,6 +187,15 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
             <option value="">Todos</option>
             <?php foreach (\ProconSEO\Results\Responsable::ETIQUETAS as $valor => $texto): ?>
                 <option value="<?= e($valor) ?>"<?= $filtro->responsable === $valor ? ' selected' : '' ?>><?= e($texto) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div>
+        <label for="f-seguimiento">Seguimiento</label>
+        <select id="f-seguimiento" name="seguimiento">
+            <option value="">Todos</option>
+            <?php foreach (\ProconSEO\Results\FiltroResultados::SEGUIMIENTOS as $valor => $texto): ?>
+                <option value="<?= e($valor) ?>"<?= $filtro->seguimiento === $valor ? ' selected' : '' ?>><?= e($texto) ?></option>
             <?php endforeach; ?>
         </select>
     </div>

@@ -17,6 +17,9 @@ final class FiltroResultados
     public const MAX_TEXTO = 200;
 
     /** Niveles WCAG que se pueden filtrar: A, AA o solo los criterios nuevos de WCAG 2.2. */
+    /** Seguimiento: los estados guardados y «sin aceptados» para ocultar lo que el equipo ya dio por bueno. */
+    public const SEGUIMIENTOS = ['sin_aceptados' => 'Todos menos los aceptados', 'pendiente' => 'Pendientes', 'en_curso' => 'En curso', 'corregido' => 'Corregidos', 'aceptado' => 'Aceptados'];
+
     public const NIVELES = ['A' => 'Solo nivel A', 'AA' => 'Solo nivel AA', 'nuevo22' => 'Nuevos en WCAG 2.2'];
 
     /** Campos en los que busca el texto. */
@@ -34,6 +37,7 @@ final class FiltroResultados
         public readonly string $texto,
         public readonly ?string $responsable = null,
         public readonly ?string $nivel = null,
+        public readonly ?string $seguimiento = null,
     ) {
     }
 
@@ -54,6 +58,7 @@ final class FiltroResultados
             mb_substr($cadena('q'), 0, self::MAX_TEXTO),
             isset(Responsable::ETIQUETAS[$cadena('responsable')]) ? $cadena('responsable') : null,
             isset(self::NIVELES[$cadena('nivel')]) ? $cadena('nivel') : null,
+            isset(self::SEGUIMIENTOS[$cadena('seguimiento')]) ? $cadena('seguimiento') : null,
         );
     }
 
@@ -66,7 +71,7 @@ final class FiltroResultados
     {
         return $this->bloque !== null || $this->estado !== null || $this->criterio !== null
             || $this->pendiente || $this->url !== null || $this->texto !== ''
-            || $this->responsable !== null || $this->nivel !== null;
+            || $this->responsable !== null || $this->nivel !== null || $this->seguimiento !== null;
     }
 
     /**
@@ -103,6 +108,10 @@ final class FiltroResultados
             if ($this->nivel !== null && !self::cumpleNivel($r, $this->nivel)) {
                 return false;
             }
+            $seguimiento = (string) ($r['seguimiento'] ?? 'pendiente');
+            if ($this->seguimiento === 'sin_aceptados' ? $seguimiento === 'aceptado' : ($this->seguimiento !== null && $seguimiento !== $this->seguimiento)) {
+                return false;
+            }
             if ($buscado === '') {
                 return true;
             }
@@ -127,6 +136,7 @@ final class FiltroResultados
             'url' => $this->url ?? '',
             'responsable' => $this->responsable ?? '',
             'nivel' => $this->nivel ?? '',
+            'seguimiento' => $this->seguimiento ?? '',
             'q' => $this->texto,
         ], static fn (string $v): bool => $v !== '');
     }

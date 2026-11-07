@@ -202,6 +202,17 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
             <p class="ayuda">El resultado original nunca se modifica: cada revisión se guarda aparte, con su autor y su justificación.</p>
         </section>
 
+        <?php if (in_array($estado, ['problema', 'mejorable', 'decision_revisar'], true) && $analisis !== null): ?>
+            <?= Vista::render('results/_seguimiento', [
+                'r' => $r,
+                'seguimiento' => $seguimiento ?? null,
+                'historial' => $historialSeguimiento ?? [],
+                'error' => $errorSeguimiento ?? null,
+                'valores' => $valoresSeguimiento ?? [],
+                'guardado' => $seguimientoGuardado ?? false,
+            ], false) ?>
+        <?php endif; ?>
+
         <section class="panel panel--separado" aria-labelledby="t-tecnico">
             <h2 id="t-tecnico">Datos técnicos</h2>
             <dl class="datos">

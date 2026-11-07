@@ -24,7 +24,9 @@ final class Prioridades
     public static function desde(Informe $informe, int $cuantas = 5, int $rapidas = 3): array
     {
         $items = array_map(self::item(...), [...$informe->bloqueos, ...$informe->incidencias]);
-        $items = array_values(array_filter($items, static fn (array $i): bool => in_array($i['estado'], self::ESTADOS, true)));
+        // Lo aceptado o ya corregido no es por donde hay que empezar.
+        $items = array_values(array_filter($items, static fn (array $i): bool => in_array($i['estado'], self::ESTADOS, true)
+            && !in_array($i['seguimiento'], ['aceptado', 'corregido'], true)));
         usort($items, static fn (array $a, array $b): int => self::orden($a) <=> self::orden($b));
 
         // Rápidos: poco esfuerzo y que merezca la pena (un problema, o algo repetido en varias páginas).
@@ -32,6 +34,26 @@ final class Prioridades
             && ($i['estado'] === 'problema' || $i['paginas'] >= 3)));
 
         return ['empezar' => array_slice($items, 0, $cuantas), 'rapidos' => array_slice($rapidos, 0, $rapidas)];
+    }
+
+    /**
+     * Cuántos hallazgos (comprobaciones distintas, no resultados) hay en cada estado de seguimiento:
+     * el mismo fallo en 40 páginas es un solo hallazgo.
+     *
+     * @return array<string, int>
+     */
+    public static function seguimiento(Informe $informe): array
+    {
+        $porEstado = [];
+        foreach ([...$informe->bloqueos, ...$informe->incidencias] as $entrada) {
+            /** @var list<array<string, mixed>> $resultados */
+            $resultados = $entrada['resultados'];
+            foreach ($resultados as $r) {
+                $porEstado[(string) ($r['seguimiento'] ?? 'pendiente')][(string) $r['id_comprobacion']] = true;
+            }
+        }
+
+        return array_map('count', $porEstado);
     }
 
     /**
@@ -54,6 +76,7 @@ final class Prioridades
             'esfuerzo' => Esfuerzo::tryFrom((string) $principal['esfuerzo'])?->value,
             'paginas' => $paginas,
             'repetido' => $entrada['tipo'] === 'repetido',
+            'seguimiento' => (string) ($principal['seguimiento'] ?? 'pendiente'),
             'bloques' => array_values(array_unique(array_map(static fn (array $r): string => (string) $r['bloque'], $entrada['resultados']))),
         ];
     }

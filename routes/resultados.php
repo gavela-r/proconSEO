@@ -9,6 +9,7 @@ use ProconSEO\Results\FiltroResultados;
 use ProconSEO\Results\Glosario;
 use ProconSEO\Results\Informe;
 use ProconSEO\Results\RepositorioResultados;
+use ProconSEO\Results\Seguimientos;
 use ProconSEO\Review\CapturaSegura;
 use ProconSEO\Run\Fabrica;
 use ProconSEO\Shared\BaseDatos;
@@ -25,6 +26,16 @@ use ProconSEO\Shared\Vista;
 return static function (Router $r): void {
     $repo = static fn (): RepositorioResultados => new RepositorioResultados(BaseDatos::conexion());
     $estilos = ['/assets/css/parte3.css'];
+    $seguimientos = static fn (): Seguimientos => new Seguimientos(BaseDatos::conexion());
+
+    // Añade a cada resultado su seguimiento actual (por proyecto y comprobación) para mostrarlo y filtrar.
+    $conSeguimiento = static function (array $resultados, array $actuales): array {
+        return array_map(static function (array $r) use ($actuales): array {
+            $s = $actuales[(string) $r['id_comprobacion']] ?? null;
+
+            return $r + ['seguimiento' => $s === null ? Seguimientos::PENDIENTE : (string) $s['estado'], 'seguimiento_actual' => $s];
+        }, $resultados);
+    };
 
     // El catálogo solo aporta nombres y explicaciones: si no se puede cargar, se muestran los identificadores.
     $catalogo = static function (): ?Catalogo {
@@ -45,7 +56,7 @@ return static function (Router $r): void {
     ])));
 
     // Dashboard del análisis en el orden de la especificación (4.4, RF-20, RF-21).
-    $r->get('/analisis/{id}', static function (Peticion $p) use ($repo, $catalogo, $estilos): Respuesta {
+    $r->get('/analisis/{id}', static function (Peticion $p) use ($repo, $catalogo, $estilos, $seguimientos, $conSeguimiento): Respuesta {
         $repositorio = $repo();
         $id = (int) $p->parametro('id');
         $analisis = $repositorio->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
@@ -67,7 +78,7 @@ return static function (Router $r): void {
             'estilos' => $estilos,
             'analisis' => $analisis,
             'informe' => new Informe(
-                $repositorio->resultados($id),
+                $conSeguimiento($repositorio->resultados($id), $seguimientos()->actuales((int) $analisis['proyecto_id'])),
                 $repositorio->recursos($id),
                 $repositorio->fases($id),
                 $cat,
@@ -144,23 +155,69 @@ return static function (Router $r): void {
     });
 
     // Detalle de un resultado con todos los campos de la sección 5 (RF-22).
-    $r->get('/resultados/{id}', static function (Peticion $p) use ($repo, $catalogo, $estilos): Respuesta {
+    // Detalle de un resultado. Con $error y $valores, el formulario de seguimiento vuelve con lo escrito.
+    $detalle = static function (Peticion $p, ?string $error = null, array $valores = [], int $estado = 200) use ($repo, $catalogo, $estilos, $seguimientos): Respuesta {
         $repositorio = $repo();
         $resultado = $repositorio->resultado((int) $p->parametro('id'))
             ?? throw new ErrorDominio('no_encontrado', 'El resultado no existe.', 404);
         $cat = $catalogo();
         $ficha = $cat?->obtener((string) $resultado['id_comprobacion']);
         $resultado = Informe::conTitulos([$resultado], $cat)[0];
+        $analisis = $repositorio->analisis((int) $resultado['analisis_id']);
+        $seg = $seguimientos();
+        $proyectoId = $analisis !== null ? (int) $analisis['proyecto_id'] : 0;
 
         return Respuesta::html(Vista::render('results/detalle', [
             'titulo' => $ficha?->nombre ?? (string) $resultado['id_comprobacion'],
             'estilos' => $estilos,
             'resultado' => $resultado,
             'ficha' => $ficha,
-            'analisis' => $repositorio->analisis((int) $resultado['analisis_id']),
+            'analisis' => $analisis,
+            'seguimiento' => $proyectoId > 0 ? ($seg->actuales($proyectoId)[(string) $resultado['id_comprobacion']] ?? null) : null,
+            'historialSeguimiento' => $proyectoId > 0 ? $seg->historial($proyectoId, (string) $resultado['id_comprobacion']) : [],
+            'errorSeguimiento' => $error,
+            'valoresSeguimiento' => $valores,
+            'seguimientoGuardado' => $p->entrada('seguimiento') === '1',
             'evidencias' => $repositorio->evidencias((int) $resultado['id']),
             'revisiones' => $repositorio->revisiones((int) $resultado['id']),
             'revisado' => $p->entrada('revisado') === '1',
-        ]));
+        ]), $estado);
+    };
+
+    $r->get('/resultados/{id}', static fn (Peticion $p): Respuesta => $detalle($p));
+
+    // Seguimiento del hallazgo en el proyecto: solo inserta una fila nueva; el resultado no cambia (RF-42).
+    $r->post('/resultados/{id}/seguimiento', static function (Peticion $p) use ($repo, $seguimientos, $detalle): Respuesta {
+        $repositorio = $repo();
+        $resultado = $repositorio->resultado((int) $p->parametro('id'))
+            ?? throw new ErrorDominio('no_encontrado', 'El resultado no existe.', 404);
+        $analisis = $repositorio->analisis((int) $resultado['analisis_id'])
+            ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+        $valores = array_map(
+            static fn (mixed $v): string => is_string($v) ? $v : '',
+            array_intersect_key($p->cuerpo, array_flip(['estado', 'autor', 'motivo'])),
+        ) + ['estado' => '', 'autor' => '', 'motivo' => ''];
+
+        try {
+            $seguimientos()->registrar((int) $analisis['proyecto_id'], (string) $resultado['id_comprobacion'], $valores['estado'], $valores['autor'], $valores['motivo'], (int) $analisis['id']);
+        } catch (ErrorDominio $e) {
+            if ($e->codigo !== 'seguimiento_no_valido') {
+                throw $e;
+            }
+
+            return $detalle($p, $e->getMessage(), $valores, 422);
+        }
+
+        (new Fabrica())->auditoria()->registrar(
+            'seguimiento_guardado',
+            (int) $analisis['id'],
+            (int) $analisis['proyecto_id'],
+            Fabrica::ipOrigen(),
+            null,
+            null,
+            "Seguimiento de {$resultado['id_comprobacion']}: {$valores['estado']}",
+        );
+
+        return Respuesta::redirigir('/resultados/' . (int) $resultado['id'] . '?seguimiento=1#t-seguimiento');
     });
 };

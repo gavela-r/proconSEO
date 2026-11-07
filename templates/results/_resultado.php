@@ -23,6 +23,9 @@ $esfuerzo = Esfuerzo::tryFrom((string) $r['esfuerzo']);
         <span class="chip"><?= e(Etiquetas::bloque((string) $r['bloque'])) ?></span>
         <?php if (in_array($estado, ['problema', 'mejorable', 'decision_revisar'], true)): ?>
             <span class="chip chip--responsable"><span class="solo-lectores">Responsable: </span><?= e(\ProconSEO\Results\Responsable::etiqueta($r)) ?></span>
+            <?php if (($r['seguimiento'] ?? 'pendiente') !== 'pendiente'): ?>
+                <span class="chip chip--seguimiento">Seguimiento: <?= e(\ProconSEO\Results\Seguimientos::etiqueta($r['seguimiento_actual'] ?? null)) ?></span>
+            <?php endif; ?>
         <?php endif; ?>
         <?php if ($wcag !== null): ?>
             <span class="chip <?= Etiquetas::esNuevo22($r) ? 'chip--wcag22' : 'chip--wcag21' ?>"><?= e($wcag) ?></span>

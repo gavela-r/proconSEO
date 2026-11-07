@@ -332,3 +332,20 @@ details.plegable[open] { padding-bottom: 1rem; }
 
 /* Responsable de cada incidencia */
 .chip--responsable { background: #fff; border-color: var(--texto-tenue); color: var(--texto); }
+
+/* Seguimiento del hallazgo */
+.seguimiento__actual { display: flex; flex-direction: column; gap: .125rem; margin: 0 0 .5rem; padding-left: .75rem; border-left: 3px solid var(--borde-fuerte); }
+.seguimiento__estado { font-weight: 700; font-size: 1.0625rem; }
+.seguimiento__actual--en_curso { border-left-color: var(--estado-mejorable); }
+.seguimiento__actual--corregido { border-left-color: var(--estado-no-verificable); }
+.seguimiento__actual--comprobado { border-left-color: var(--estado-correcto); }
+.seguimiento__actual--reaparece { border-left-color: var(--estado-problema); }
+.seguimiento__actual--aceptado { border-left-color: var(--estado-decision); }
+.seguimiento__motivo { font-style: italic; color: var(--texto-suave); }
+.seguimiento__cambiar, .seguimiento__historial { margin-top: .75rem; border-top: 1px solid var(--borde); }
+.seguimiento__cambiar summary, .seguimiento__historial summary { cursor: pointer; padding: .75rem 0; font-weight: 600; min-height: 24px; }
+.seguimiento fieldset { border: 0; padding: 0; margin: 0; }
+.seguimiento .opcion span strong { display: block; }
+.seguimiento input, .seguimiento textarea { max-width: none; }
+.chip--seguimiento { background: #fff; border-style: dashed; border-color: var(--texto-tenue); color: var(--texto); }
+.seguimiento-resumen { display: flex; flex-wrap: wrap; gap: .375rem 1.125rem; margin: 1.25rem 0 0; font-size: .9375rem; color: var(--texto-suave); }
