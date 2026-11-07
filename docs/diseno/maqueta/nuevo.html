@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuevo análisis · proconSEO</title>
+<link rel="stylesheet" href="estilos.css">
+<link rel="stylesheet" href="paginas.css">
+<script src="interaccion.js" defer></script>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-correcto" viewBox="0 0 24 24"><path d="M4.5 12.5l4.8 4.8L19.5 7"/></symbol>
+  <symbol id="i-mejorable" viewBox="0 0 24 24"><path d="M12 19V5.5M6.5 11 12 5.5l5.5 5.5"/></symbol>
+  <symbol id="i-problema" viewBox="0 0 24 24"><path d="M12 3.8 2.9 19.6h18.2Z"/><path d="M12 10v4.6"/><path d="M12 17.3v.05"/></symbol>
+  <symbol id="i-decision" viewBox="0 0 24 24"><path d="M12 4v16M6.5 20h11M4.5 7.5h15"/><path d="M7 7.5 4.2 13.5a2.9 2.9 0 0 0 5.6 0Z"/><path d="M17 7.5l-2.8 6a2.9 2.9 0 0 0 5.6 0Z"/></symbol>
+  <symbol id="i-no-verificable" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.4"/><path d="M12 16.6v.05"/></symbol>
+  <symbol id="i-no-aplicable" viewBox="0 0 24 24"><path d="M6.5 12h11"/></symbol>
+  <symbol id="i-mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-descarga" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/></symbol>
+  <symbol id="i-buscar" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 4.5 4.5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.8v.05"/></symbol>
+  <symbol id="i-parar" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="1"/></symbol>
+</svg>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<header class="cabecera">
+  <div class="cabecera__dentro">
+    <a class="marca" href="index.html" aria-label="proconSEO, inicio">
+      <img src="logo-proconsi.png" alt="Proconsi">
+      <span class="marca__separador" aria-hidden="true"></span>
+      <span class="marca__nombre">proconSEO</span>
+    </a>
+    <nav class="navegacion" aria-label="Principal">
+      <a href="index.html">Inicio</a>
+      <a href="#">Proyectos</a>
+      <a href="nuevo.html" aria-current="page">Nuevo análisis</a>
+      <a href="#">Catálogo</a>
+      <a href="#">Glosario</a>
+      <a href="#">Avisos <span class="contador">2</span></a>
+    </nav>
+    <div class="cabecera__estado" aria-label="Estado del servicio">
+      <span><span class="punto" aria-hidden="true"></span>Worker en marcha</span>
+      <span>Catálogo 1.3 · Perfil v3</span>
+    </div>
+  </div>
+</header>
+
+<main id="contenido">
+  <p class="migas"><a href="index.html">Inicio</a><span aria-hidden="true">/</span>Nuevo análisis</p>
+  <div class="titular">
+    <div>
+      <h1>Nuevo análisis</h1>
+      <p class="entradilla">Indica la web y hasta dónde mirar. Antes de hacer ninguna petición, se comprueba que la dirección es pública y segura.</p>
+    </div>
+  </div>
+
+  <div class="dos-columnas">
+    <form action="progreso.html">
+      <div class="paso">
+        <span class="paso__numero">01</span>
+        <div>
+          <label class="campo">
+            <span class="campo__etiqueta">Dirección de la web</span>
+            <input class="entrada entrada--grande" type="url" value="https://www.gasolinera-ejemplo.es/" autocomplete="off" spellcheck="false">
+            <span class="campo__ayuda">Solo http:// o https:// públicas. Las direcciones de la red interna se rechazan.</span>
+          </label>
+          <label class="campo">
+            <span class="campo__etiqueta">Proyecto</span>
+            <select class="selector">
+              <option>Estaciones de servicio Ruiz — Web de cliente · Hidrocarburos</option>
+              <option>Ferretería Hermanos Vega — Web de cliente · Comercio</option>
+              <option>Bar La Plaza — Web Kit Digital</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="paso">
+        <span class="paso__numero">02</span>
+        <fieldset class="campo" style="border:0;padding:0;margin:0">
+          <legend class="campo__etiqueta">Alcance</legend>
+          <div class="opciones">
+            <label class="opcion">
+              <input type="radio" name="alcance">
+              <span class="opcion__nombre"><span class="opcion__marca" aria-hidden="true"></span>URL individual</span>
+              <span class="opcion__texto">Solo esta página. Lo más rápido.</span>
+              <span class="opcion__dato">1 página · ≈ 1 min</span>
+            </label>
+            <label class="opcion">
+              <input type="radio" name="alcance">
+              <span class="opcion__nombre"><span class="opcion__marca" aria-hidden="true"></span>URL con contexto</span>
+              <span class="opcion__texto">Esta página y las pocas que necesitan algunas comprobaciones.</span>
+              <span class="opcion__dato">≤ 20 URLs · ≈ 2 min</span>
+            </label>
+            <label class="opcion">
+              <input type="radio" name="alcance" checked>
+              <span class="opcion__nombre"><span class="opcion__marca" aria-hidden="true"></span>Sitio completo</span>
+              <span class="opcion__texto">Recorre la web por sus enlaces y su sitemap.</span>
+              <span class="opcion__dato">≤ 200 páginas · ≈ 6 min</span>
+            </label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="paso">
+        <span class="paso__numero">03</span>
+        <div>
+          <label class="campo">
+            <span class="campo__etiqueta">Otros dominios autorizados <span class="opcional">(opcional)</span></span>
+            <input class="entrada mono" type="text" placeholder="tienda.gasolinera-ejemplo.es">
+            <span class="campo__ayuda">Autorizar «ejemplo.es» no incluye «www.ejemplo.es». Si la web redirige a otro dominio, añádelo aquí.</span>
+          </label>
+          <label class="campo">
+            <span class="campo__etiqueta">Objetivo de visibilidad <span class="opcional">(opcional)</span></span>
+            <select class="selector">
+              <option>Que aparezca en buscadores y en respuestas de IA</option>
+              <option>Solo buscadores</option>
+              <option>Web interna o en desarrollo: no debe indexarse</option>
+            </select>
+            <span class="campo__ayuda">Sirve para distinguir un <span class="ayuda"><button type="button" class="termino" aria-expanded="false"><code>noindex</code></button><span class="ayuda__globo" hidden><strong>noindex</strong>Instrucción que pide a buscadores y asistentes de IA que no muestren la página. En una web en desarrollo es lo correcto; en una web publicada, casi siempre un olvido.</span></span> intencionado de uno olvidado.</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="envio">
+        <button class="boton" type="submit">Comprobar y lanzar<svg class="icono"><use href="#i-flecha"/></svg></button>
+        <p class="meta">Se pondrá en cola y empezará en cuanto haya un hueco. Se puede cancelar en cualquier momento.</p>
+      </div>
+    </form>
+
+    <aside>
+      <section class="ficha" aria-labelledby="f-ambito">
+        <h2 id="f-ambito">Ámbito autorizado <span class="ayuda"><button type="button" class="ayuda__boton" aria-expanded="false"><span class="visualmente-oculto">Qué es el ámbito</span><span aria-hidden="true">?</span></button><span class="ayuda__globo" hidden><strong>Ámbito</strong>Los únicos dominios a los que la herramienta puede hacer peticiones. Aunque un dominio esté aquí, si apunta a una red interna se bloquea igual.</span></span></h2>
+        <p class="meta" style="margin-bottom:12px">Solo se harán peticiones a estos hosts:</p>
+        <ul class="hosts">
+          <li class="mono">www.gasolinera-ejemplo.es</li>
+        </ul>
+      </section>
+      <section class="ficha" aria-labelledby="f-perfil">
+        <h2 id="f-perfil">Perfil de ejecución v3</h2>
+        <dl class="datos">
+          <dt>Ritmo</dt><dd class="mono">3 peticiones/s</dd>
+          <dt>Páginas</dt><dd class="mono">200 como máximo</dd>
+          <dt>Por petición</dt><dd class="mono">15 s · 5 MB</dd>
+          <dt>Total</dt><dd class="mono">200 MB</dd>
+          <dt>Identidad</dt><dd class="mono">proconSEO/1.0</dd>
+        </dl>
+        <p class="meta" style="margin-top:14px">Los límites no se amplían nunca en silencio: si se alcanza uno, el informe lo dice.</p>
+      </section>
+      <section class="ficha" aria-labelledby="f-que">
+        <h2 id="f-que">Qué se va a revisar</h2>
+        <dl class="datos">
+          <dt>Búsqueda con IA</dt><dd>11 criterios</dd>
+          <dt>SEO</dt><dd>16 criterios</dd>
+          <dt>Accesibilidad</dt><dd>12 criterios · WCAG 2.2 AA</dd>
+        </dl>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="pie__dentro">
+    <span>proconSEO · herramienta interna de Proconsi · solo red interna</span>
+    <span>Maqueta de diseño · datos de ejemplo</span>
+  </div>
+</footer>
+</body>
+</html>

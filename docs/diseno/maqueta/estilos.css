@@ -1,0 +1,272 @@
+/*
+ * proconSEO · base visual («informe de laboratorio»)
+ *
+ * Fondo blanco, tinta casi negra, líneas finas y un solo color de marca usado con
+ * moderación. Sin sombras ni degradados. Todo se carga desde la propia herramienta.
+ * Tipografías: Atkinson Hyperlegible Next (texto) y Mono (datos), licencia OFL.
+ */
+
+@font-face { font-family: "Atkinson Next"; src: url("fuentes/texto-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Atkinson Next"; src: url("fuentes/texto-400-cursiva.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "Atkinson Next"; src: url("fuentes/texto-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Atkinson Next"; src: url("fuentes/texto-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: "Atkinson Next"; src: url("fuentes/texto-700.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Atkinson Mono"; src: url("fuentes/mono-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Atkinson Mono"; src: url("fuentes/mono-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+
+:root {
+    /* Tinta y papel */
+    --tinta: #15171c;
+    --tinta-2: #444a54;      /* texto secundario: 8,9:1 sobre blanco */
+    --tinta-3: #656b75;      /* metadatos: 5,4:1 */
+    --regla: #e6e8eb;
+    --regla-fuerte: #cdd1d7;
+    --fondo: #ffffff;
+    --fondo-suave: #f7f8fa;
+    --marca: #c8102e;        /* rojo Proconsi, solo como acento */
+
+    /* Estados: siempre con icono y texto, nunca solo color (WCAG 1.4.1) */
+    --correcto: #1b7443;
+    --mejorable: #94570a;
+    --problema: #c01a24;
+    --decision: #6a3db3;
+    --no-verificable: #36597c;
+    --no-aplicable: #656b75;
+
+    --texto: "Atkinson Next", "Segoe UI", system-ui, sans-serif;
+    --mono: "Atkinson Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+    --ancho: 1240px;
+    --hueco: 24px;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+    margin: 0;
+    background: var(--fondo);
+    color: var(--tinta);
+    font: 400 16px/1.55 var(--texto);
+    font-feature-settings: "kern", "liga";
+}
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--marca); }
+:focus-visible { outline: 2px solid var(--tinta); outline-offset: 3px; border-radius: 1px; }
+.mono, code, kbd, samp { font-family: var(--mono); font-size: .92em; }
+.saltar { position: absolute; left: -999px; top: 8px; background: var(--tinta); color: #fff; padding: 8px 12px; z-index: 10; }
+.saltar:focus { left: 8px; }
+.visualmente-oculto { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Cabecera ---------- */
+.cabecera { border-bottom: 1px solid var(--regla); }
+.cabecera__dentro {
+    max-width: var(--ancho); margin: 0 auto; padding: 0 var(--hueco);
+    display: flex; align-items: stretch; gap: 32px; min-height: 64px;
+}
+.marca { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+.marca img { height: 30px; width: auto; display: block; }
+.marca__separador { width: 1px; height: 26px; background: var(--regla-fuerte); }
+.marca__nombre { font: 500 15px/1 var(--mono); letter-spacing: .02em; color: var(--tinta); }
+.navegacion { display: flex; gap: 4px; margin-left: 8px; }
+.navegacion a {
+    display: flex; align-items: center; padding: 0 12px; text-decoration: none;
+    color: var(--tinta-2); font-weight: 500; font-size: 15px; border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.navegacion a:hover { color: var(--tinta); }
+.navegacion a[aria-current="page"] { color: var(--tinta); border-bottom-color: var(--marca); }
+.navegacion .contador { margin-left: 6px; font: 500 12px/1 var(--mono); color: var(--marca); }
+.cabecera__estado { margin-left: auto; display: flex; align-items: center; gap: 18px; font-size: 13.5px; color: var(--tinta-3); }
+.punto { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--correcto); margin-right: 7px; vertical-align: 1px; }
+
+/* ---------- Página ---------- */
+main { max-width: var(--ancho); margin: 0 auto; padding: 40px var(--hueco) 72px; }
+.migas { font-size: 14px; color: var(--tinta-3); margin: 0 0 18px; }
+.migas a { color: var(--tinta-2); }
+.migas span[aria-hidden] { margin: 0 8px; }
+
+h1 { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -.015em; margin: 0; }
+h2 { font-size: 20px; line-height: 1.3; font-weight: 700; margin: 0; }
+h3 { font-size: 17px; line-height: 1.35; font-weight: 600; margin: 0; }
+p { margin: 0; }
+.entradilla { color: var(--tinta-2); font-size: 17px; max-width: 64ch; margin-top: 10px; }
+.meta { font-size: 14px; line-height: 1.45; color: var(--tinta-3); }
+.url { font: 400 13px/1.45 var(--mono); color: var(--tinta-3); word-break: break-all; }
+
+/* Encabezado de página: título a la izquierda, acciones a la derecha */
+.titular { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-bottom: 28px; border-bottom: 1px solid var(--tinta); }
+.titular__acciones { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Secciones numeradas, como en un informe técnico */
+.seccion { margin-top: 48px; }
+.seccion__cabeza { display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px; }
+.seccion__numero { font: 500 13px/1 var(--mono); color: var(--marca); letter-spacing: .04em; }
+.seccion__cabeza::after { content: ""; flex: 1; height: 1px; background: var(--regla); transform: translateY(-4px); }
+.seccion__nota { color: var(--tinta-3); font-size: 14px; margin: -8px 0 18px; max-width: 72ch; }
+
+/* ---------- Botones ---------- */
+.boton {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px;
+    font: 600 15px/1 var(--texto); border-radius: 2px; cursor: pointer; text-decoration: none;
+    border: 1px solid var(--tinta); background: var(--tinta); color: #fff;
+}
+.boton:hover { background: #000; color: #fff; }
+.boton--linea { background: transparent; color: var(--tinta); border-color: var(--regla-fuerte); }
+.boton--linea:hover { background: var(--fondo-suave); color: var(--tinta); border-color: var(--tinta-3); }
+.boton--peligro { background: transparent; color: var(--problema); border-color: currentColor; }
+.boton--peligro:hover { background: #fdf2f2; color: var(--problema); }
+.boton svg { width: 16px; height: 16px; flex: none; }
+.boton--pequeno { min-height: 34px; padding: 0 12px; font-size: 14px; }
+
+/* ---------- Iconos y estados ---------- */
+.icono { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.estado { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 14px; white-space: nowrap; }
+.estado--correcto { color: var(--correcto); }
+.estado--mejorable { color: var(--mejorable); }
+.estado--problema { color: var(--problema); }
+.estado--decision { color: var(--decision); }
+.estado--no-verificable { color: var(--no-verificable); }
+.estado--no-aplicable { color: var(--no-aplicable); }
+
+.gravedad { font: 500 11.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; padding: 4px 7px; border: 1px solid currentColor; border-radius: 2px; color: var(--problema); }
+.gravedad--critico { background: var(--problema); border-color: var(--problema); color: #fff; }
+.gravedad--medio, .gravedad--bajo { color: var(--tinta-2); }
+
+.etiqueta { display: inline-block; font: 500 13px/1 var(--texto); padding: 5px 8px; border: 1px solid var(--regla-fuerte); border-radius: 2px; color: var(--tinta-2); white-space: nowrap; }
+.etiqueta--prueba { border-color: #e0b44c; color: #7a5300; background: #fff8e6; }
+.etiqueta--kit { border-color: #f1c4ca; color: #9b0f22; background: #fff5f6; }
+.etiqueta--curso { border-color: var(--tinta); color: var(--tinta); }
+
+/* ---------- Tablas tipo registro ---------- */
+.registro { width: 100%; border-collapse: collapse; font-size: 15px; }
+.registro th {
+    text-align: left; font: 600 12.5px/1.2 var(--texto); text-transform: uppercase; letter-spacing: .07em;
+    color: var(--tinta-3); padding: 0 12px 10px; border-bottom: 1px solid var(--tinta);
+}
+.registro td { padding: 14px 12px; border-bottom: 1px solid var(--regla); vertical-align: top; }
+.registro tr:hover td { background: var(--fondo-suave); }
+.registro td:first-child, .registro th:first-child { padding-left: 0; }
+.registro td:last-child, .registro th:last-child { padding-right: 0; }
+.registro .num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.registro .titulo-fila { font-weight: 600; text-decoration: none; }
+.registro .titulo-fila:hover { text-decoration: underline; }
+.cero { color: #b3b8bf; }
+
+.recuento { display: flex; gap: 14px; flex-wrap: wrap; font: 500 13.5px/1 var(--mono); }
+.recuento span { display: inline-flex; align-items: center; gap: 5px; }
+.recuento .icono { width: 14px; height: 14px; }
+
+/* ---------- Formularios ---------- */
+.campo { display: block; margin-bottom: 26px; }
+.campo__etiqueta { display: block; font-weight: 600; margin-bottom: 8px; }
+.campo__ayuda { display: block; color: var(--tinta-3); font-size: 14px; margin-top: 7px; }
+.opcional { font-weight: 400; color: var(--tinta-3); }
+.entrada, .selector {
+    width: 100%; min-height: 46px; padding: 10px 14px; font: 400 16px/1.3 var(--texto); color: var(--tinta);
+    background: #fff; border: 1px solid var(--regla-fuerte); border-radius: 2px;
+}
+.entrada--grande { min-height: 56px; font: 400 19px/1.2 var(--mono); padding: 12px 16px; border-color: var(--tinta-3); }
+.entrada:hover, .selector:hover { border-color: var(--tinta-3); }
+.entrada:focus, .selector:focus { outline: 2px solid var(--tinta); outline-offset: 0; border-color: var(--tinta); }
+.entrada::placeholder { color: #9aa0a8; }
+
+.opciones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--regla-fuerte); border-radius: 2px; }
+.opcion { position: relative; display: block; padding: 18px 18px 16px; cursor: pointer; border-right: 1px solid var(--regla-fuerte); }
+.opcion:last-child { border-right: 0; }
+.opcion input { position: absolute; opacity: 0; }
+.opcion__nombre { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.opcion__marca { width: 16px; height: 16px; border: 1.5px solid var(--tinta-3); border-radius: 50%; flex: none; display: grid; place-items: center; }
+.opcion__texto { display: block; color: var(--tinta-2); font-size: 14px; margin-top: 8px; }
+.opcion__dato { display: block; font: 400 12.5px/1 var(--mono); color: var(--tinta-3); margin-top: 12px; }
+.opcion:has(input:checked) { background: var(--fondo-suave); box-shadow: inset 0 -3px 0 var(--tinta); }
+.opcion:has(input:checked) .opcion__marca { border-color: var(--tinta); }
+.opcion:has(input:checked) .opcion__marca::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--tinta); }
+.opcion:has(input:focus-visible) { outline: 2px solid var(--tinta); outline-offset: -2px; }
+
+/* Ficha lateral («antes de empezar», datos del análisis) */
+.ficha { border-top: 1px solid var(--tinta); padding-top: 18px; }
+.ficha + .ficha { margin-top: 32px; }
+.ficha h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; color: var(--tinta-2); margin-bottom: 14px; }
+.datos { display: grid; grid-template-columns: max-content 1fr; gap: 9px 18px; margin: 0; font-size: 14.5px; }
+.datos dt { color: var(--tinta-3); }
+.datos dd { margin: 0; }
+.datos dd.mono { font-size: 13.5px; }
+
+/* ---------- Rejillas ---------- */
+.dos-columnas { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 64px; align-items: start; }
+.mitades { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+
+/* ---------- Pie ---------- */
+.pie { border-top: 1px solid var(--regla); }
+.pie__dentro { max-width: var(--ancho); margin: 0 auto; padding: 22px var(--hueco); display: flex; justify-content: space-between; gap: 16px; color: var(--tinta-3); font-size: 13px; }
+
+/* ---------- Avisos de la maqueta ---------- */
+.aviso { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-left: 3px solid var(--tinta); background: var(--fondo-suave); font-size: 15px; }
+.aviso--parcial { border-left-color: var(--mejorable); }
+.aviso .icono { margin-top: 3px; }
+
+@media (max-width: 900px) {
+    .dos-columnas, .mitades { grid-template-columns: 1fr; gap: 40px; }
+    .opciones { grid-template-columns: 1fr; }
+    .opcion { border-right: 0; border-bottom: 1px solid var(--regla-fuerte); }
+    .opcion:last-child { border-bottom: 0; }
+    .cabecera__estado { display: none; }
+    .titular { flex-direction: column; align-items: flex-start; }
+    h1 { font-size: 28px; }
+}
+@media (max-width: 640px) {
+    .cabecera__dentro { flex-wrap: wrap; gap: 0; padding-top: 12px; }
+    .navegacion { width: 100%; margin: 8px 0 0 -12px; overflow-x: auto; }
+    .navegacion a { min-height: 44px; }
+    main { padding-top: 28px; }
+}
+
+.fecha { font-size: 13.5px; color: var(--tinta-2); white-space: nowrap; }
+
+.navegacion a { white-space: nowrap; }
+@media (max-width: 640px) {
+    .marca img { height: 26px; }
+    .titular__acciones { width: 100%; }
+}
+
+/* ---------- Ayuda en contexto (toggletip, WCAG 1.4.13) ----------
+ * Se abre al pasar el ratón, al llegar con el teclado o al tocar; se cierra con Esc; no
+ * desaparece al mover el ratón encima. El texto visible (icono + palabra) no depende de ella. */
+.ayuda { position: relative; display: inline-flex; align-items: center; vertical-align: baseline; }
+.ayuda__boton {
+    display: inline-grid; place-items: center; width: 24px; height: 24px; margin-left: 2px; padding: 0;
+    border: 1px solid var(--regla-fuerte); border-radius: 50%; background: #fff; color: var(--tinta-2);
+    font: 600 12px/1 var(--texto); cursor: help;
+}
+.ayuda__boton:hover, .ayuda__boton[aria-expanded="true"] { border-color: var(--tinta); color: var(--tinta); }
+.termino {
+    display: inline; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: help;
+    text-decoration: underline dotted var(--tinta-3); text-decoration-thickness: 1.5px; text-underline-offset: 3px;
+}
+.termino:hover, .termino[aria-expanded="true"] { text-decoration-color: var(--tinta); }
+code.termino, .termino code { font-family: var(--mono); font-size: .92em; }
+.ayuda__globo {
+    position: absolute; z-index: 20; left: -8px; top: calc(100% + 8px); width: max-content; max-width: 320px;
+    padding: 12px 14px; background: var(--tinta); color: #fff; border-radius: 3px;
+    font: 400 14px/1.5 var(--texto); text-align: left; text-transform: none; letter-spacing: 0; white-space: normal;
+}
+.ayuda__globo::before { content: ""; position: absolute; left: 14px; top: -6px; border: 6px solid transparent; border-top: 0; border-bottom-color: var(--tinta); }
+.ayuda__globo[hidden] { display: none; }
+.ayuda__globo strong { display: block; margin-bottom: 2px; }
+.ayuda__globo a { color: #fff; }
+.ayuda__globo a:hover { color: #ffd6dc; }
+.ayuda--izquierda .ayuda__globo { left: auto; right: -8px; }
+.ayuda--izquierda .ayuda__globo::before { left: auto; right: 14px; }
+
+/* ---------- Chips de clasificación ---------- */
+.chip { display: inline-flex; align-items: center; gap: 6px; font: 500 13px/1 var(--texto); padding: 5px 9px; border-radius: 999px; background: var(--fondo-suave); border: 1px solid var(--regla); color: var(--tinta-2); white-space: nowrap; }
+.chip--nuevo { background: #eef3ff; border-color: #c9d6f5; color: #23418a; }
+.chip svg { width: 13px; height: 13px; }
+
+/* ---------- Código con líneas numeradas ---------- */
+.codigo { margin: 0; padding: 12px 0; font: 400 13.5px/1.7 var(--mono); counter-reset: linea var(--desde, 0); overflow-x: auto; }
+.codigo .l { display: block; padding: 0 14px 0 0; white-space: pre; counter-increment: linea; }
+.codigo .l::before { content: counter(linea); display: inline-block; width: 3.2em; padding-right: 1em; margin-right: .2em; text-align: right; color: #9aa0a8; user-select: none; }
+.codigo .l--marcada { background: #fdecee; box-shadow: inset 3px 0 0 var(--problema); }
+.codigo .l--marcada::before { color: var(--problema); }
+
+.anuncio { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inicio · proconSEO</title>
+<link rel="stylesheet" href="estilos.css">
+<link rel="stylesheet" href="paginas.css">
+<script src="interaccion.js" defer></script>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-correcto" viewBox="0 0 24 24"><path d="M4.5 12.5l4.8 4.8L19.5 7"/></symbol>
+  <symbol id="i-mejorable" viewBox="0 0 24 24"><path d="M12 19V5.5M6.5 11 12 5.5l5.5 5.5"/></symbol>
+  <symbol id="i-problema" viewBox="0 0 24 24"><path d="M12 3.8 2.9 19.6h18.2Z"/><path d="M12 10v4.6"/><path d="M12 17.3v.05"/></symbol>
+  <symbol id="i-decision" viewBox="0 0 24 24"><path d="M12 4v16M6.5 20h11M4.5 7.5h15"/><path d="M7 7.5 4.2 13.5a2.9 2.9 0 0 0 5.6 0Z"/><path d="M17 7.5l-2.8 6a2.9 2.9 0 0 0 5.6 0Z"/></symbol>
+  <symbol id="i-no-verificable" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.4"/><path d="M12 16.6v.05"/></symbol>
+  <symbol id="i-no-aplicable" viewBox="0 0 24 24"><path d="M6.5 12h11"/></symbol>
+  <symbol id="i-mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-descarga" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/></symbol>
+  <symbol id="i-buscar" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 4.5 4.5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.8v.05"/></symbol>
+  <symbol id="i-parar" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="1"/></symbol>
+</svg>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<header class="cabecera">
+  <div class="cabecera__dentro">
+    <a class="marca" href="index.html" aria-label="proconSEO, inicio">
+      <img src="logo-proconsi.png" alt="Proconsi">
+      <span class="marca__separador" aria-hidden="true"></span>
+      <span class="marca__nombre">proconSEO</span>
+    </a>
+    <nav class="navegacion" aria-label="Principal">
+      <a href="index.html" aria-current="page">Inicio</a>
+      <a href="#">Proyectos</a>
+      <a href="nuevo.html">Nuevo análisis</a>
+      <a href="#">Catálogo</a>
+      <a href="#">Glosario</a>
+      <a href="#">Avisos <span class="contador">2</span></a>
+    </nav>
+    <div class="cabecera__estado" aria-label="Estado del servicio">
+      <span><span class="punto" aria-hidden="true"></span>Worker en marcha</span>
+      <span>Catálogo 1.3 · Perfil v3</span>
+    </div>
+  </div>
+</header>
+
+<main id="contenido">
+  <div class="titular">
+    <div>
+      <p class="meta">Viernes, 7 de noviembre de 2026</p>
+      <h1>Buenos días</h1>
+      <p class="entradilla">Dos análisis han terminado desde ayer y uno sigue en curso. Hay dos avisos de análisis programados que han encontrado problemas graves.</p>
+    </div>
+    <div class="titular__acciones">
+      <a class="boton" href="nuevo.html"><svg class="icono"><use href="#i-mas"/></svg>Nuevo análisis</a>
+    </div>
+  </div>
+
+  <section class="seccion" aria-labelledby="s-recientes">
+    <div class="seccion__cabeza"><span class="seccion__numero">01</span><h2 id="s-recientes">Análisis recientes</h2></div>
+    <div class="desplazable"><table class="registro inicio">
+      <thead>
+        <tr><th scope="col">Fecha</th><th scope="col">Proyecto y dirección</th><th scope="col">Alcance</th><th scope="col">Ejecución</th><th scope="col">Resultados <span class="ayuda"><button type="button" class="ayuda__boton" aria-expanded="false"><span class="visualmente-oculto">Qué significan los iconos</span><span aria-hidden="true">?</span></button><span class="ayuda__globo" hidden><strong>Resultados por estado</strong>⚠ problemas · ↑ mejorables · ⚖ decisiones a revisar · ✓ correctos. No es una nota: abre el análisis para ver el detalle.</span></span></th><th scope="col"><span class="visualmente-oculto">Abrir</span></th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono fecha">07/11 · 10:42</td>
+          <td><a class="titulo-fila" href="progreso.html">Estaciones de servicio Ruiz</a><div class="url">https://www.gasolinera-ejemplo.es/</div></td>
+          <td>Sitio completo</td>
+          <td><span class="etiqueta etiqueta--curso">En curso · fase 6 de 8</span></td>
+          <td class="meta">—</td>
+          <td class="num"><a href="progreso.html" aria-label="Ver progreso"><svg class="icono"><use href="#i-flecha"/></svg></a></td>
+        </tr>
+        <tr>
+          <td class="mono fecha">06/11 · 19:05</td>
+          <td><a class="titulo-fila" href="resultados.html">Ferretería Hermanos Vega</a><div class="url">https://ferreteria-ejemplo.es/</div></td>
+          <td>URL con contexto</td>
+          <td><span class="etiqueta">Completado</span></td>
+          <td>
+            <div class="recuento">
+              <span class="estado--problema"><svg class="icono" aria-hidden="true"><use href="#i-problema"/></svg>7<span class="visualmente-oculto"> problemas</span></span>
+              <span class="estado--mejorable"><svg class="icono" aria-hidden="true"><use href="#i-mejorable"/></svg>12<span class="visualmente-oculto"> mejorables</span></span>
+              <span class="estado--decision"><svg class="icono" aria-hidden="true"><use href="#i-decision"/></svg>2<span class="visualmente-oculto"> decisiones a revisar</span></span>
+              <span class="estado--correcto"><svg class="icono" aria-hidden="true"><use href="#i-correcto"/></svg>64<span class="visualmente-oculto"> correctos</span></span>
+            </div>
+          </td>
+          <td class="num"><a href="resultados.html" aria-label="Ver resultados"><svg class="icono"><use href="#i-flecha"/></svg></a></td>
+        </tr>
+        <tr>
+          <td class="mono fecha">06/11 · 12:18</td>
+          <td><a class="titulo-fila" href="resultados.html">Clínica dental Sonrisa</a><div class="url">https://clinica-ejemplo.es/</div></td>
+          <td>URL individual</td>
+          <td><span class="etiqueta">Completado</span></td>
+          <td>
+            <div class="recuento">
+              <span class="estado--problema"><svg class="icono" aria-hidden="true"><use href="#i-problema"/></svg>3<span class="visualmente-oculto"> problemas</span></span>
+              <span class="estado--mejorable"><svg class="icono" aria-hidden="true"><use href="#i-mejorable"/></svg>5<span class="visualmente-oculto"> mejorables</span></span>
+              <span class="estado--decision cero"><svg class="icono" aria-hidden="true"><use href="#i-decision"/></svg>0<span class="visualmente-oculto"> decisiones a revisar</span></span>
+              <span class="estado--correcto"><svg class="icono" aria-hidden="true"><use href="#i-correcto"/></svg>58<span class="visualmente-oculto"> correctos</span></span>
+            </div>
+          </td>
+          <td class="num"><a href="resultados.html" aria-label="Ver resultados"><svg class="icono"><use href="#i-flecha"/></svg></a></td>
+        </tr>
+        <tr>
+          <td class="mono fecha">05/11 · 16:50</td>
+          <td><a class="titulo-fila" href="resultados.html">Web de Proconsi</a> <span class="etiqueta">Interna</span><div class="url">https://proconsi.com/</div></td>
+          <td>Sitio completo</td>
+          <td><span class="etiqueta">Parcial · límite de páginas</span></td>
+          <td>
+            <div class="recuento">
+              <span class="estado--problema"><svg class="icono" aria-hidden="true"><use href="#i-problema"/></svg>21<span class="visualmente-oculto"> problemas</span></span>
+              <span class="estado--mejorable"><svg class="icono" aria-hidden="true"><use href="#i-mejorable"/></svg>40<span class="visualmente-oculto"> mejorables</span></span>
+              <span class="estado--decision"><svg class="icono" aria-hidden="true"><use href="#i-decision"/></svg>4<span class="visualmente-oculto"> decisiones a revisar</span></span>
+              <span class="estado--correcto"><svg class="icono" aria-hidden="true"><use href="#i-correcto"/></svg>310<span class="visualmente-oculto"> correctos</span></span>
+            </div>
+          </td>
+          <td class="num"><a href="resultados.html" aria-label="Ver resultados"><svg class="icono"><use href="#i-flecha"/></svg></a></td>
+        </tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <div class="mitades">
+    <section class="seccion" aria-labelledby="s-avisos">
+      <div class="seccion__cabeza"><span class="seccion__numero">02</span><h2 id="s-avisos">Avisos</h2></div>
+      <ol class="lista-avisos">
+        <li>
+          <span class="estado estado--problema"><svg class="icono"><use href="#i-problema"/></svg>Crítico</span>
+          <div>
+            <p><strong>Ferretería Hermanos Vega</strong> tiene <code>noindex</code> en la página principal.</p>
+            <p class="meta">Análisis programado semanal · 06/11 · 03:00</p>
+          </div>
+        </li>
+        <li>
+          <span class="estado estado--problema"><svg class="icono"><use href="#i-problema"/></svg>Alto</span>
+          <div>
+            <p><strong>Clínica dental Sonrisa</strong>: 5 problemas nuevos desde el análisis anterior.</p>
+            <p class="meta">Análisis programado mensual · 01/11 · 03:00</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="seccion" aria-labelledby="s-proyectos">
+      <div class="seccion__cabeza"><span class="seccion__numero">03</span><h2 id="s-proyectos">Proyectos activos</h2></div>
+      <ul class="lista-proyectos">
+        <li><a href="#">Estaciones de servicio Ruiz</a><span class="meta">Web de cliente · Hidrocarburos</span><span class="meta">12 análisis</span></li>
+        <li><a href="#">Ferretería Hermanos Vega</a><span class="meta">Web de cliente · Comercio</span><span class="meta">4 análisis</span></li>
+        <li><a href="#">Bar La Plaza</a><span class="meta">Web Kit Digital</span><span class="meta">1 análisis</span></li>
+        <li><a href="#">Clínica dental Sonrisa</a><span class="meta">Web de cliente · Salud</span><span class="meta">2 análisis</span></li>
+        <li><a href="#">Web de Proconsi</a><span class="meta">Web propia de Proconsi</span><span class="meta">9 análisis</span></li>
+      </ul>
+      <p class="mas"><a href="#">Ver los 14 proyectos</a></p>
+    </section>
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="pie__dentro">
+    <span>proconSEO · herramienta interna de Proconsi · solo red interna</span>
+    <span>Maqueta de diseño · datos de ejemplo</span>
+  </div>
+</footer>
+</body>
+</html>
