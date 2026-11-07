@@ -262,3 +262,12 @@ tbody tr:hover > * { background: var(--superficie); }
 @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
 }
+
+/* Botón «?» de la ayuda en contexto (24 px como mínimo, WCAG 2.5.8) */
+.pista__boton {
+    display: inline-grid; place-items: center; width: 24px; height: 24px; padding: 0; margin-left: .25rem; vertical-align: middle;
+    border: 1px solid var(--borde-fuerte); border-radius: 50%; background: #fff; color: var(--texto-suave);
+    font: 600 .75rem/1 var(--fuente); cursor: help;
+}
+.pista__boton:hover, .pista__boton:focus-visible { border-color: var(--texto); color: var(--texto); }
+h2 .pista__globo { font-weight: 400; }
