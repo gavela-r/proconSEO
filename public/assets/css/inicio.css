@@ -1,0 +1,32 @@
+/* Página de inicio (Parte 0). Usa las variables de base.css. */
+
+.inicio__fecha { white-space: nowrap; font: 400 .84rem/1.6 var(--fuente-datos); color: var(--texto-suave); }
+.inicio__proyecto { font-weight: 600; text-decoration: none; }
+.inicio__proyecto:hover { text-decoration: underline; }
+.inicio__recientes .chip { margin-left: .375rem; }
+.inicio__ejecucion { display: inline-block; padding: .3rem .5rem; border: 1px solid var(--borde-fuerte); border-radius: var(--radio); font-size: .8125rem; white-space: nowrap; color: var(--texto-suave); }
+.inicio__ejecucion--marcha { border-color: var(--texto); color: var(--texto); }
+
+.inicio__recuento { display: flex; flex-wrap: wrap; gap: .25rem .875rem; list-style: none; margin: 0; padding: 0; }
+.inicio__recuento .estado { font: 500 .84rem/1.4 var(--fuente-datos); }
+.inicio__cero { color: var(--texto-tenue); font-weight: 400; }
+
+.inicio__mitades { display: grid; grid-template-columns: 1fr 1fr; gap: 0 3rem; }
+.inicio__lista { list-style: none; margin: 0; padding: 0; }
+.inicio__lista li { display: flex; flex-direction: column; gap: .125rem; padding: .75rem 0; border-bottom: 1px solid var(--borde); }
+.inicio__lista li:first-child { padding-top: 0; }
+.inicio__lista a { font-weight: 600; text-decoration: none; }
+.inicio__lista a:hover { text-decoration: underline; }
+.inicio__lista--proyectos li { display: grid; grid-template-columns: 1fr auto auto; gap: 1.125rem; align-items: baseline; }
+.inicio__mas { margin-top: .875rem; font-size: .9375rem; }
+
+@media (max-width: 56rem) {
+    .inicio__mitades { grid-template-columns: 1fr; }
+}
+@media (max-width: 40rem) {
+    .inicio__lista--proyectos li { grid-template-columns: 1fr; gap: .125rem; }
+    .inicio__recientes thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .inicio__recientes, .inicio__recientes tbody, .inicio__recientes tr, .inicio__recientes td { display: block; width: 100%; }
+    .inicio__recientes tr { padding: .75rem 0; border-bottom: 1px solid var(--borde); }
+    .inicio__recientes td { border: 0; padding: .125rem 0; }
+}

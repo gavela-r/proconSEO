@@ -18,6 +18,9 @@ final class Glosario
 {
     private static ?self $comun = null;
 
+    /** Para que cada globo de la página tenga un id distinto. */
+    private static int $siguienteId = 0;
+
     /** @var list<array{termino: string, ancla: string, variantes: list<string>, bloque: string, definicion: string}> */
     public readonly array $terminos;
 
@@ -93,8 +96,13 @@ final class Glosario
             }
             $vistos[$i] = true;
             $t = $this->terminos[$i];
+            $id = 'def-' . self::escapar($t['ancla']) . '-' . ++self::$siguienteId;
 
-            return '<a class="termino" href="/glosario#' . self::escapar($t['ancla']) . '" title="' . self::escapar($t['definicion']) . '">' . $m[1] . '</a>';
+            // Ayuda en contexto (WCAG 1.4.13, assets/js/comun.js): el globo se abre con el ratón o el
+            // teclado y se cierra con Esc. Sin JavaScript, el término es un enlace normal al glosario.
+            // No se usa title: no se ve con el teclado ni en el móvil.
+            return '<span class="pista"><a class="termino" href="/glosario#' . self::escapar($t['ancla']) . '" aria-describedby="' . $id . '">' . $m[1] . '</a>'
+                . '<span class="pista__globo" id="' . $id . '" role="tooltip" hidden><strong>' . self::escapar($t['termino']) . '</strong>' . self::escapar($t['definicion']) . '</span></span>';
         }, $html);
     }
 

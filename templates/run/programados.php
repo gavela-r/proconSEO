@@ -84,14 +84,16 @@ $idProyecto = (int) $proyecto['id'];
         <?php endforeach; ?>
     </select>
 
-    <fieldset>
+    <fieldset class="programar__alcance">
         <legend>Alcance</legend>
-        <?php foreach ($alcances as $valor => $texto): ?>
-            <div class="opcion">
-                <input type="radio" id="alcance-<?= e($valor) ?>" name="alcance" value="<?= e($valor) ?>"<?= $v('alcance') === $valor ? ' checked' : '' ?>>
-                <label for="alcance-<?= e($valor) ?>"><?= e($texto) ?></label>
-            </div>
-        <?php endforeach; ?>
+        <div class="alcances">
+            <?php foreach ($alcances as $valor => $texto): ?>
+                <label class="alcance" for="alcance-<?= e($valor) ?>">
+                    <input type="radio" id="alcance-<?= e($valor) ?>" name="alcance" value="<?= e($valor) ?>"<?= $v('alcance') === $valor ? ' checked' : '' ?>>
+                    <span class="alcance__nombre"><span class="alcance__marca" aria-hidden="true"></span><?= e($texto) ?></span>
+                </label>
+            <?php endforeach; ?>
+        </div>
     </fieldset>
 
     <label for="hosts_extra">Otros dominios autorizados <span class="opcional">(opcional)</span></label>
