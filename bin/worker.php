@@ -30,11 +30,22 @@ $maxSimultaneos = (int) ($perfil['parametros']['trafico']['analisis_simultaneos'
 
 echo '[' . date('H:i:s') . "] Worker en marcha (máximo {$maxSimultaneos} análisis a la vez)." . PHP_EOL;
 
+// Margen para dar por perdido un análisis «en curso»: el doble del máximo de un sitio completo
+// (el orquestador ya corta al llegar a su límite, así que pasado esto no puede seguir vivo).
+$margenHuerfanos = 2 * (int) ($perfil['parametros']['tiempo']['analisis_sitio']['valor'] ?? 1800);
+
 $ultimaRevision = 0;
 while (true) {
     // Análisis programados: como mucho una revisión por minuto. Un fallo aquí no para el worker.
     if (time() - $ultimaRevision >= 60) {
         $ultimaRevision = time();
+        try {
+            foreach ($fabrica->repositorio()->cerrarHuerfanos($margenHuerfanos) as $huerfano) {
+                echo '[' . date('H:i:s') . "] Análisis {$huerfano}: cerrado (se quedó sin terminar)." . PHP_EOL;
+            }
+        } catch (Throwable $e) {
+            error_log('Análisis sin terminar: ' . (string) $e);
+        }
         try {
             foreach ($fabrica->programaciones()->lanzarPendientes() as $programado) {
                 echo '[' . date('H:i:s') . "] Análisis {$programado}: en cola (programado)." . PHP_EOL;

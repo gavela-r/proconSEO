@@ -187,6 +187,41 @@ final class RepositorioAnalisis
         )->execute([$estado->value, $hechos, $total, mb_substr($mensaje, 0, 500), $estado->value, $id, $fase->value]);
     }
 
+    /**
+     * Cierra los análisis que se quedaron «en curso» o «cancelando» porque el worker se detuvo a
+     * mitad (reinicio del servidor, proceso cerrado…). Sin esto ocuparían para siempre un hueco de
+     * los análisis simultáneos. Solo se cierran los que llevan más de $segundos desde que empezaron:
+     * el orquestador ya corta cualquier análisis al llegar a su límite de tiempo, así que pasado ese
+     * margen no puede seguir vivo. Los resultados que hubiera se conservan.
+     *
+     * @return list<int> ids cerrados
+     */
+    public function cerrarHuerfanos(int $segundos): array
+    {
+        $consulta = $this->bd->prepare(
+            "SELECT id, estado FROM analisis
+             WHERE estado IN ('en_curso', 'cancelando') AND iniciado_en < NOW(3) - INTERVAL ? SECOND"
+        );
+        $consulta->execute([max(60, $segundos)]);
+        $cerrados = [];
+        foreach ($consulta->fetchAll() as $fila) {
+            $id = (int) $fila['id'];
+            $estado = $fila['estado'] === 'cancelando' ? EstadoAnalisis::Cancelado : EstadoAnalisis::DetenidoError;
+            $motivo = $estado === EstadoAnalisis::Cancelado
+                ? 'Se pidió cancelar y el análisis se quedó sin cerrar (el worker se detuvo). Se cierra automáticamente; se conservan los resultados obtenidos.'
+                : 'El análisis se quedó sin terminar porque el worker se detuvo. Se cierra automáticamente; se conservan los resultados obtenidos.';
+            // Solo si sigue en el mismo estado: otro worker podría haberlo cerrado mientras tanto.
+            $cerrar = $this->bd->prepare('UPDATE analisis SET estado = ?, motivo_cierre = ?, terminado_en = NOW(3) WHERE id = ? AND estado = ?');
+            $cerrar->execute([$estado->value, $motivo, $id, $fila['estado']]);
+            if ($cerrar->rowCount() === 1) {
+                $this->cerrarFasesPendientes($id, 'No terminó: el worker se detuvo.');
+                $cerrados[] = $id;
+            }
+        }
+
+        return $cerrados;
+    }
+
     /** Marca como omitidas las fases que no llegaron a empezar (al cancelar o al fallar). */
     public function cerrarFasesPendientes(int $id, string $mensaje): void
     {
