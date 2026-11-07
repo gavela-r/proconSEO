@@ -91,6 +91,25 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
     <?php endif; ?>
 <?php else: ?>
 
+<!-- Índice de la página: con un sitio completo la página es larga y hay que poder saltar a cada parte. -->
+<nav class="indice" aria-label="En esta página">
+    <ul class="indice__secciones">
+        <li><a href="#t-resumen">Resumen</a></li>
+        <li><a href="#resultados">Filtrar</a></li>
+        <li><a href="#t-bloqueos">Bloqueos <span class="indice__n"><?= e(count($informe->bloqueos) + count($informe->recursosBloqueados)) ?></span></a></li>
+        <li><a href="#t-incidencias">Qué corregir <span class="indice__n"><?= e(count($informe->incidencias)) ?></span></a></li>
+        <li><a href="#t-correctos">Está bien <span class="indice__n"><?= e(count($informe->correctos) + count($informe->noAplicables)) ?></span></a></li>
+        <li><a href="#t-noverif">Sin comprobar <span class="indice__n"><?= e(count($informe->noVerificables)) ?></span></a></li>
+        <li><a href="#t-limites">Límites</a></li>
+    </ul>
+    <ul class="indice__bloques" aria-label="Ver solo un bloque">
+        <?php foreach (Bloque::cases() as $b): ?>
+            <li><a href="<?= e($enlace(['bloque' => $b->value])) ?>"<?= $filtro->bloque === $b ? ' aria-current="true"' : '' ?>>Solo <?= e($b->etiqueta()) ?></a></li>
+        <?php endforeach; ?>
+        <?php if ($filtrando): ?><li><a href="<?= e($enlace([])) ?>">Todo</a></li><?php endif; ?>
+    </ul>
+</nav>
+
 <!-- 2. Resumen por bloque y cobertura -->
 <section class="seccion" aria-labelledby="t-resumen">
     <h2 id="t-resumen">Resumen</h2>

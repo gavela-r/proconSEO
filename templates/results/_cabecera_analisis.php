@@ -3,7 +3,7 @@
  * Cabecera común del dashboard y de la vista Kit Digital: aviso de prueba, migas, título y pestañas.
  *
  * @var array<string, mixed> $analisis
- * @var string $vista 'todos' o 'kit'
+ * @var string $vista 'todos', 'paginas', 'wcag' o 'kit'
  * @var bool $conKitDigital
  */
 
@@ -30,7 +30,7 @@ $url = $analisis['url_final'] ?? $analisis['url_normalizada'] ?? $analisis['url_
 
 <div class="cabecera-pagina">
     <div>
-        <h1><?= $vista === 'kit' ? 'Compromisos Kit Digital' : 'Resultados del análisis' ?></h1>
+        <h1><?= e(['kit' => 'Compromisos Kit Digital', 'paginas' => 'Páginas analizadas', 'wcag' => 'Criterios WCAG 2.2'][$vista] ?? 'Resultados del análisis') ?></h1>
         <p><span class="codigo"><?= e($url) ?></span> · <?= e(Formato::fecha((string) $analisis['creado_en'])) ?> · <?= e($estado?->etiqueta() ?? $analisis['estado']) ?></p>
     </div>
     <div class="acciones">
@@ -46,11 +46,17 @@ $url = $analisis['url_final'] ?? $analisis['url_normalizada'] ?? $analisis['url_
     <p class="aviso" role="note"><strong><?= e($estado?->etiqueta() ?? '') ?>.</strong> <?= e($analisis['motivo_cierre']) ?></p>
 <?php endif; ?>
 
-<?php if ($conKitDigital): ?>
-    <nav aria-label="Vista de los resultados">
-        <ul class="pestanas">
-            <li><a href="/analisis/<?= e($id) ?>"<?= $vista === 'todos' ? ' aria-current="page"' : '' ?>>Todos los resultados</a></li>
-            <li><a href="/analisis/<?= e($id) ?>/kit-digital"<?= $vista === 'kit' ? ' aria-current="page"' : '' ?>>Compromisos Kit Digital</a></li>
-        </ul>
-    </nav>
-<?php endif; ?>
+<?php
+// Formas de mirar el mismo análisis: por hallazgos, por páginas y por criterios WCAG.
+$pestanas = ['todos' => ['', 'Hallazgos'], 'paginas' => ['/paginas', 'Por páginas'], 'wcag' => ['/wcag', 'Criterios WCAG']];
+if ($conKitDigital) {
+    $pestanas['kit'] = ['/kit-digital', 'Compromisos Kit Digital'];
+}
+?>
+<nav aria-label="Vista de los resultados">
+    <ul class="pestanas">
+        <?php foreach ($pestanas as $clave => [$ruta, $texto]): ?>
+            <li><a href="/analisis/<?= e($id) ?><?= e($ruta) ?>"<?= $vista === $clave ? ' aria-current="page"' : '' ?>><?= e($texto) ?></a></li>
+        <?php endforeach; ?>
+    </ul>
+</nav>

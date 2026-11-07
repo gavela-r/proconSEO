@@ -9,6 +9,7 @@
  * @var array<string, mixed>|null $analisis
  * @var list<array<string, mixed>> $evidencias
  * @var list<array<string, mixed>> $revisiones
+ * @var list<array<string, mixed>> $otrasPaginas la misma comprobación en otras páginas del análisis
  */
 
 use ProconSEO\Projects\Formato;
@@ -31,6 +32,15 @@ $esfuerzo = Esfuerzo::tryFrom((string) $r['esfuerzo']);
 $titulo = $ficha?->nombre ?? (string) $r['id_comprobacion'];
 $esPrueba = $r['es_dato_prueba'] || ($analisis !== null && ($analisis['es_dato_prueba'] || $analisis['proyecto_es_dato_prueba']));
 $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) === '';
+/** @var list<array<string, mixed>> $otrasPaginas */
+$otrasPaginas = is_array($otrasPaginas ?? null) ? $otrasPaginas : [];
+// Anterior y siguiente: las páginas con esta misma comprobación, por orden de dirección.
+$recorrido = array_merge($otrasPaginas, [$r]);
+usort($recorrido, static fn (array $a, array $b): int => [(string) $a['url_recurso'], (int) $a['id']] <=> [(string) $b['url_recurso'], (int) $b['id']]);
+$posicion = (int) array_search((int) $r['id'], array_map(static fn (array $o): int => (int) $o['id'], $recorrido), true);
+$previo = $posicion > 0 ? $recorrido[$posicion - 1] : null;
+$siguiente = $recorrido[$posicion + 1] ?? null;
+$mismoEstado = count(array_filter($otrasPaginas, static fn (array $o): bool => $o['estado_vigente'] === $r['estado_vigente']));
 ?>
 <?php if ($esPrueba): ?>
     <?= Vista::render('layout/aviso_prueba', [], false) ?>
@@ -66,7 +76,7 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
     <?php endif; ?>
 </div>
 <?php if ($revisado ?? false): ?>
-    <p class="aviso aviso--info" role="status"><strong>Revisión guardada.</strong> El resultado original se conserva y la revisión aparece en el historial.</p>
+    <p class="aviso aviso--info" role="status"><strong>Revisión guardada.</strong> El resultado original se conserva y la revisión aparece en el historial.<?php if (($enBloque ?? 0) > 0): ?> También se ha aplicado a <?= e($enBloque) ?> páginas más con el mismo resultado.<?php endif; ?></p>
 <?php endif; ?>
 <h1><?= e($titulo) ?></h1>
 <p class="explicacion"><?= \ProconSEO\Results\Glosario::comun()->enlazar($r['explicacion_sencilla']) ?></p>
@@ -190,6 +200,40 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
                 <p><strong>Necesita revisión humana<?= $r['motivo_revision'] !== null ? ':' : '.' ?></strong> <?= e($r['motivo_revision'] ?? '') ?></p>
             <?php endif; ?>
         </section>
+
+        <?php if ($otrasPaginas !== []): ?>
+            <section class="seccion" aria-labelledby="t-otras">
+                <h2 id="t-otras">En otras páginas</h2>
+                <p>
+                    Esta comprobación se ha hecho en <?= e(count($otrasPaginas) + 1) ?> páginas.
+                    <?php if ($mismoEstado > 0): ?>
+                        En <?= e($mismoEstado) ?> más está igual (<?= e(mb_strtolower(Etiquetas::estado($estado))) ?>)<?= in_array($estado, ['problema', 'mejorable', 'decision_revisar'], true) ? ': si comparten plantilla, se arregla una vez' : '' ?>.
+                    <?php else: ?>
+                        En las demás tiene otro estado.
+                    <?php endif; ?>
+                </p>
+                <nav class="recorrido" aria-label="Esta comprobación en otras páginas">
+                    <?php if ($previo !== null): ?><a href="/resultados/<?= e($previo['id']) ?>" rel="prev">← Página anterior<span class="solo-lectores">: <?= e($previo['url_recurso'] ?? '') ?></span></a><?php endif; ?>
+                    <span class="recorrido__posicion"><?= e($posicion + 1) ?> de <?= e(count($recorrido)) ?></span>
+                    <?php if ($siguiente !== null): ?><a href="/resultados/<?= e($siguiente['id']) ?>" rel="next">Página siguiente<span class="solo-lectores">: <?= e($siguiente['url_recurso'] ?? '') ?></span> →</a><?php endif; ?>
+                </nav>
+                <details class="repeticion__paginas">
+                    <summary>Ver las <?= e(count($recorrido)) ?> páginas con su estado</summary>
+                    <ul class="otras-paginas">
+                        <?php foreach ($recorrido as $o): ?>
+                            <li>
+                                <span class="estado estado--<?= e($o['estado_vigente']) ?>"><?= \ProconSEO\Results\Iconos::estado((string) $o['estado_vigente']) ?><?= e(Etiquetas::estado((string) $o['estado_vigente'])) ?></span>
+                                <?php if ((int) $o['id'] === (int) $r['id']): ?>
+                                    <span class="codigo" aria-current="page"><?= e($o['url_recurso'] ?? '') ?> (esta)</span>
+                                <?php else: ?>
+                                    <a class="codigo" href="/resultados/<?= e($o['id']) ?>"><?= e($o['url_recurso'] ?? '') ?></a>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </details>
+            </section>
+        <?php endif; ?>
 
         <?php if ($ficha !== null): ?>
             <section class="seccion" aria-labelledby="t-criterio">

@@ -9,7 +9,10 @@ use ProconSEO\Results\FiltroResultados;
 use ProconSEO\Results\Glosario;
 use ProconSEO\Results\Informe;
 use ProconSEO\Results\RepositorioResultados;
+use ProconSEO\Results\PanelesSitio;
 use ProconSEO\Results\Seguimientos;
+use ProconSEO\Results\VistaPaginas;
+use ProconSEO\Results\VistaWcag;
 use ProconSEO\Review\CapturaSegura;
 use ProconSEO\Run\Fabrica;
 use ProconSEO\Shared\BaseDatos;
@@ -92,6 +95,40 @@ return static function (Router $r): void {
         ]));
     });
 
+    // Vista por páginas e inventario de lo descargado: qué páginas y qué zonas concentran los problemas.
+    $r->get('/analisis/{id}/paginas', static function (Peticion $p) use ($repo, $estilos): Respuesta {
+        $repositorio = $repo();
+        $id = (int) $p->parametro('id');
+        $analisis = $repositorio->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+        $orden = (string) $p->entrada('orden', 'problemas');
+        $orden = array_key_exists($orden, VistaPaginas::ORDENES) ? $orden : 'problemas';
+
+        return Respuesta::html(Vista::render('results/paginas', [
+            'titulo' => 'Páginas analizadas',
+            'estilos' => $estilos,
+            'analisis' => $analisis,
+            'paginas' => new VistaPaginas($resultados = $repositorio->resultados($id), $repositorio->recursos($id), $orden),
+            'paneles' => new PanelesSitio($resultados),
+            'orden' => $orden,
+            'conKitDigital' => CompromisosKitDigital::aplica($analisis['proyecto_tipo']),
+        ]));
+    });
+
+    // Criterios WCAG 2.2 A y AA con lo que dice el análisis de cada uno (para la declaración de accesibilidad).
+    $r->get('/analisis/{id}/wcag', static function (Peticion $p) use ($repo, $catalogo, $estilos): Respuesta {
+        $repositorio = $repo();
+        $id = (int) $p->parametro('id');
+        $analisis = $repositorio->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+
+        return Respuesta::html(Vista::render('results/wcag', [
+            'titulo' => 'Criterios WCAG 2.2',
+            'estilos' => $estilos,
+            'analisis' => $analisis,
+            'wcag' => new VistaWcag(Informe::conTitulos($repositorio->resultados($id), $catalogo())),
+            'conKitDigital' => CompromisosKitDigital::aplica($analisis['proyecto_tipo']),
+        ]));
+    });
+
     // Borrado definitivo de un análisis con confirmación previa (RF-16; decisión 16).
     $borrado = static fn (): BorradoAnalisis => new BorradoAnalisis(
         BaseDatos::conexion(),
@@ -166,6 +203,11 @@ return static function (Router $r): void {
         $analisis = $repositorio->analisis((int) $resultado['analisis_id']);
         $seg = $seguimientos();
         $proyectoId = $analisis !== null ? (int) $analisis['proyecto_id'] : 0;
+        // La misma comprobación en las otras páginas del análisis, para ir de una a otra.
+        $otrasPaginas = array_values(array_filter(
+            $repositorio->resultados((int) $resultado['analisis_id']),
+            static fn (array $o): bool => $o['id_comprobacion'] === $resultado['id_comprobacion'] && (int) $o['id'] !== (int) $resultado['id'],
+        ));
 
         return Respuesta::html(Vista::render('results/detalle', [
             'titulo' => $ficha?->nombre ?? (string) $resultado['id_comprobacion'],
@@ -181,6 +223,8 @@ return static function (Router $r): void {
             'evidencias' => $repositorio->evidencias((int) $resultado['id']),
             'revisiones' => $repositorio->revisiones((int) $resultado['id']),
             'revisado' => $p->entrada('revisado') === '1',
+            'enBloque' => max(0, min(10000, (int) $p->entrada('en_bloque', 0))),
+            'otrasPaginas' => $otrasPaginas,
         ]), $estado);
     };
 
