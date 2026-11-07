@@ -43,6 +43,9 @@ final class FiltroResultadosTest extends TestCase
         self::assertSame([], $this->claves(['estado' => 'decision_revisar']));
         self::assertSame(['acc'], $this->claves(['criterio' => 'acc-01']), 'El criterio no distingue mayúsculas');
         self::assertSame(['ia'], $this->claves(['url' => 'https://ejemplo.es/robots.txt']));
+        self::assertSame(['seo'], $this->claves(['url' => 'https://ejemplo.es/']), 'Una dirección exacta del análisis filtra solo esa, no todas las que empiezan igual');
+        self::assertSame(['acc'], $this->claves(['url' => '/CONTACTO']), 'Parte de la dirección, sin distinguir mayúsculas');
+        self::assertSame(['seo', 'acc', 'ia'], $this->claves(['url' => 'ejemplo.es']));
         self::assertSame(['acc'], $this->claves(['pendiente' => '1']));
         self::assertSame([], $this->claves(['bloque' => 'seo', 'pendiente' => '1']), 'Los filtros se combinan');
     }

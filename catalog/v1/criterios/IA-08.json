@@ -7,6 +7,7 @@
   "explicacion_sencilla": "La URL canónica es la dirección «oficial» de una página. Si además está en el mapa del sitio y otras páginas la enlazan, los buscadores la encuentran y la consideran importante.",
   "modo": "automatico",
   "esfuerzo": "medio",
+  "responsable": "desarrollo",
   "mvp": "si",
   "ref_investigacion": [
     "C03"

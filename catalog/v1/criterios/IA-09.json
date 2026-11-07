@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Las IA citan con más frecuencia páginas que aportan información concreta y propia, no textos genéricos.",
   "modo": "humano",
   "esfuerzo": "alto",
+  "responsable": "contenido",
   "mvp": "no",
   "ref_investigacion": [
     "C06",

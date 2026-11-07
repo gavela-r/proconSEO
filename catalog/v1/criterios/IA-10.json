@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Las máquinas leen texto mucho mejor que imágenes. Si un horario o una tarifa solo está en una foto o un PDF, puede que nadie lo encuentre.",
   "modo": "hibrido",
   "esfuerzo": "medio",
+  "responsable": "contenido",
   "mvp": "parcial",
   "ref_investigacion": [
     "C04"

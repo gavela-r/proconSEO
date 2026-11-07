@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Los enlaces son los caminos por los que Google recorre la web. Si están rotos o no se pueden seguir, hay páginas que nunca encontrará.",
   "modo": "automatico",
   "esfuerzo": "medio",
+  "responsable": "contenido",
   "mvp": "si",
   "ref_investigacion": [
     "O9",

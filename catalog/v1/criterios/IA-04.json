@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Si el título promete una cosa y el texto habla de otra, los buscadores y las IA entienden peor de qué trata la página.",
   "modo": "humano",
   "esfuerzo": "medio",
+  "responsable": "contenido",
   "mvp": "no",
   "ref_investigacion": [
     "C05",

@@ -127,6 +127,14 @@ $wcag = Etiquetas::wcag($r);
                 <?= $error('captura') ?>
             </fieldset>
 
+            <?php if (($iguales ?? 0) > 0): ?>
+                <fieldset class="en-bloque">
+                    <legend>Otras páginas con el mismo resultado</legend>
+                    <label class="opcion"><input type="checkbox" name="aplicar_iguales" value="1"<?= $v('aplicar_iguales') === '1' ? ' checked' : '' ?> aria-describedby="ayuda-en-bloque"><span>Aplicar esta misma revisión a las otras <?= e($iguales) ?> páginas</span></label>
+                    <span class="ayuda" id="ayuda-en-bloque">Solo a las que tienen esta comprobación con el mismo estado y aún no las ha revisado nadie. Cada una guarda su propia revisión con tu nombre y tu justificación; la captura solo se añade a esta.</span>
+                </fieldset>
+            <?php endif; ?>
+
             <div class="formulario__botones">
                 <button class="boton" type="submit">Guardar revisión</button>
                 <a class="boton boton--secundario" href="/resultados/<?= e($r['id']) ?>">Cancelar</a>

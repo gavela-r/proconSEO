@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Cada botón, menú o casilla tiene que decir qué es y en qué estado está (abierto, marcado…) para que un lector de pantalla lo pueda explicar.",
   "modo": "automatico",
   "esfuerzo": "medio",
+  "responsable": "desarrollo",
   "mvp": "parcial",
   "ref_investigacion": [],
   "reutiliza": [],

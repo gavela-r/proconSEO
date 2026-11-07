@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Si una página muestra precios u ofertas caducadas, una IA puede repetir información que ya no es cierta.",
   "modo": "humano",
   "esfuerzo": "bajo",
+  "responsable": "contenido",
   "mvp": "no",
   "ref_investigacion": [
     "C11"
