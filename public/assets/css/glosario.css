@@ -1,0 +1,60 @@
+/* Página del glosario. Usa las variables de base.css. */
+
+.glosario__total { margin: 0; color: var(--texto-tenue); }
+.glosario__cifra { display: block; font: 400 2.25rem/1 var(--fuente-datos); color: var(--texto); }
+
+/* Barra fija arriba: buscador, bloques y letras siempre a mano */
+.glosario__barra {
+    position: sticky; top: 0; z-index: 5;
+    display: grid; grid-template-columns: minmax(16rem, 1fr) auto; gap: .875rem 1.5rem; align-items: center;
+    margin: 0 calc(-1 * var(--espacio)); padding: 1rem var(--espacio) .875rem;
+    background: rgba(255, 255, 255, .97); border-bottom: 1px solid var(--borde);
+}
+.glosario__buscar { position: relative; }
+.glosario__buscar .icono { position: absolute; left: .875rem; top: 50%; transform: translateY(-50%); color: var(--texto-tenue); }
+.glosario__buscar input { max-width: none; padding-left: 2.75rem; }
+
+.glosario__bloques { display: flex; flex-wrap: wrap; gap: .5rem; }
+.glosario__bloque {
+    min-height: 40px; padding: 0 .875rem; border: 1px solid var(--borde-fuerte); border-radius: 999px;
+    background: #fff; color: var(--texto-suave); font: 500 .875rem/1 var(--fuente); cursor: pointer;
+}
+.glosario__bloque span { margin-left: .25rem; font-family: var(--fuente-datos); color: var(--texto-tenue); }
+.glosario__bloque:hover { border-color: var(--texto); color: var(--texto); }
+.glosario__bloque[aria-pressed="true"] { background: var(--texto); border-color: var(--texto); color: #fff; }
+.glosario__bloque[aria-pressed="true"] span { color: #d3d6db; }
+
+.glosario__letras { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: .125rem; }
+.glosario__letras a, .glosario__letras span {
+    display: grid; place-items: center; min-width: 30px; height: 30px; padding: 0 .25rem;
+    font: 500 .875rem/1 var(--fuente-datos); border-radius: var(--radio);
+}
+.glosario__letras a { color: var(--texto); text-decoration: none; }
+.glosario__letras a:hover { background: var(--superficie); color: var(--marca); }
+.glosario__letras a.glosario__letra--sin { color: #8d939b; text-decoration: line-through; pointer-events: none; }
+.glosario__letras span { color: #c4c8ce; }
+.glosario__resultado { grid-column: 1 / -1; margin: 0; min-height: 1.2em; }
+.glosario__resultado:empty { display: none; }
+
+/* Grupos por letra con fichas en rejilla */
+.glosario__lista { margin-top: 1.5rem; }
+.glosario__grupo { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: 0 1.5rem; padding: 1.5rem 0; border-bottom: 1px solid var(--borde); scroll-margin-top: 11rem; }
+.glosario__letra { margin: 0; font: 400 2rem/1 var(--fuente-datos); color: var(--marca); }
+.glosario__fichas { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem 1.75rem; margin: 0; }
+.glosario__ficha { padding: .125rem 0 .25rem 1rem; border-left: 3px solid var(--borde-fuerte); scroll-margin-top: 11rem; }
+.glosario__ficha--ia { border-left-color: #2f6f9f; }
+.glosario__ficha--seo { border-left-color: var(--texto); }
+.glosario__ficha--acc { border-left-color: var(--estado-correcto); }
+.glosario__ficha:target { background: #fff8e6; outline: 2px solid #e0b44c; outline-offset: 4px; }
+.glosario__ficha dt { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .625rem; margin-bottom: .375rem; }
+.glosario__termino { font-weight: 700; font-size: 1.0625rem; }
+.glosario__etiqueta { font: 500 .72rem/1 var(--fuente-datos); text-transform: uppercase; letter-spacing: .06em; color: var(--texto-tenue); }
+.glosario__ficha dd { margin: 0; color: var(--texto-suave); font-size: .9375rem; }
+.glosario__variantes { display: block; margin-top: .375rem; font-size: .8125rem; color: var(--texto-tenue); }
+.glosario__vacio { padding: 2rem 0; color: var(--texto-suave); }
+
+@media (max-width: 40rem) {
+    .glosario__barra { grid-template-columns: 1fr; position: static; }
+    .glosario__grupo { grid-template-columns: 1fr; gap: .75rem; }
+    .glosario__letra { font-size: 1.5rem; }
+}

@@ -85,7 +85,7 @@ final class VistaCatalogo
      * Criterios con las subcomprobaciones que pasan los filtros, en el orden del catálogo.
      *
      * @param array{bloque: ?Bloque, cobertura: ?Cobertura, texto: string} $filtros
-     * @return list<array{id: string, nombre: string, bloque: Bloque, explicacion: string, que_comprueba: string, modo: string, esfuerzo: string, wcag: list<array<string, mixed>>, fuentes: list<array<string, mixed>>, subcomprobaciones: list<array<string, mixed>>}>
+     * @return list<array{id: string, nombre: string, bloque: Bloque, explicacion: string, que_comprueba: string, modo: string, esfuerzo: string, responsable: string, wcag: list<array<string, mixed>>, fuentes: list<array<string, mixed>>, subcomprobaciones: list<array<string, mixed>>}>
      */
     public function criterios(array $filtros): array
     {
@@ -108,6 +108,7 @@ final class VistaCatalogo
                 'que_comprueba' => (string) ($c['que_comprueba'] ?? ''),
                 'modo' => ModoEvaluacion::tryFrom((string) ($c['modo'] ?? ''))?->etiqueta() ?? '',
                 'esfuerzo' => Esfuerzo::tryFrom((string) ($c['esfuerzo'] ?? ''))?->etiqueta() ?? '',
+                'responsable' => \ProconSEO\Results\Responsable::ETIQUETAS[(string) ($c['responsable'] ?? '')] ?? '',
                 'wcag' => array_values($c['wcag'] ?? []),
                 'fuentes' => array_values($c['fuentes'] ?? []),
                 'subcomprobaciones' => $subs,

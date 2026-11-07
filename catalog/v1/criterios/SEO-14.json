@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Con los datos estructurados correctos, Google puede mostrar estrellas, precios o disponibilidad directamente en los resultados.",
   "modo": "automatico",
   "esfuerzo": "medio",
+  "responsable": "desarrollo",
   "mvp": "parcial",
   "ref_investigacion": [
     "T13"

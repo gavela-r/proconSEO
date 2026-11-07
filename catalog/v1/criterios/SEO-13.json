@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Las ventanas que tapan la página al entrar molestan a los usuarios y Google las penaliza en móvil.",
   "modo": "automatico",
   "esfuerzo": "medio",
+  "responsable": "diseno",
   "mvp": "no",
   "ref_investigacion": [
     "T12"

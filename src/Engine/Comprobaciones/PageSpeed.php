@@ -119,7 +119,7 @@ final class PageSpeed implements Comprobacion
             return $disponibles;
         }
         if ($errores === []) {
-            throw new NoVerificable('No se pidieron datos a Google PageSpeed Insights para esta página.', Causas::PAGESPEED_SIN_DATOS);
+            throw new NoVerificable('No se pidieron datos a Google PageSpeed Insights para esta página: en un sitio completo se miden la primera y unas páginas de muestra (una por zona de la web), porque medirlas todas tardaría horas.', Causas::PAGESPEED_SIN_DATOS);
         }
         throw new NoVerificable('Google PageSpeed Insights no devolvió datos (' . implode('; ', $errores) . ').', Causas::PAGESPEED_SIN_DATOS);
     }

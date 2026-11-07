@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Los asistentes con IA y las personas que usan lector de pantalla necesitan saber qué hace cada botón. Un botón sin nombre es un botón invisible para ellos.",
   "modo": "automatico",
   "esfuerzo": "medio",
+  "responsable": "desarrollo",
   "mvp": "parcial",
   "ref_investigacion": [],
   "reutiliza": [

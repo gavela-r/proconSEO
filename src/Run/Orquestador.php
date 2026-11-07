@@ -52,6 +52,19 @@ final class Orquestador
     private const AGENTE = 'proconSEO';
 
     /**
+     * Comprobaciones que miran un fichero del sitio (el robots.txt, el llms.txt, el sitemap) y no
+     * la página: dan lo mismo en todas. En un sitio completo se guardan solo con la primera página;
+     * repetirlas en cada una solo añadía filas iguales (31 en un análisis de 31 páginas).
+     * El permiso de cada agente sí depende de la ruta de la página, así que ese se guarda siempre.
+     */
+    public const SOLO_PRIMERA_PAGINA = [
+        'IA-01.robots-recuperado',
+        'IA-01.robots-sintaxis',
+        'IA-01.llms-txt',
+        'IA-08.presencia-sitemap',
+    ];
+
+    /**
      * @param Closure(Ambito, LimitesDescarga): ClienteHttpSeguro $fabricaCliente
      */
     public function __construct(
@@ -170,7 +183,7 @@ final class Orquestador
             } elseif ($cancelado) {
                 $this->terminar($id, Fase::Descubrimiento, EstadoFase::Omitida, 'El análisis se canceló antes de recorrer el sitio.');
             } else {
-                [$salidasSitio, $cancelado, $limiteAlcanzado] = $this->recorrerSitio($id, $cliente, $proveedor, $robots, $pagina, $limites, $limitesRastreo, $ambito, $progreso, $contexto, $inicio);
+                [$salidasSitio, $cancelado, $limiteAlcanzado] = $this->recorrerSitio($id, $cliente, $proveedor, $robots, $pagina, $limites, $limitesRastreo, $ambito, $progreso, $contexto, $inicio, $perfil);
                 array_push($salidas, ...$salidasSitio);
                 if ($this->motor instanceof ConsolidadorSitio) {
                     [$salidas, $salidaSitio] = $this->consolidarSitio($this->motor, $contexto($pagina), $salidas, $progreso);
@@ -209,13 +222,13 @@ final class Orquestador
     }
 
     /**
-     * Mediciones de Google PageSpeed de la página analizada (SEO-11 y ACC-05), móvil y ordenador
-     * según el perfil. Solo de esa página: en el sitio completo serían cientos de llamadas.
+     * Mediciones de Google PageSpeed de una página (SEO-11 y ACC-05), móvil y ordenador según el
+     * perfil. En el sitio completo, solo de la primera y de las páginas de muestra (recorrerSitio).
      *
      * @param array<string, mixed> $perfil
      * @return list<InformePageSpeed>
      */
-    private function pedirPageSpeed(int $id, RecursoDescargado $pagina, array $perfil, ProgresoBd $progreso): array
+    private function pedirPageSpeed(int $id, RecursoDescargado $pagina, array $perfil, ProgresoBd $progreso, bool $anunciar = true): array
     {
         if ($this->pageSpeed === null || !$pagina->esCorrecto()) {
             return [];
@@ -225,12 +238,20 @@ final class Orquestador
         if ($dispositivos === [] || $progreso->estaCancelado()) {
             return [];
         }
-        if ($this->pageSpeed->configurado()) {
+        if ($anunciar && $this->pageSpeed->configurado()) {
             $this->repositorio->actualizarFase($id, Fase::Recuperacion, EstadoFase::EnCurso, 0, 1, 'Midiendo la velocidad con Google PageSpeed (puede tardar medio minuto)');
         }
 
         // Móvil y ordenador a la vez: es un servicio externo, no el sitio analizado.
         return $this->pageSpeed->informes($pagina->urlFinal, $dispositivos);
+    }
+
+    /** Zona de la web de una dirección: la primera parte de la ruta («/blog/»), o «/» si no tiene. */
+    public static function zona(string $url): string
+    {
+        $partes = array_values(array_filter(explode('/', (string) (parse_url($url, PHP_URL_PATH) ?? '/')), static fn (string $s): bool => $s !== ''));
+
+        return count($partes) <= 1 ? '/' : '/' . $partes[0] . '/';
     }
 
     private function empezar(int $id, Fase $fase): void
@@ -321,7 +342,12 @@ final class Orquestador
      * De las páginas siguientes a la primera solo se guardan las comprobaciones implementadas:
      * las no implementadas serían la misma fila repetida en cada página.
      *
-     * @param Closure(RecursoDescargado): ContextoAnalisis $contexto
+     * PageSpeed se pide también para unas páginas de muestra: una por zona de la web (la primera
+     * parte de la ruta, que suele ser una plantilla), hasta el máximo del perfil
+     * (apis.pagespeed_paginas_sitio). Medir las 200 páginas tardaría horas.
+     *
+     * @param Closure(RecursoDescargado, list<InformePageSpeed>=): ContextoAnalisis $contexto
+     * @param array<string, mixed> $perfil
      * @return array{0: list<SalidaMotor>, 1: bool, 2: ?string} salidas, cancelado y límite alcanzado
      */
     private function recorrerSitio(
@@ -336,7 +362,10 @@ final class Orquestador
         ProgresoBd $progreso,
         Closure $contexto,
         float $inicio,
+        array $perfil = [],
     ): array {
+        $muestras = max(1, min(20, (int) ($perfil['apis']['pagespeed_paginas_sitio']['valor'] ?? 1)));
+        $zonasMedidas = [self::zona($pagina->urlFinal) => true]; // la primera página ya se midió
         $this->empezar($id, Fase::Descubrimiento);
 
         // RFC 9309: sin robots.txt (4xx) se puede rastrear todo; si no se pudo leer (5xx, red) no se rastrea nada.
@@ -372,11 +401,18 @@ final class Orquestador
 
             $proveedor->nuevaPagina($otra);
             $this->adelantar($proveedor, $contexto($otra), $limitesRastreo->maxUrlsContexto);
-            $salida = $this->motor->ejecutar($contexto($otra), $proveedor, $progresoPagina, $progreso);
+            $informes = [];
+            $zona = self::zona($otra->urlFinal);
+            if (count($zonasMedidas) < $muestras && !isset($zonasMedidas[$zona])) {
+                $zonasMedidas[$zona] = true;
+                $informes = $this->pedirPageSpeed($id, $otra, $perfil, $progreso, false);
+            }
+            $salida = $this->motor->ejecutar($contexto($otra, $informes), $proveedor, $progresoPagina, $progreso);
             $this->registrarBloqueos($id, $cliente);
 
             $salidas[] = new SalidaMotor(
-                array_values(array_filter($salida->resultados, static fn ($r): bool => $r->cobertura !== Cobertura::NoImplementada)),
+                array_values(array_filter($salida->resultados, static fn ($r): bool => $r->cobertura !== Cobertura::NoImplementada
+                    && !in_array($r->idComprobacion, self::SOLO_PRIMERA_PAGINA, true))),
                 $salida->evidencias,
                 $salida->gruposCausa,
                 $salida->senales,

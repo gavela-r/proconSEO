@@ -7,8 +7,14 @@ use ProconSEO\Results\ComparacionAnalisis;
 use ProconSEO\Results\CompromisosKitDigital;
 use ProconSEO\Results\FiltroResultados;
 use ProconSEO\Results\Glosario;
+use ProconSEO\Results\GuiaWcag;
 use ProconSEO\Results\Informe;
 use ProconSEO\Results\RepositorioResultados;
+use ProconSEO\Results\RevisionesManuales;
+use ProconSEO\Results\PanelesSitio;
+use ProconSEO\Results\Seguimientos;
+use ProconSEO\Results\VistaPaginas;
+use ProconSEO\Results\VistaWcag;
 use ProconSEO\Review\CapturaSegura;
 use ProconSEO\Run\Fabrica;
 use ProconSEO\Shared\BaseDatos;
@@ -25,6 +31,16 @@ use ProconSEO\Shared\Vista;
 return static function (Router $r): void {
     $repo = static fn (): RepositorioResultados => new RepositorioResultados(BaseDatos::conexion());
     $estilos = ['/assets/css/parte3.css'];
+    $seguimientos = static fn (): Seguimientos => new Seguimientos(BaseDatos::conexion());
+
+    // Añade a cada resultado su seguimiento actual (por proyecto y comprobación) para mostrarlo y filtrar.
+    $conSeguimiento = static function (array $resultados, array $actuales): array {
+        return array_map(static function (array $r) use ($actuales): array {
+            $s = $actuales[(string) $r['id_comprobacion']] ?? null;
+
+            return $r + ['seguimiento' => $s === null ? Seguimientos::PENDIENTE : (string) $s['estado'], 'seguimiento_actual' => $s];
+        }, $resultados);
+    };
 
     // El catálogo solo aporta nombres y explicaciones: si no se puede cargar, se muestran los identificadores.
     $catalogo = static function (): ?Catalogo {
@@ -40,12 +56,12 @@ return static function (Router $r): void {
     // Glosario de los términos técnicos que aparecen en los resultados.
     $r->get('/glosario', static fn (): Respuesta => Respuesta::html(Vista::render('results/glosario', [
         'titulo' => 'Glosario',
-        'estilos' => $estilos,
+        'estilos' => [...$estilos, '/assets/css/glosario.css'],
         'glosario' => Glosario::comun(),
     ])));
 
     // Dashboard del análisis en el orden de la especificación (4.4, RF-20, RF-21).
-    $r->get('/analisis/{id}', static function (Peticion $p) use ($repo, $catalogo, $estilos): Respuesta {
+    $r->get('/analisis/{id}', static function (Peticion $p) use ($repo, $catalogo, $estilos, $seguimientos, $conSeguimiento): Respuesta {
         $repositorio = $repo();
         $id = (int) $p->parametro('id');
         $analisis = $repositorio->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
@@ -67,7 +83,7 @@ return static function (Router $r): void {
             'estilos' => $estilos,
             'analisis' => $analisis,
             'informe' => new Informe(
-                $repositorio->resultados($id),
+                $conSeguimiento($repositorio->resultados($id), $seguimientos()->actuales((int) $analisis['proyecto_id'])),
                 $repositorio->recursos($id),
                 $repositorio->fases($id),
                 $cat,
@@ -79,6 +95,102 @@ return static function (Router $r): void {
             'eventos' => $repositorio->eventosSeguridad($id),
             'conKitDigital' => CompromisosKitDigital::aplica($analisis['proyecto_tipo']),
         ]));
+    });
+
+    // Vista por páginas e inventario de lo descargado: qué páginas y qué zonas concentran los problemas.
+    $r->get('/analisis/{id}/paginas', static function (Peticion $p) use ($repo, $estilos): Respuesta {
+        $repositorio = $repo();
+        $id = (int) $p->parametro('id');
+        $analisis = $repositorio->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+        $orden = (string) $p->entrada('orden', 'problemas');
+        $orden = array_key_exists($orden, VistaPaginas::ORDENES) ? $orden : 'problemas';
+
+        return Respuesta::html(Vista::render('results/paginas', [
+            'titulo' => 'Páginas analizadas',
+            'estilos' => $estilos,
+            'analisis' => $analisis,
+            'paginas' => new VistaPaginas($resultados = $repositorio->resultados($id), $repositorio->recursos($id), $orden),
+            'paneles' => new PanelesSitio($resultados),
+            'orden' => $orden,
+            'conKitDigital' => CompromisosKitDigital::aplica($analisis['proyecto_tipo']),
+        ]));
+    });
+
+    // Criterios WCAG 2.2 A y AA con lo que dice el análisis de cada uno (para la declaración de accesibilidad).
+    $r->get('/analisis/{id}/wcag', static function (Peticion $p) use ($repo, $catalogo, $estilos): Respuesta {
+        $repositorio = $repo();
+        $id = (int) $p->parametro('id');
+        $analisis = $repositorio->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+
+        return Respuesta::html(Vista::render('results/wcag', [
+            'titulo' => 'Criterios WCAG 2.2',
+            'estilos' => $estilos,
+            'analisis' => $analisis,
+            'wcag' => new VistaWcag(Informe::conTitulos($repositorio->resultados($id), $catalogo()), (new RevisionesManuales(BaseDatos::conexion()))->vigentes($id)),
+            'conKitDigital' => CompromisosKitDigital::aplica($analisis['proyecto_tipo']),
+        ]));
+    });
+
+    // Revisión manual guiada de un criterio WCAG: qué ha visto la herramienta, cómo revisarlo y dónde apuntarlo.
+    $criterioWcag = static function (Peticion $p, ?string $error = null, array $valores = [], int $estado = 200) use ($repo, $catalogo, $estilos): Respuesta {
+        $repositorio = $repo();
+        $id = (int) $p->parametro('id');
+        $analisis = $repositorio->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+        $numero = (string) $p->entrada('criterio', '');
+        if (!RevisionesManuales::esCriterio($numero)) {
+            throw new ErrorDominio('no_encontrado', 'Ese criterio no es de WCAG 2.2 A o AA.', 404);
+        }
+        $manuales = new RevisionesManuales(BaseDatos::conexion());
+        $wcag = new VistaWcag(Informe::conTitulos($repositorio->resultados($id), $catalogo()), $manuales->vigentes($id));
+        $criterio = array_values(array_filter($wcag->criterios, static fn (array $c): bool => $c['numero'] === $numero))[0];
+
+        return Respuesta::html(Vista::render('results/wcag_criterio', [
+            'titulo' => 'WCAG ' . $numero . ' · ' . $criterio['nombre'],
+            'estilos' => $estilos,
+            'analisis' => $analisis,
+            'criterio' => $criterio,
+            'pasos' => GuiaWcag::pasos($numero),
+            'historial' => $manuales->historial($id, $numero),
+            'error' => $error,
+            'valores' => $valores,
+            'guardado' => $p->entrada('guardado') === '1',
+        ]), $estado);
+    };
+
+    // El criterio (2.1.1) va en ?criterio=: el router común solo admite parámetros numéricos.
+    $r->get('/analisis/{id}/wcag/revisar', static fn (Peticion $p): Respuesta => $criterioWcag($p));
+
+    // Solo inserta: cada revisión manual es una fila nueva con quién, qué miró y qué vio.
+    $r->post('/analisis/{id}/wcag/revisiones', static function (Peticion $p) use ($repo, $criterioWcag): Respuesta {
+        $id = (int) $p->parametro('id');
+        $analisis = $repo()->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+        $numero = (string) $p->entrada('criterio', '');
+        $valores = array_map(
+            static fn (mixed $v): string => is_string($v) ? $v : '',
+            array_intersect_key($p->cuerpo, array_flip(['resultado', 'revisor', 'paginas', 'notas'])),
+        ) + ['resultado' => '', 'revisor' => '', 'paginas' => '', 'notas' => ''];
+
+        try {
+            $revision = (new RevisionesManuales(BaseDatos::conexion()))->registrar($id, $numero, $valores['resultado'], $valores['revisor'], $valores['paginas'], $valores['notas']);
+        } catch (ErrorDominio $e) {
+            if ($e->codigo !== 'revision_manual_no_valida') {
+                throw $e;
+            }
+
+            return $criterioWcag($p, $e->getMessage(), $valores, 422);
+        }
+
+        (new Fabrica())->auditoria()->registrar(
+            'revision_manual_guardada',
+            $id,
+            (int) $analisis['proyecto_id'],
+            Fabrica::ipOrigen(),
+            null,
+            null,
+            "Revisión manual {$revision} de WCAG {$numero}: {$valores['resultado']}",
+        );
+
+        return Respuesta::redirigir('/analisis/' . $id . '/wcag/revisar?' . http_build_query(['criterio' => $numero, 'guardado' => '1']) . '#t-revisar');
     });
 
     // Borrado definitivo de un análisis con confirmación previa (RF-16; decisión 16).
@@ -144,23 +256,76 @@ return static function (Router $r): void {
     });
 
     // Detalle de un resultado con todos los campos de la sección 5 (RF-22).
-    $r->get('/resultados/{id}', static function (Peticion $p) use ($repo, $catalogo, $estilos): Respuesta {
+    // Detalle de un resultado. Con $error y $valores, el formulario de seguimiento vuelve con lo escrito.
+    $detalle = static function (Peticion $p, ?string $error = null, array $valores = [], int $estado = 200) use ($repo, $catalogo, $estilos, $seguimientos): Respuesta {
         $repositorio = $repo();
         $resultado = $repositorio->resultado((int) $p->parametro('id'))
             ?? throw new ErrorDominio('no_encontrado', 'El resultado no existe.', 404);
         $cat = $catalogo();
         $ficha = $cat?->obtener((string) $resultado['id_comprobacion']);
         $resultado = Informe::conTitulos([$resultado], $cat)[0];
+        $analisis = $repositorio->analisis((int) $resultado['analisis_id']);
+        $seg = $seguimientos();
+        $proyectoId = $analisis !== null ? (int) $analisis['proyecto_id'] : 0;
+        // La misma comprobación en las otras páginas del análisis, para ir de una a otra.
+        $otrasPaginas = array_values(array_filter(
+            $repositorio->resultados((int) $resultado['analisis_id']),
+            static fn (array $o): bool => $o['id_comprobacion'] === $resultado['id_comprobacion'] && (int) $o['id'] !== (int) $resultado['id'],
+        ));
 
         return Respuesta::html(Vista::render('results/detalle', [
             'titulo' => $ficha?->nombre ?? (string) $resultado['id_comprobacion'],
             'estilos' => $estilos,
             'resultado' => $resultado,
             'ficha' => $ficha,
-            'analisis' => $repositorio->analisis((int) $resultado['analisis_id']),
+            'analisis' => $analisis,
+            'seguimiento' => $proyectoId > 0 ? ($seg->actuales($proyectoId)[(string) $resultado['id_comprobacion']] ?? null) : null,
+            'historialSeguimiento' => $proyectoId > 0 ? $seg->historial($proyectoId, (string) $resultado['id_comprobacion']) : [],
+            'errorSeguimiento' => $error,
+            'valoresSeguimiento' => $valores,
+            'seguimientoGuardado' => $p->entrada('seguimiento') === '1',
             'evidencias' => $repositorio->evidencias((int) $resultado['id']),
             'revisiones' => $repositorio->revisiones((int) $resultado['id']),
             'revisado' => $p->entrada('revisado') === '1',
-        ]));
+            'enBloque' => max(0, min(10000, (int) $p->entrada('en_bloque', 0))),
+            'otrasPaginas' => $otrasPaginas,
+        ]), $estado);
+    };
+
+    $r->get('/resultados/{id}', static fn (Peticion $p): Respuesta => $detalle($p));
+
+    // Seguimiento del hallazgo en el proyecto: solo inserta una fila nueva; el resultado no cambia (RF-42).
+    $r->post('/resultados/{id}/seguimiento', static function (Peticion $p) use ($repo, $seguimientos, $detalle): Respuesta {
+        $repositorio = $repo();
+        $resultado = $repositorio->resultado((int) $p->parametro('id'))
+            ?? throw new ErrorDominio('no_encontrado', 'El resultado no existe.', 404);
+        $analisis = $repositorio->analisis((int) $resultado['analisis_id'])
+            ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+        $valores = array_map(
+            static fn (mixed $v): string => is_string($v) ? $v : '',
+            array_intersect_key($p->cuerpo, array_flip(['estado', 'autor', 'motivo'])),
+        ) + ['estado' => '', 'autor' => '', 'motivo' => ''];
+
+        try {
+            $seguimientos()->registrar((int) $analisis['proyecto_id'], (string) $resultado['id_comprobacion'], $valores['estado'], $valores['autor'], $valores['motivo'], (int) $analisis['id']);
+        } catch (ErrorDominio $e) {
+            if ($e->codigo !== 'seguimiento_no_valido') {
+                throw $e;
+            }
+
+            return $detalle($p, $e->getMessage(), $valores, 422);
+        }
+
+        (new Fabrica())->auditoria()->registrar(
+            'seguimiento_guardado',
+            (int) $analisis['id'],
+            (int) $analisis['proyecto_id'],
+            Fabrica::ipOrigen(),
+            null,
+            null,
+            "Seguimiento de {$resultado['id_comprobacion']}: {$valores['estado']}",
+        );
+
+        return Respuesta::redirigir('/resultados/' . (int) $resultado['id'] . '?seguimiento=1#t-seguimiento');
     });
 };

@@ -1,6 +1,6 @@
 {
-  "version": "1.3.0",
-  "fecha": "2026-11-06",
+  "version": "1.4.0",
+  "fecha": "2026-11-07",
   "especificacion": "1.2",
   "descripcion": "Catálogo de criterios de proconSEO: 11 de búsqueda con IA, 16 de SEO y 12 de accesibilidad (WCAG 2.2 A y AA). Un fichero por criterio en criterios/.",
   "pendiente": [
@@ -16,6 +16,12 @@
       "automatico": "Lo comprueba el código sin intervención humana",
       "hibrido": "El código detecta y una persona confirma",
       "humano": "Requiere el juicio de una persona (o de IA en una fase futura)"
+    },
+    "responsable": {
+      "contenido": "Quien escribe y publica los textos e imágenes de la web",
+      "desarrollo": "Quien programa la web o su plantilla",
+      "diseno": "Quien decide colores, tamaños y maquetación",
+      "cliente": "El cliente decide (solo para las decisiones a revisar)"
     },
     "esfuerzo": {
       "bajo": "Cambiar un texto, un atributo o una configuración puntual",

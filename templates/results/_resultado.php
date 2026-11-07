@@ -3,6 +3,7 @@
  * Tarjeta de un resultado en las listas del dashboard. Todo dato se imprime escapado (SEG-09).
  *
  * @var array<string, mixed> $r fila de RepositorioResultados::resultados() con 'titulo'
+ * @var list<array<string, mixed>>|null $repetidos si es la misma comprobación en varias páginas, todas ellas
  */
 
 use ProconSEO\Results\Etiquetas;
@@ -20,6 +21,12 @@ $esfuerzo = Esfuerzo::tryFrom((string) $r['esfuerzo']);
             <span class="gravedad gravedad--<?= e(Etiquetas::claseGravedad($r)) ?>"><?= e($gravedad) ?></span>
         <?php endif; ?>
         <span class="chip"><?= e(Etiquetas::bloque((string) $r['bloque'])) ?></span>
+        <?php if (in_array($estado, ['problema', 'mejorable', 'decision_revisar'], true)): ?>
+            <span class="chip chip--responsable"><span class="solo-lectores">Responsable: </span><?= e(\ProconSEO\Results\Responsable::etiqueta($r)) ?></span>
+            <?php if (($r['seguimiento'] ?? 'pendiente') !== 'pendiente'): ?>
+                <span class="chip chip--seguimiento">Seguimiento: <?= e(\ProconSEO\Results\Seguimientos::etiqueta($r['seguimiento_actual'] ?? null)) ?></span>
+            <?php endif; ?>
+        <?php endif; ?>
         <?php if ($wcag !== null): ?>
             <span class="chip <?= Etiquetas::esNuevo22($r) ? 'chip--wcag22' : 'chip--wcag21' ?>"><?= e($wcag) ?></span>
         <?php elseif (($normativa = Etiquetas::normativa($r)) !== null): ?>
@@ -56,5 +63,29 @@ $esfuerzo = Esfuerzo::tryFrom((string) $r['esfuerzo']);
         <?php if ($r['cobertura'] === 'no_implementada' && $r['limitacion'] !== null): ?>
             <span>Motivo: <?= e($r['limitacion']) ?></span>
         <?php endif; ?>
+        <?php if ($r['cobertura'] !== 'implementada'): ?>
+            <a href="/catalogo?<?= e(http_build_query(['texto' => (string) $r['id_comprobacion']])) ?>#subcomprobaciones">Qué cubre la herramienta<span class="solo-lectores"> de <?= e($r['titulo']) ?></span></a>
+        <?php endif; ?>
     </div>
+    <?php if (($repetidos ?? []) !== []): ?>
+        <?php $paginas = count(array_unique(array_map(static fn (array $o): string => (string) ($o['url_recurso'] ?? ''), $repetidos))); ?>
+        <div class="repeticion">
+            <p class="repeticion__aviso">
+                <svg class="icono" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 9h16M9.5 9v11"/></svg>
+                <?php if (in_array($estado, ['problema', 'mejorable', 'decision_revisar'], true)): ?>
+                    <span><strong>Se repite en <?= e($paginas) ?> páginas.</strong> Si todas usan la misma plantilla, arreglándola una vez se corrige en todas.</span>
+                <?php else: ?>
+                    <span><strong>Igual en <?= e($paginas) ?> páginas.</strong> Se muestra una vez; abajo están todas.</span>
+                <?php endif; ?>
+            </p>
+            <details class="repeticion__paginas">
+                <summary>Ver las <?= e($paginas) ?> páginas</summary>
+                <ul>
+                    <?php foreach ($repetidos as $otra): ?>
+                        <li><a class="codigo" href="/resultados/<?= e($otra['id']) ?>"><?= e($otra['url_recurso'] ?? $otra['id_comprobacion']) ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            </details>
+        </div>
+    <?php endif; ?>
 </article>

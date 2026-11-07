@@ -84,18 +84,37 @@ $detalle = static function (array $r) use ($evidencias, $revisiones, $recortar, 
     return (string) ob_get_clean();
 };
 
-/** Tabla compacta para listas largas (correctos, no aplicables, no verificables). */
+/**
+ * Páginas en las que se repite un hallazgo. En un sitio completo el mismo fallo puede estar en
+ * cientos de páginas: el detalle sale una vez y aquí solo la lista (como mucho 40 direcciones).
+ */
+$paginas = static function (array $resultados): string {
+    $urls = array_values(array_unique(array_filter(array_map(static fn (array $r): string => (string) ($r['url_recurso'] ?? ''), $resultados))));
+    if (count($urls) <= 1) {
+        return '';
+    }
+    $mostradas = array_slice($urls, 0, 40);
+    $resto = count($urls) - count($mostradas);
+
+    return '<p class="pequeno"><strong>Se repite en ' . e(count($urls)) . ' páginas:</strong></p><p class="paginas codigo">'
+        . implode('<br>', array_map(static fn (string $u): string => e($u), $mostradas))
+        . ($resto > 0 ? '<br>… y ' . e($resto) . ' más (la lista completa está en la herramienta y en el CSV).' : '') . '</p>';
+};
+
+/** Tabla compacta para listas largas (correctos, no aplicables, no verificables): una fila por comprobación. */
 $tabla = static function (array $lista, string $columna) use ($referencia): string {
     ob_start();
     ?>
     <table class="compacta">
-        <thead><tr><th>Comprobación</th><th><?= e($columna) ?></th><th>Referencia</th></tr></thead>
+        <thead><tr><th>Comprobación</th><th><?= e($columna) ?></th><th>Referencia</th><th class="num">Páginas</th></tr></thead>
         <tbody>
-        <?php foreach ($lista as $r): ?>
+        <?php foreach (\ProconSEO\Results\Informe::agrupar($lista) as $g): ?>
+            <?php $r = $g['principal']; ?>
             <tr>
                 <td><?= e($r['titulo']) ?><br><span class="codigo"><?= e($r['id_comprobacion']) ?></span><?= $r['revision_pendiente'] ? '<br>revisión humana pendiente' : '' ?></td>
-                <td><?= e($r['cobertura'] === 'no_implementada' && $r['limitacion'] !== null ? $r['limitacion'] : $r['explicacion_sencilla']) ?></td>
+                <td><?= e($r['cobertura'] === 'no_implementada' && $r['limitacion'] !== null ? $r['limitacion'] : ($r['estado_vigente'] === 'no_verificable' && $r['limitacion'] !== null ? $r['limitacion'] : $r['explicacion_sencilla'])) ?></td>
                 <td><?= e($referencia($r) ?? '') ?></td>
+                <td class="num"><?= e(max(1, $g['paginas'])) ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>
@@ -104,15 +123,19 @@ $tabla = static function (array $lista, string $columna) use ($referencia): stri
     return (string) ob_get_clean();
 };
 
-/** Una incidencia: un resultado o una causa con varios efectos (RF-24). */
-$entrada = static function (array $e) use ($detalle): string {
+/** Una incidencia: un resultado, el mismo hallazgo en varias páginas o una causa con varios efectos (RF-24). */
+$entrada = static function (array $e) use ($detalle, $paginas): string {
+    if ($e['tipo'] === 'repetido') {
+        return $detalle($e['principal']) . $paginas($e['resultados']);
+    }
     if ($e['tipo'] !== 'causa' || count($e['resultados']) === 1) {
         return implode('', array_map($detalle, $e['resultados']));
     }
+    $efectos = $e['efectos'] ?? \ProconSEO\Results\Informe::agrupar($e['resultados']);
 
     return '<div class="causa"><p class="etiquetas">Causa ' . e($e['codigo']) . ' · afecta a ' . e(count($e['bloques'])) . ' bloque(s)</p>'
-        . '<h4>' . e($e['descripcion']) . '</h4>'
-        . implode('', array_map($detalle, $e['resultados'])) . '</div>';
+        . '<h4>' . e($e['principal']['titulo']) . '</h4><p>' . e($e['descripcion']) . '</p>'
+        . implode('', array_map(static fn (array $g): string => $detalle($g['principal']) . $paginas($g['resultados']), $efectos)) . '</div>';
 };
 $estado = EstadoAnalisis::tryFrom((string) $analisis['estado']);
 ?>
@@ -144,6 +167,7 @@ $estado = EstadoAnalisis::tryFrom((string) $analisis['estado']);
     .estado-problema { color: #b3261e; } .estado-mejorable { color: #8a5a00; } .estado-decision_revisar { color: #5b3fa0; }
     .estado-correcto { color: #1e6b34; } .estado-no_verificable, .estado-no_aplicable { color: #4a525c; }
     .compacta td, .compacta th { font-size: 8pt; }
+    .paginas { font-size: 7.5pt; color: #4a525c; margin: 0 0 6pt 10pt; }
     .aviso { border: 1.5pt solid #8a5a00; background: #fff6e0; padding: 5pt 7pt; margin: 4pt 0 8pt; }
     .prueba { position: fixed; top: -15mm; left: 0; right: 0; text-align: center; font-weight: bold; color: #8a5a00; font-size: 9pt; }
     .pie { position: fixed; bottom: -12mm; left: 0; right: 0; font-size: 7.5pt; color: #4a525c; }
@@ -199,7 +223,7 @@ $estado = EstadoAnalisis::tryFrom((string) $analisis['estado']);
 
 <!-- 3. Bloqueos -->
 <h2>1. Bloqueos</h2>
-<?php foreach ($informe->recursosBloqueados as $rec): ?>
+<?php foreach (array_slice($informe->recursosBloqueados, 0, 30) as $rec): ?>
     <p>No se pudo descargar <span class="codigo"><?= e($rec['url']) ?></span>: <?= e(ResultadoDescarga::tryFrom((string) $rec['resultado'])?->etiqueta() ?? $rec['resultado']) ?><?= $rec['estado_http'] !== null ? ' (HTTP ' . e($rec['estado_http']) . ')' : '' ?><?= $rec['motivo'] !== null ? ' · ' . e($rec['motivo']) : '' ?>.</p>
 <?php endforeach; ?>
 <?= implode('', array_map($entrada, $informe->bloqueos)) ?>
@@ -226,6 +250,30 @@ $estado = EstadoAnalisis::tryFrom((string) $analisis['estado']);
 
 <?php endif; ?>
 
+<?php
+$manuales = [];
+foreach ($exportacion['revisiones_manuales'] ?? [] as $m) {
+    $manuales[(string) $m['criterio_wcag']] = $m; // la última de cada criterio es la vigente
+}
+?>
+<?php if ($manuales !== []): ?>
+    <h2>Revisiones manuales de criterios WCAG</h2>
+    <p class="pequeno">Lo que una persona ha revisado a mano siguiendo la guía de cada criterio. No cambia ningún resultado automático.</p>
+    <table class="compacta">
+        <thead><tr><th>Criterio</th><th>Resultado</th><th>Quién y cuándo</th><th>Qué se revisó y qué se vio</th></tr></thead>
+        <tbody>
+        <?php foreach ($manuales as $criterio => $m): ?>
+            <tr>
+                <td><?= e($criterio) ?></td>
+                <td><?= e(\ProconSEO\Results\RevisionesManuales::RESULTADOS[(string) $m['resultado']] ?? $m['resultado']) ?></td>
+                <td><?= e($m['revisor']) ?><br><?= e(Formato::fecha((string) $m['creada_en_utc'])) ?></td>
+                <td><?= $m['paginas'] !== null ? 'Páginas: ' . e($recortar((string) $m['paginas'], 300)) . '<br>' : '' ?><?= e($recortar((string) $m['notas'], 800)) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endif; ?>
+
 <!-- 7. Capacidades pendientes y límites -->
 <h2>5. Límites de este análisis</h2>
 <?php if (Alcance::tryFrom((string) $analisis['alcance']) === Alcance::UrlIndividual): ?>
@@ -233,6 +281,9 @@ $estado = EstadoAnalisis::tryFrom((string) $analisis['estado']);
 <?php endif; ?>
 <?php foreach ($informe->fasesIncompletas as $f): ?>
     <p>Fase «<?= e(Fase::tryFrom((string) $f['fase'])?->etiqueta() ?? $f['fase']) ?>»: <?= e(mb_strtolower(EstadoFase::tryFrom((string) $f['estado'])?->etiqueta() ?? (string) $f['estado'])) ?>. <?= e($f['mensaje'] ?? '') ?></p>
+<?php endforeach; ?>
+<?php foreach ($informe->fueraDeAmbito as $fuera): ?>
+    <p>No se siguieron <?= e($fuera['total']) ?> enlace(s) a <span class="codigo"><?= e($fuera['host']) ?></span>: no está entre los sitios autorizados del análisis. No es un error.</p>
 <?php endforeach; ?>
 <?php foreach ($informe->recursosNoEncontrados as $rec): ?>
     <p>No existe <span class="codigo"><?= e($rec['url']) ?></span> (HTTP <?= e($rec['estado_http']) ?>). No es un bloqueo.</p>

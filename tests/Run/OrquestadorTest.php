@@ -165,6 +165,12 @@ final class OrquestadorTest extends TestCase
         self::assertSame(1, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND id_comprobacion = 'SEO-03.title-duplicado'", [$id]), 'Una sola fila para todo el sitio');
         self::assertSame('mejorable', $this->valor("SELECT estado FROM resultados WHERE analisis_id = ? AND id_comprobacion = 'SEO-03.title-duplicado'", [$id]));
         self::assertStringContainsString('https://ejemplo.es/servicios', (string) $this->valor("SELECT contenido FROM evidencias WHERE analisis_id = ? AND codigo LIKE 'S-%'", [$id]));
+        // Lo que es del sitio (robots.txt, llms.txt, sitemap) se guarda una vez; el permiso de cada agente, por página.
+        foreach (\ProconSEO\Run\Orquestador::SOLO_PRIMERA_PAGINA as $delSitio) {
+            self::assertLessThanOrEqual(1, (int) $this->valor('SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND id_comprobacion = ?', [$id, $delSitio]), "{$delSitio} una sola vez");
+        }
+        self::assertSame(1, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND id_comprobacion = 'IA-01.robots-recuperado'", [$id]));
+        self::assertSame(3, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND id_comprobacion = 'IA-01.permiso-buscadores'", [$id]), 'El permiso depende de la ruta: uno por página');
         // La misma causa en varias páginas es un solo grupo.
         self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM grupos_causa WHERE analisis_id = ? AND REGEXP_LIKE(codigo, '^P[0-9]+-', 'c')", [$id]));
     }
@@ -215,6 +221,47 @@ final class OrquestadorTest extends TestCase
         self::assertSame(1, $google->tandas, 'Pedidos a la vez, no uno detrás de otro');
         self::assertSame(2000.0, $motor->contexto?->pageSpeed(InformePageSpeed::MOVIL)?->laboratorio['lcp_ms']);
         self::assertStringContainsString('cuota', (string) $motor->contexto?->pageSpeed(InformePageSpeed::ORDENADOR)?->error);
+    }
+
+    public function testEnElSitioCompletoPageSpeedMideUnaPaginaPorZona(): void
+    {
+        $html = static fn (string ...$hrefs): RespuestaHttp => new RespuestaHttp(200, ['content-type' => 'text/html'],
+            '<html lang="es"><head><title>T</title></head><body>' . implode('', array_map(static fn (string $h): string => "<a href=\"{$h}\">x</a>", $hrefs)) . '</body></html>');
+        $this->transporte->porUrl = [
+            'https://ejemplo.es/robots.txt' => new RespuestaHttp(200, ['content-type' => 'text/plain'], "User-agent: *\nAllow: /"),
+            'https://ejemplo.es/' => $html('/blog/a', '/blog/b', '/productos/x', '/contacto'),
+            'https://ejemplo.es/blog/a' => $html('/'),
+            'https://ejemplo.es/blog/b' => $html('/'),
+            'https://ejemplo.es/productos/x' => $html('/'),
+            'https://ejemplo.es/contacto' => $html('/'),
+            'https://ejemplo.es/sitemap.xml' => new RespuestaHttp(404),
+        ];
+        $google = new TransporteFalso();
+        for ($i = 0; $i < 20; $i++) {
+            $google->responder(new RespuestaHttp(200, [], (string) json_encode(['lighthouseResult' => ['audits' => []]])));
+        }
+        $this->dns->tabla['www.googleapis.com'] = ['142.250.184.10'];
+        $pageSpeed = new ClientePageSpeed($google, $this->validador(), 'clave-de-prueba', 'proconSEO/1.0');
+        $id = $this->lanzar('https://ejemplo.es/', 'sitio_completo');
+
+        $this->orquestador(Motor::v1(), $pageSpeed)->ejecutar($id);
+
+        $medidas = array_values(array_unique(array_map(static function ($p): string {
+            parse_str((string) parse_url($p->destino->url->url(), PHP_URL_QUERY), $q);
+
+            return (string) ($q['url'] ?? '');
+        }, $google->peticiones)));
+        sort($medidas);
+        self::assertSame(['https://ejemplo.es/', 'https://ejemplo.es/blog/a', 'https://ejemplo.es/productos/x'], $medidas,
+            'La primera y una por zona: /blog/b es de la misma zona que /blog/a y /contacto de la misma que la portada');
+        self::assertCount(6, $google->peticiones, 'Móvil y ordenador de cada una');
+    }
+
+    public function testZonaDeUnaDireccion(): void
+    {
+        self::assertSame('/', Orquestador::zona('https://ejemplo.es/'));
+        self::assertSame('/', Orquestador::zona('https://ejemplo.es/contacto'));
+        self::assertSame('/blog/', Orquestador::zona('https://ejemplo.es/blog/una-entrada?x=1'));
     }
 
     public function testSiLaPaginaNoSeDescargaNoSeLlamaAPageSpeed(): void

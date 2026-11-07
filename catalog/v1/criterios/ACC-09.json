@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Un formulario de contacto sin etiquetas es imposible de rellenar para quien no ve la pantalla. Es uno de los fallos más frecuentes y más fáciles de corregir.",
   "modo": "hibrido",
   "esfuerzo": "medio",
+  "responsable": "desarrollo",
   "mvp": "parcial",
   "ref_investigacion": [],
   "reutiliza": [],
