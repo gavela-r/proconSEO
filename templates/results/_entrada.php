@@ -9,6 +9,13 @@ use ProconSEO\Results\Etiquetas;
 use ProconSEO\Shared\Enum\Esfuerzo;
 use ProconSEO\Shared\Vista;
 
+if ($entrada['tipo'] === 'repetido') {
+    // La misma comprobación en varias páginas: una tarjeta con la lista de páginas afectadas.
+    echo Vista::render('results/_resultado', ['r' => $entrada['principal'], 'repetidos' => $entrada['resultados']], false);
+
+    return;
+}
+
 if ($entrada['tipo'] !== 'causa' || count($entrada['resultados']) === 1) {
     foreach ($entrada['resultados'] as $r) {
         echo Vista::render('results/_resultado', ['r' => $r], false);

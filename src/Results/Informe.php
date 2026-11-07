@@ -171,11 +171,29 @@ final class Informe
      */
     private static function agruparPorCausa(array $incidencias): array
     {
+        // La misma comprobación, con el mismo estado y gravedad, en varias páginas distintas es un solo
+        // hallazgo repetido (suele ser la plantilla): se muestra una vez con la lista de páginas.
+        $repetidos = [];
+        foreach ($incidencias as $r) {
+            if ($r['grupo_causa_id'] === null) {
+                $repetidos[self::claveRepeticion($r)][(string) ($r['url_recurso'] ?? '')] = true;
+            }
+        }
+
         $entradas = [];
         foreach ($incidencias as $r) {
-            $clave = $r['grupo_causa_id'] !== null ? 'causa-' . $r['grupo_causa_id'] : 'resultado-' . $r['id'];
+            if ($r['grupo_causa_id'] !== null) {
+                $clave = 'causa-' . $r['grupo_causa_id'];
+                $tipo = 'causa';
+            } elseif (count($repetidos[self::claveRepeticion($r)]) > 1) {
+                $clave = 'repetido-' . self::claveRepeticion($r);
+                $tipo = 'repetido';
+            } else {
+                $clave = 'resultado-' . $r['id'];
+                $tipo = 'resultado';
+            }
             $entradas[$clave] ??= [
-                'tipo' => $r['grupo_causa_id'] !== null ? 'causa' : 'resultado',
+                'tipo' => $tipo,
                 'codigo' => $r['causa_codigo'],
                 'descripcion' => $r['causa_descripcion'],
                 'resultados' => [],
@@ -201,6 +219,12 @@ final class Informe
         usort($entradas, static fn (array $a, array $b): int => self::comparar($a['principal'], $b['principal']));
 
         return $entradas;
+    }
+
+    /** @param array<string, mixed> $r */
+    private static function claveRepeticion(array $r): string
+    {
+        return $r['id_comprobacion'] . '|' . $r['estado_vigente'] . '|' . ($r['estado_vigente'] === 'problema' ? (string) $r['gravedad'] : '');
     }
 
     /** Problemas por gravedad, después decisiones a revisar y al final mejorables. */

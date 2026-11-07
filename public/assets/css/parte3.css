@@ -299,3 +299,28 @@ details.plegable[open] { padding-bottom: 1rem; }
 
 /* Las URLs largas en la tipografía de datos se parten en cualquier punto (sin desplazamiento horizontal, WCAG 1.4.10) */
 .codigo, .resultado__meta, .url { overflow-wrap: anywhere; }
+
+/* La misma comprobación en varias páginas (probablemente la plantilla) */
+.repeticion { margin-top: .875rem; }
+.repeticion__aviso { display: flex; gap: .625rem; align-items: flex-start; margin: 0; padding: .625rem .75rem; background: #f4f1fb; color: #3c2a6b; font-size: .9rem; max-width: 76ch; }
+.repeticion__aviso .icono { flex: none; margin-top: .2rem; }
+.repeticion__paginas summary { cursor: pointer; padding: .5rem 0; font-size: .9rem; font-weight: 600; min-height: 24px; }
+.repeticion__paginas ul { margin: 0; padding-left: 1.25rem; columns: 2 22rem; font-size: .84rem; }
+.repeticion__paginas li { margin: .2rem 0; break-inside: avoid; }
+
+/* Por dónde empezar y arreglos rápidos */
+.empezar { display: grid; grid-template-columns: minmax(0, 1fr) 20rem; gap: 3rem; align-items: start; }
+.empezar__lista { list-style: none; margin: 0; padding: 0; counter-reset: orden; }
+.empezar__lista li { counter-increment: orden; display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: .25rem 0; padding: .875rem 0; border-bottom: 1px solid var(--borde); }
+.empezar__lista li:first-child { padding-top: 0; }
+.empezar__lista li::before { content: counter(orden, decimal-leading-zero); grid-row: span 2; font: 500 .8125rem/1.7 var(--fuente-datos); color: var(--texto-tenue); }
+.empezar__lista a { font-weight: 600; text-decoration: none; }
+.empezar__lista a:hover { text-decoration: underline; }
+.empezar__datos { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .375rem; }
+.rapidos { border-top: 1px solid var(--texto); padding-top: 1rem; }
+.rapidos h3 { margin: 0; font-size: .8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--texto-suave); }
+.rapidos p { margin: .25rem 0 0; font-size: .875rem; color: var(--texto-tenue); }
+.rapidos ul { list-style: none; margin: .75rem 0 0; padding: 0; }
+.rapidos li { display: flex; flex-direction: column; gap: .125rem; padding: .625rem 0; border-bottom: 1px solid var(--borde); }
+.rapidos a { font-weight: 600; }
+@media (max-width: 56rem) { .empezar { grid-template-columns: 1fr; gap: 2rem; } }

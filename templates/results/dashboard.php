@@ -126,6 +126,8 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
     </div>
 </section>
 
+<?= Vista::render('results/_prioridades', ['prioridades' => \ProconSEO\Results\Prioridades::desde($informe)], false) ?>
+
 <?php if (($candidatos ?? []) !== []): ?>
     <!-- Cambios desde el análisis anterior de la misma dirección -->
     <?= Vista::render('results/_cambios', ['analisis' => $analisis, 'anterior' => $anterior ?? null, 'comparacion' => $comparacion ?? null, 'candidatos' => $candidatos], false) ?>

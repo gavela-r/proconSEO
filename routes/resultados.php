@@ -40,7 +40,7 @@ return static function (Router $r): void {
     // Glosario de los términos técnicos que aparecen en los resultados.
     $r->get('/glosario', static fn (): Respuesta => Respuesta::html(Vista::render('results/glosario', [
         'titulo' => 'Glosario',
-        'estilos' => $estilos,
+        'estilos' => [...$estilos, '/assets/css/glosario.css'],
         'glosario' => Glosario::comun(),
     ])));
 
