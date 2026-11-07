@@ -6,6 +6,8 @@ Todo lo que se instala es **gratuito** y de su fuente oficial. Los scripts de Po
 
 Antes de abrirla al uso: pentest del equipo de ciberseguridad (SEG-19).
 
+> **Para probarla en tu ordenador** (no en el servidor): doble clic en `deploy\windows\iniciar-local.cmd`. Comprueba PHP, MySQL, las dependencias y el `.env`, aplica las migraciones, arranca el servidor web y el worker y abre `http://localhost:8090`. Pulsando Enter en su ventana se para todo. No hace falta ningún programa como Local o XAMPP: basta con PHP, MySQL y Composer.
+
 ---
 
 ## Instalación paso a paso
