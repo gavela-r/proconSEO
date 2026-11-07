@@ -222,6 +222,16 @@ final class RepositorioAnalisis
         return $cerrados;
     }
 
+    /** Cierra un análisis que falló de forma inesperada, si sigue abierto. */
+    public function cerrarPorError(int $id, string $motivo): void
+    {
+        $cerrar = $this->bd->prepare("UPDATE analisis SET estado = 'detenido_error', motivo_cierre = ?, terminado_en = NOW(3) WHERE id = ? AND estado IN ('en_cola', 'en_curso', 'cancelando')");
+        $cerrar->execute([$motivo, $id]);
+        if ($cerrar->rowCount() === 1) {
+            $this->cerrarFasesPendientes($id, 'No terminó: error inesperado.');
+        }
+    }
+
     /** Marca como omitidas las fases que no llegaron a empezar (al cancelar o al fallar). */
     public function cerrarFasesPendientes(int $id, string $mensaje): void
     {

@@ -67,8 +67,21 @@ while (true) {
     }
 
     echo '[' . date('H:i:s') . "] Análisis {$id}: empieza." . PHP_EOL;
-    $estado = $fabrica->orquestador()->ejecutar($id);
-    echo '[' . date('H:i:s') . "] Análisis {$id}: {$estado->etiqueta()}." . PHP_EOL;
+    // Un fallo en un análisis no debe parar el worker: se registra, se cierra ese análisis (si
+    // todavía existe) y se sigue con los demás.
+    try {
+        $estado = $fabrica->orquestador()->ejecutar($id);
+        echo '[' . date('H:i:s') . "] Análisis {$id}: {$estado->etiqueta()}." . PHP_EOL;
+    } catch (Throwable $e) {
+        error_log("Análisis {$id}: " . (string) $e);
+        echo '[' . date('H:i:s') . "] Análisis {$id}: detenido por un error inesperado (detalle en el registro de errores)." . PHP_EOL;
+        try {
+            $fabrica->repositorio()->cerrarPorError($id, 'El análisis se detuvo por un error inesperado. Se conservan los resultados obtenidos.');
+        } catch (Throwable) {
+            // Si ni siquiera se puede cerrar (p. ej. ya no existe), lo recogerá cerrarHuerfanos().
+        }
+        continue;
+    }
 
     try {
         foreach ($fabrica->avisos()->trasAnalisis($id) as $aviso) {

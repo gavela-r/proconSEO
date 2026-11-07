@@ -58,6 +58,21 @@ final class AnalisisHuerfanosTest extends TestCase
         return $c->fetch();
     }
 
+    public function testCerrarPorErrorSoloSiSigueAbierto(): void
+    {
+        $abierto = $this->analisis('en_curso', '1 MINUTE');
+        $repo = new RepositorioAnalisis($this->bd);
+
+        $repo->cerrarPorError($abierto, 'Error inesperado');
+        self::assertSame('detenido_error', $this->fila($abierto)['estado']);
+        self::assertSame('Error inesperado', $this->fila($abierto)['motivo_cierre']);
+
+        $this->bd->prepare("UPDATE analisis SET estado = 'completado', motivo_cierre = NULL WHERE id = ?")->execute([$abierto]);
+        $repo->cerrarPorError($abierto, 'Otro error');
+        self::assertSame('completado', $this->fila($abierto)['estado'], 'Uno ya terminado no se toca');
+        $repo->cerrarPorError(999999999, 'No existe'); // no lanza nada
+    }
+
     public function testCierraLosViejosYDejaLosQueSiguenVivos(): void
     {
         $colgado = $this->analisis('en_curso', '3 HOUR');
