@@ -47,16 +47,38 @@ $bloques = count($entrada['bloques']);
         <?php endif; ?>
         <span class="chip">Causa <?= e($entrada['codigo']) ?><?= $bloques > 1 ? ' · afecta a ' . e($bloques) . ' bloques' : '' ?></span>
     </div>
-    <h3 id="causa-<?= e($entrada['codigo']) ?>"><?= e($entrada['descripcion']) ?></h3>
-    <p>Una sola causa con <?= e(count($entrada['resultados'])) ?> efectos:</p>
+    <?php
+    /** @var list<array{principal: array<string, mixed>, resultados: list<array<string, mixed>>, paginas: int}> $efectos */
+    $efectos = $entrada['efectos'] ?? \ProconSEO\Results\Informe::agrupar($entrada['resultados']);
+    $paginasCausa = count(array_unique(array_map(static fn (array $r): string => (string) ($r['url_recurso'] ?? ''), $entrada['resultados'])));
+    ?>
+    <h3 id="causa-<?= e($entrada['codigo']) ?>"><?= e($principal['titulo']) ?></h3>
+    <p><?= \ProconSEO\Results\Glosario::comun()->enlazar((string) $entrada['descripcion']) ?></p>
+    <p class="causa__resumen">
+        Una sola causa con <?= e(count($efectos) === 1 ? '1 efecto' : count($efectos) . ' efectos') ?>
+        <?= $paginasCausa > 1 ? 'en ' . e($paginasCausa) . ' páginas' : '' ?>:
+    </p>
     <ul class="causa__efectos">
-        <?php foreach ($entrada['resultados'] as $r): ?>
+        <?php foreach ($efectos as $g): ?>
+            <?php $r = $g['principal']; ?>
             <li>
                 <strong><?= e(Etiquetas::bloque((string) $r['bloque'])) ?></strong> —
+                <a href="/resultados/<?= e($r['id']) ?>"><?= e($r['titulo']) ?><?php if ($r['titulo'] !== $r['id_comprobacion']): ?><span class="solo-lectores"> (<?= e($r['id_comprobacion']) ?>)</span><?php endif; ?></a>:
                 <?= \ProconSEO\Results\Glosario::comun()->enlazar($r['consecuencia'] ?? $r['explicacion_sencilla']) ?>
-                <a href="/resultados/<?= e($r['id']) ?>"><?= e($r['titulo']) ?><?php if ($r['titulo'] !== $r['id_comprobacion']): ?><span class="solo-lectores"> (<?= e($r['id_comprobacion']) ?>)</span><?php endif; ?></a>
                 <?php if ($r['estado_vigente'] !== $estado): ?>
                     <span class="chip"><?= e(Etiquetas::estado((string) $r['estado_vigente'])) ?></span>
+                <?php endif; ?>
+                <?php if ($g['paginas'] > 1): ?>
+                    <details class="repeticion__paginas">
+                        <summary>En <?= e($g['paginas']) ?> páginas</summary>
+                        <ul>
+                            <?php foreach ($g['resultados'] as $otra): ?>
+                                <li><a class="codigo" href="/resultados/<?= e($otra['id']) ?>"><?= e($otra['url_recurso'] ?? $otra['id_comprobacion']) ?></a></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </details>
+                <?php elseif ($r['url_recurso'] !== null): ?>
+                    <span class="codigo causa__pagina"><?= e($r['url_recurso']) ?></span>
                 <?php endif; ?>
             </li>
         <?php endforeach; ?>

@@ -65,11 +65,15 @@ $esfuerzo = Esfuerzo::tryFrom((string) $r['esfuerzo']);
         <?php endif; ?>
     </div>
     <?php if (($repetidos ?? []) !== []): ?>
-        <?php $paginas = count($repetidos); ?>
+        <?php $paginas = count(array_unique(array_map(static fn (array $o): string => (string) ($o['url_recurso'] ?? ''), $repetidos))); ?>
         <div class="repeticion">
             <p class="repeticion__aviso">
                 <svg class="icono" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 9h16M9.5 9v11"/></svg>
-                <span><strong>Se repite en <?= e($paginas) ?> páginas.</strong> Si todas usan la misma plantilla, arreglándola una vez se corrige en todas.</span>
+                <?php if (in_array($estado, ['problema', 'mejorable', 'decision_revisar'], true)): ?>
+                    <span><strong>Se repite en <?= e($paginas) ?> páginas.</strong> Si todas usan la misma plantilla, arreglándola una vez se corrige en todas.</span>
+                <?php else: ?>
+                    <span><strong>Igual en <?= e($paginas) ?> páginas.</strong> Se muestra una vez; abajo están todas.</span>
+                <?php endif; ?>
             </p>
             <details class="repeticion__paginas">
                 <summary>Ver las <?= e($paginas) ?> páginas</summary>

@@ -29,7 +29,7 @@ final class Informe
     /** Estados que se muestran como incidencias, en orden de prioridad. */
     private const ESTADOS_INCIDENCIA = ['problema', 'decision_revisar', 'mejorable'];
 
-    /** @var array<string, array{recuento: array<string, int>, total: int, no_implementadas: int, pendientes: int}> */
+    /** @var array<string, array{recuento: array<string, int>, total: int, comprobaciones: int, no_implementadas: int, pendientes: int}> */
     public readonly array $resumen;
 
     public readonly FiltroResultados $filtro;
@@ -44,8 +44,16 @@ final class Informe
     /** @var list<string> páginas o recursos presentes en el análisis, para el filtro */
     public readonly array $urls;
 
-    /** @var list<array<string, mixed>> recursos que no se pudieron descargar */
+    /** @var list<array<string, mixed>> recursos que no se pudieron descargar (sin los que quedaron fuera del ámbito) */
     public readonly array $recursosBloqueados;
+
+    /**
+     * Enlaces a otros sitios que no se siguieron porque no estaban autorizados. No son un bloqueo:
+     * se dejaron fuera a propósito. Uno por host, con cuántas direcciones y unos ejemplos.
+     *
+     * @var list<array{host: string, total: int, ejemplos: list<string>}>
+     */
+    public readonly array $fueraDeAmbito;
 
     /**
      * Recursos secundarios que no existen (404/410), como un robots.txt o un sitemap que no se ha
@@ -97,6 +105,9 @@ final class Informe
         $resultados = $this->filtro->aplicar($todos);
         $this->mostrados = count($resultados);
         $fallidos = array_filter($recursos, static fn (array $r): bool => $r['resultado'] !== ResultadoDescarga::Correcto->value);
+        $fuera = array_filter($fallidos, static fn (array $r): bool => $r['resultado'] === ResultadoDescarga::FueraDeAmbito->value);
+        $fallidos = array_filter($fallidos, static fn (array $r): bool => $r['resultado'] !== ResultadoDescarga::FueraDeAmbito->value);
+        $this->fueraDeAmbito = self::agruparPorHost(array_values($fuera));
         $this->recursosBloqueados = array_values(array_filter($fallidos, static fn (array $r): bool => !self::noExiste($r)));
         $this->recursosNoEncontrados = array_values(array_filter($fallidos, self::noExiste(...)));
         $this->recursosTruncados = array_values(array_filter($recursos, static fn (array $r): bool => (bool) $r['truncado']));
@@ -134,7 +145,7 @@ final class Informe
 
     /**
      * @param list<array<string, mixed>> $resultados
-     * @return array<string, array{recuento: array<string, int>, total: int, no_implementadas: int, pendientes: int}>
+     * @return array<string, array{recuento: array<string, int>, total: int, comprobaciones: int, no_implementadas: int, pendientes: int}>
      */
     private static function resumir(array $resultados): array
     {
@@ -143,20 +154,27 @@ final class Informe
             $resumen[$bloque->value] = [
                 'recuento' => array_fill_keys(EstadoResultado::valores(), 0),
                 'total' => 0,
+                'comprobaciones' => 0,
                 'no_implementadas' => 0,
                 'pendientes' => 0,
             ];
         }
 
+        $distintas = [];
         foreach ($resultados as $r) {
             $bloque = (string) $r['bloque'];
             if (!isset($resumen[$bloque])) {
                 continue;
             }
             $resumen[$bloque]['total']++;
+            $distintas[$bloque][(string) $r['id_comprobacion']] = true;
             $resumen[$bloque]['recuento'][(string) $r['estado_vigente']] = ($resumen[$bloque]['recuento'][(string) $r['estado_vigente']] ?? 0) + 1;
             $resumen[$bloque]['no_implementadas'] += (int) ($r['cobertura'] === Cobertura::NoImplementada->value);
             $resumen[$bloque]['pendientes'] += (int) $r['revision_pendiente'];
+        }
+
+        foreach ($distintas as $bloque => $ids) {
+            $resumen[$bloque]['comprobaciones'] = count($ids);
         }
 
         return $resumen;
@@ -207,6 +225,7 @@ final class Informe
 
             return $e + [
                 'principal' => $principal,
+                'efectos' => self::agrupar($e['resultados']),
                 'bloques' => array_values(array_unique(array_column($e['resultados'], 'bloque'))),
                 'bloquea' => array_reduce(
                     $e['resultados'],
@@ -219,6 +238,49 @@ final class Informe
         usort($entradas, static fn (array $a, array $b): int => self::comparar($a['principal'], $b['principal']));
 
         return $entradas;
+    }
+
+    /**
+     * Junta los resultados de la misma comprobación con el mismo estado (el mismo hallazgo en varias
+     * páginas), respetando el orden en que llegan. Cada grupo lleva su primer resultado como
+     * principal y la lista de páginas distintas.
+     *
+     * @param list<array<string, mixed>> $resultados
+     * @return list<array{principal: array<string, mixed>, resultados: list<array<string, mixed>>, paginas: int}>
+     */
+    public static function agrupar(array $resultados): array
+    {
+        $grupos = [];
+        foreach ($resultados as $r) {
+            $grupos[self::claveRepeticion($r)][] = $r;
+        }
+
+        return array_values(array_map(static fn (array $lista): array => [
+            'principal' => $lista[0],
+            'resultados' => $lista,
+            'paginas' => count(array_unique(array_map(static fn (array $r): string => (string) ($r['url_recurso'] ?? ''), $lista))),
+        ], $grupos));
+    }
+
+    /**
+     * @param list<array<string, mixed>> $recursos
+     * @return list<array{host: string, total: int, ejemplos: list<string>}>
+     */
+    private static function agruparPorHost(array $recursos): array
+    {
+        $hosts = [];
+        foreach ($recursos as $rec) {
+            $url = (string) $rec['url'];
+            $host = strtolower((string) (parse_url($url, PHP_URL_HOST) ?? ''));
+            $hosts[$host][$url] = true;
+        }
+        $grupos = [];
+        foreach ($hosts as $host => $urls) {
+            $grupos[] = ['host' => (string) $host, 'total' => count($urls), 'ejemplos' => array_slice(array_map('strval', array_keys($urls)), 0, 5)];
+        }
+        usort($grupos, static fn (array $a, array $b): int => $b['total'] <=> $a['total']);
+
+        return $grupos;
     }
 
     /** @param array<string, mixed> $r */

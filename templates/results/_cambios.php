@@ -47,7 +47,11 @@ $recuento = $comparacion?->recuento() ?? [];
 
     <form class="cambios__elegir" method="get" action="/analisis/<?= e($analisis['id']) ?>#t-cambios">
         <label for="comparar">Comparar con</label>
-        <select id="comparar" name="comparar">
+        <select id="comparar" name="comparar" required>
+            <?php if ($elegidoId === 0): ?>
+                <!-- Sin un anterior de la misma dirección y alcance no se propone ninguno: que no parezca que ya se está comparando. -->
+                <option value="" selected>Elige un análisis…</option>
+            <?php endif; ?>
             <?php foreach ($candidatos as $c): ?>
                 <option value="<?= e($c['id']) ?>"<?= (int) $c['id'] === $elegidoId ? ' selected' : '' ?>>
                     <?= e($fecha($c)) ?> · <?= e($etiquetaAlcance($c['alcance'])) ?> · <?= e($c['url_normalizada'] ?? $c['url_introducida']) ?>

@@ -29,11 +29,15 @@ final class Prioridades
             && !in_array($i['seguimiento'], ['aceptado', 'corregido'], true)));
         usort($items, static fn (array $a, array $b): int => self::orden($a) <=> self::orden($b));
 
+        $empezar = array_slice($items, 0, $cuantas);
         // Rápidos: poco esfuerzo y que merezca la pena (un problema, o algo repetido en varias páginas).
+        // Sin repetir lo que ya está en «por dónde empezar».
+        $yaEstan = array_column($empezar, 'enlace');
         $rapidos = array_values(array_filter($items, static fn (array $i): bool => $i['esfuerzo'] === Esfuerzo::Bajo->value
-            && ($i['estado'] === 'problema' || $i['paginas'] >= 3)));
+            && ($i['estado'] === 'problema' || $i['paginas'] >= 3)
+            && !in_array($i['enlace'], $yaEstan, true)));
 
-        return ['empezar' => array_slice($items, 0, $cuantas), 'rapidos' => array_slice($rapidos, 0, $rapidas)];
+        return ['empezar' => $empezar, 'rapidos' => array_slice($rapidos, 0, $rapidas)];
     }
 
     /**
@@ -69,7 +73,9 @@ final class Prioridades
         $esCausa = $entrada['tipo'] === 'causa' && count($entrada['resultados']) > 1;
 
         return [
-            'titulo' => $esCausa ? (string) $entrada['descripcion'] : (string) $principal['titulo'],
+            // Siempre el nombre corto de la comprobación; la explicación larga de la causa va en su tarjeta.
+            'titulo' => (string) $principal['titulo'],
+            'causa' => $esCausa,
             'enlace' => $esCausa ? '#causa-' . $entrada['codigo'] : '#r-' . $principal['id'],
             'estado' => $estado,
             'gravedad' => $estado === 'problema' ? Gravedad::tryFrom((string) $principal['gravedad'])?->value : null,

@@ -100,7 +100,38 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
                             <button type="button" class="boton boton--secundario boton--pequeno evidencia__copiar" data-copiar="#ev-<?= e($ev['codigo']) ?>">Copiar<span class="solo-lectores"> la evidencia <?= e($ev['codigo']) ?></span></button>
                         <?php endif; ?>
                     </div>
-                    <?php if ($ev['contenido'] !== null): ?>
+                    <?php $contrastes = $ev['contenido'] !== null ? \ProconSEO\Results\LecturaContraste::filas((string) $ev['contenido']) : []; ?>
+                    <?php if ($contrastes !== []): ?>
+                        <?php
+                        $n = \ProconSEO\Results\LecturaContraste::numero(...);
+                        $muestra = static function (string $color): string {
+                            $seguro = \ProconSEO\Results\LecturaContraste::colorSeguro($color);
+
+                            return $seguro === null ? '' : '<svg class="muestra-color" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><rect x=".5" y=".5" width="15" height="15" rx="2" fill="' . e($seguro) . '" stroke="#5c6470"/></svg>';
+                        };
+                        ?>
+                        <div class="tabla-desplazable">
+                            <table class="tabla-contraste">
+                                <caption class="solo-lectores">Textos con contraste insuficiente</caption>
+                                <thead><tr><th scope="col">Elemento</th><th scope="col">Texto</th><th scope="col">Fondo</th><th scope="col">Contraste</th><th scope="col">Exigido</th></tr></thead>
+                                <tbody>
+                                    <?php foreach ($contrastes as $c): ?>
+                                        <tr>
+                                            <th scope="row"><span class="codigo"><?= e($c['selector']) ?></span><span class="tabla-contraste__nota"><?= e($n($c['tamano'])) ?> px<?= $c['negrita'] ? ', negrita' : '' ?><?= $c['veces'] > 1 ? ' · ' . e($c['veces']) . ' veces' : '' ?></span></th>
+                                            <td><?= $muestra($c['texto']) ?> <span class="codigo"><?= e($c['texto']) ?></span></td>
+                                            <td><?= $muestra($c['fondo']) ?> <span class="codigo"><?= e($c['fondo']) ?></span></td>
+                                            <td><strong><?= e($n($c['contraste'])) ?>:1</strong></td>
+                                            <td><?= e($n($c['exigido'])) ?>:1</td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <details class="plegable plegable--dentro">
+                            <summary>Ver la evidencia original de Google (en inglés)</summary>
+                            <pre id="ev-<?= e($ev['codigo']) ?>"><code><?= e($ev['contenido']) ?></code></pre>
+                        </details>
+                    <?php elseif ($ev['contenido'] !== null): ?>
                         <pre id="ev-<?= e($ev['codigo']) ?>"><code><?= e($ev['contenido']) ?></code></pre>
                     <?php endif; ?>
                 </div>

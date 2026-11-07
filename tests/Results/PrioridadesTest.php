@@ -37,7 +37,21 @@ final class PrioridadesTest extends TestCase
             'Gravedad primero; con la misma gravedad, la que afecta a más páginas');
         self::assertSame(3, $p['empezar'][1]['paginas']);
         self::assertTrue($p['empezar'][1]['repetido']);
-        self::assertSame(['ALTO-1PAG'], array_column($p['rapidos'], 'titulo'), 'Rápidos: poco esfuerzo y que merezca la pena');
+        self::assertSame([], $p['rapidos'], 'ALTO-1PAG ya está entre los cinco primeros: no se repite como arreglo rápido');
+        self::assertSame(['ALTO-1PAG'], array_column(Prioridades::desde($informe, 2)['rapidos'], 'titulo'), 'Rápidos: poco esfuerzo y que merezca la pena');
+    }
+
+    public function testUnaCausaSeTitulaConElNombreCortoDeLaComprobacion(): void
+    {
+        $causa = ['grupo_causa_id' => 9, 'causa_codigo' => 'imagenes-sin-alt', 'causa_descripcion' => 'Hay imágenes sin texto alternativo. Los buscadores, los asistentes con IA y los lectores de pantalla no saben qué muestran.'];
+        $p = Prioridades::desde(new Informe([
+            self::fila('Imágenes con atributo alt', $causa + ['estado' => 'problema', 'gravedad' => 'alto', 'bloque' => 'acc']),
+            self::fila('Texto alternativo de imágenes', $causa + ['estado' => 'mejorable', 'bloque' => 'seo']),
+        ], [], []));
+
+        self::assertSame('Imágenes con atributo alt', $p['empezar'][0]['titulo'], 'La explicación larga va en la tarjeta, no en la lista');
+        self::assertTrue($p['empezar'][0]['causa']);
+        self::assertSame('#causa-imagenes-sin-alt', $p['empezar'][0]['enlace']);
     }
 
     public function testComoMuchoCincoYSinNada(): void

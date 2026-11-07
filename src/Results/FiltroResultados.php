@@ -85,8 +85,11 @@ final class FiltroResultados
         }
 
         $buscado = self::normalizar($this->texto);
+        // Página: si es una dirección exacta del análisis, solo esa; si no, las que la contienen
+        // ("/blog/" filtra todas las páginas del blog).
+        $urlExacta = $this->url !== null && in_array($this->url, array_column($resultados, 'url_recurso'), true);
 
-        return array_values(array_filter($resultados, function (array $r) use ($buscado): bool {
+        return array_values(array_filter($resultados, function (array $r) use ($buscado, $urlExacta): bool {
             if ($this->bloque !== null && $r['bloque'] !== $this->bloque->value) {
                 return false;
             }
@@ -99,7 +102,7 @@ final class FiltroResultados
             if ($this->pendiente && !$r['revision_pendiente']) {
                 return false;
             }
-            if ($this->url !== null && $r['url_recurso'] !== $this->url) {
+            if ($this->url !== null && ($urlExacta ? $r['url_recurso'] !== $this->url : !str_contains(mb_strtolower((string) $r['url_recurso']), mb_strtolower($this->url)))) {
                 return false;
             }
             if ($this->responsable !== null && Responsable::de($r) !== $this->responsable) {

@@ -16,12 +16,13 @@ if ($prioridades['empezar'] === []) {
 $paginas = static fn (int $n): string => $n === 1 ? '1 página' : $n . ' páginas';
 ?>
 <section class="seccion" aria-labelledby="t-empezar">
-    <h2 id="t-empezar">Por dónde empezar
+    <div class="titulo-con-pista">
+    <h2 id="t-empezar">Por dónde empezar</h2>
         <span class="pista">
             <button type="button" class="pista__boton" aria-describedby="ayuda-empezar"><span class="solo-lectores">Cómo se ordena</span><span aria-hidden="true">?</span></button>
             <span class="pista__globo" id="ayuda-empezar" role="tooltip" hidden><strong>Cómo se ordena</strong>Primero la gravedad; después, cuántas páginas afecta y lo poco que cuesta arreglarlo. Es una ayuda para decidir, no una nota.</span>
         </span>
-    </h2>
+    </div>
     <div class="empezar">
         <ol class="empezar__lista">
             <?php foreach ($prioridades['empezar'] as $i): ?>
@@ -34,6 +35,7 @@ $paginas = static fn (int $n): string => $n === 1 ? '1 página' : $n . ' página
                             <span class="estado estado--<?= e($i['estado']) ?>"><?= Iconos::estado((string) $i['estado']) ?><?= e(Etiquetas::estado((string) $i['estado'])) ?></span>
                         <?php endif; ?>
                         <span class="chip"><?= e($paginas((int) $i['paginas'])) ?><?= $i['repetido'] ? ' · se repite' : '' ?></span>
+                        <?php if ($i['causa'] ?? false): ?><span class="chip">Causa común</span><?php endif; ?>
                         <?php if ($i['esfuerzo'] !== null): ?>
                             <span class="chip">Esfuerzo <?= e(mb_strtolower(Esfuerzo::from((string) $i['esfuerzo'])->etiqueta())) ?></span>
                         <?php endif; ?>

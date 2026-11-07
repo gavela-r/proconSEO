@@ -349,3 +349,26 @@ details.plegable[open] { padding-bottom: 1rem; }
 .seguimiento input, .seguimiento textarea { max-width: none; }
 .chip--seguimiento { background: #fff; border-style: dashed; border-color: var(--texto-tenue); color: var(--texto); }
 .seguimiento-resumen { display: flex; flex-wrap: wrap; gap: .375rem 1.125rem; margin: 1.25rem 0 0; font-size: .9375rem; color: var(--texto-suave); }
+
+/* ===== Sitio completo: resultados agrupados ===== */
+/* Título con ayuda al lado (la ayuda fuera del h2, para que el título se lea limpio). */
+.titulo-con-pista { display: flex; align-items: center; gap: .5rem .875rem; margin-bottom: 1rem; }
+.titulo-con-pista h2 { margin: 0; }
+.titulo-con-pista::after { content: ""; flex: 1; min-width: 2rem; height: 1px; background: var(--borde); }
+.tabla--grupos th[scope="row"] { font-weight: 500; }
+.tabla--grupos .tabla__codigo { display: block; font-size: .8rem; color: var(--texto-tenue); margin-top: .15rem; overflow-wrap: anywhere; }
+.tabla--grupos td .codigo { overflow-wrap: anywhere; font-size: .84rem; }
+.tabla--grupos .repeticion__paginas summary { padding: 0; }
+.tabla--grupos .repeticion__paginas ul { columns: 1; }
+.causa__resumen { font-weight: 600; margin: .75rem 0 .25rem; }
+.causa__efectos .repeticion__paginas { margin-top: .15rem; }
+.causa__pagina { display: block; font-size: .84rem; color: var(--texto-tenue); overflow-wrap: anywhere; }
+.lista-recursos li { overflow-wrap: anywhere; margin: .2rem 0; }
+.plegable--dentro { margin: .35rem 0 0; }
+.seccion .subtitulo { font-size: 1.05rem; margin: 1.25rem 0 .5rem; display: flex; gap: .5rem; align-items: baseline; flex-wrap: wrap; }
+.seccion .subtitulo .contador { font: 500 .85rem/1 var(--fuente-datos); color: var(--texto-tenue); }
+.tabla-contraste { margin: .5rem 0; font-size: .875rem; }
+.tabla-contraste th[scope="row"] { font-weight: 400; max-width: 22rem; }
+.tabla-contraste .codigo { overflow-wrap: anywhere; }
+.tabla-contraste__nota { display: block; font-size: .8rem; color: var(--texto-tenue); margin-top: .15rem; }
+.muestra-color { vertical-align: -3px; }
