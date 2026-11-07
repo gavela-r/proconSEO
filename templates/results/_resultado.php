@@ -63,6 +63,9 @@ $esfuerzo = Esfuerzo::tryFrom((string) $r['esfuerzo']);
         <?php if ($r['cobertura'] === 'no_implementada' && $r['limitacion'] !== null): ?>
             <span>Motivo: <?= e($r['limitacion']) ?></span>
         <?php endif; ?>
+        <?php if ($r['cobertura'] !== 'implementada'): ?>
+            <a href="/catalogo?<?= e(http_build_query(['texto' => (string) $r['id_comprobacion']])) ?>#subcomprobaciones">Qué cubre la herramienta<span class="solo-lectores"> de <?= e($r['titulo']) ?></span></a>
+        <?php endif; ?>
     </div>
     <?php if (($repetidos ?? []) !== []): ?>
         <?php $paginas = count(array_unique(array_map(static fn (array $o): string => (string) ($o['url_recurso'] ?? ''), $repetidos))); ?>

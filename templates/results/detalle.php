@@ -240,6 +240,7 @@ $mismoEstado = count(array_filter($otrasPaginas, static fn (array $o): bool => $
                 <h2 id="t-criterio">Sobre esta comprobación</h2>
                 <p><strong><?= e($r['id_criterio']) ?> · <?= e($ficha->extra['nombre_criterio'] ?? '') ?>.</strong> <?= e($ficha->extra['explicacion_sencilla'] ?? '') ?></p>
                 <p><strong>Qué comprueba:</strong> <?= e($ficha->queComprueba) ?></p>
+                <p><a href="/catalogo?<?= e(http_build_query(['texto' => (string) $r['id_comprobacion']])) ?>#subcomprobaciones">Ver esta comprobación en el catálogo</a> (fuente, cobertura y qué queda fuera).</p>
             </section>
         <?php endif; ?>
     </div>
