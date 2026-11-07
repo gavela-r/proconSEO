@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Si la web está en varios idiomas, hreflang le dice a Google qué versión mostrar a cada persona según su idioma.",
   "modo": "automatico",
   "esfuerzo": "medio",
+  "responsable": "desarrollo",
   "mvp": "si",
   "ref_investigacion": [
     "T14"

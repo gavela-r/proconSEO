@@ -52,7 +52,7 @@ final class CatalogoV1Test extends TestCase
 
     private const CAMPOS_CRITERIO = [
         'id', 'bloque', 'nombre', 'que_comprueba', 'cuando_aplica', 'explicacion_sencilla', 'modo',
-        'esfuerzo', 'mvp', 'ref_investigacion', 'reutiliza', 'fuentes', 'wcag', 'subcomprobaciones',
+        'esfuerzo', 'responsable', 'mvp', 'ref_investigacion', 'reutiliza', 'fuentes', 'wcag', 'subcomprobaciones',
     ];
 
     private const CAMPOS_SUBCOMPROBACION = [
@@ -189,6 +189,7 @@ final class CatalogoV1Test extends TestCase
         yield 'bloque' => ['criterio', 'bloque'];
         yield 'modo del criterio' => ['criterio', 'modo'];
         yield 'esfuerzo' => ['criterio', 'esfuerzo'];
+        yield 'responsable' => ['criterio', 'responsable'];
         yield 'mvp del criterio' => ['criterio', 'mvp'];
         yield 'modo de la subcomprobación' => ['sub', 'modo'];
         yield 'mvp de la subcomprobación' => ['sub', 'mvp'];

@@ -52,6 +52,19 @@ final class Orquestador
     private const AGENTE = 'proconSEO';
 
     /**
+     * Comprobaciones que miran un fichero del sitio (el robots.txt, el llms.txt, el sitemap) y no
+     * la página: dan lo mismo en todas. En un sitio completo se guardan solo con la primera página;
+     * repetirlas en cada una solo añadía filas iguales (31 en un análisis de 31 páginas).
+     * El permiso de cada agente sí depende de la ruta de la página, así que ese se guarda siempre.
+     */
+    public const SOLO_PRIMERA_PAGINA = [
+        'IA-01.robots-recuperado',
+        'IA-01.robots-sintaxis',
+        'IA-01.llms-txt',
+        'IA-08.presencia-sitemap',
+    ];
+
+    /**
      * @param Closure(Ambito, LimitesDescarga): ClienteHttpSeguro $fabricaCliente
      */
     public function __construct(
@@ -376,7 +389,8 @@ final class Orquestador
             $this->registrarBloqueos($id, $cliente);
 
             $salidas[] = new SalidaMotor(
-                array_values(array_filter($salida->resultados, static fn ($r): bool => $r->cobertura !== Cobertura::NoImplementada)),
+                array_values(array_filter($salida->resultados, static fn ($r): bool => $r->cobertura !== Cobertura::NoImplementada
+                    && !in_array($r->idComprobacion, self::SOLO_PRIMERA_PAGINA, true))),
                 $salida->evidencias,
                 $salida->gruposCausa,
                 $salida->senales,

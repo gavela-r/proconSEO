@@ -127,6 +127,8 @@ final class CatalogoJson implements Catalogo
             fuente: $fuente === null ? null : $fuente['nombre'] . ' — ' . $fuente['url'],
             extra: [
                 'nombre_criterio' => $criterio['nombre'],
+                // Quién suele arreglarlo (contenido, desarrollo, diseño); para repartir el trabajo.
+                'responsable' => $criterio['responsable'] ?? null,
                 'explicacion_sencilla' => $criterio['explicacion_sencilla'],
                 'cuando_aplica' => $sub['cuando_aplica'],
                 'condicion' => $sub['condicion'],

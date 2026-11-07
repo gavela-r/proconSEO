@@ -16,6 +16,7 @@ Cada análisis guarda la versión del catálogo que usó (RF-61). **Un fichero d
 | `explicacion_sencilla` | Qué es y por qué importa, sin jerga, para cualquier persona de Proconsi |
 | `modo` | `automatico`, `hibrido` o `humano` (se deduce de sus subcomprobaciones) |
 | `esfuerzo` | Esfuerzo orientativo de corrección: `bajo`, `medio` o `alto` |
+| `responsable` | Quién suele arreglarlo: `contenido`, `desarrollo` o `diseno` (desde la 1.4.0). Las decisiones a revisar son siempre del cliente |
 | `mvp` | `si`, `parcial`, `psi` o `no` (columna MVP de la especificación) |
 | `ref_investigacion` | Referencias a la Investigación ejecutiva (C02, O5, T1…) |
 | `reutiliza` | Otros criterios cuyos datos aprovecha |

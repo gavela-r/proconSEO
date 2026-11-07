@@ -9,7 +9,9 @@ namespace ProconSEO\Results;
  * por responsabilidad de Siteimprove). Sirve para pasarle a cada persona solo lo suyo.
  *
  * Es una orientación por criterio, no una regla: una decisión a revisar es siempre del cliente.
- * Cuando el catálogo tenga este dato (Parte 2), esta tabla se sustituye por el suyo.
+ * El dato sale del catálogo (campo «responsable» de cada criterio, desde la versión 1.4.0). La tabla
+ * de aquí solo se usa si el resultado no trae el del catálogo (p. ej., si no se pudo cargar), y un
+ * test comprueba que dice lo mismo.
  */
 final class Responsable
 {
@@ -25,7 +27,8 @@ final class Responsable
         self::CLIENTE => 'Decisión del cliente',
     ];
 
-    private const POR_CRITERIO = [
+    /** Copia de respaldo del catálogo: ResponsableTest comprueba que coinciden. */
+    public const POR_CRITERIO = [
         'IA-01' => self::DESARROLLO, 'IA-02' => self::DESARROLLO, 'IA-03' => self::DESARROLLO,
         'IA-04' => self::CONTENIDO, 'IA-05' => self::CONTENIDO, 'IA-06' => self::CONTENIDO,
         'IA-07' => self::DESARROLLO, 'IA-08' => self::DESARROLLO, 'IA-09' => self::CONTENIDO,
@@ -47,6 +50,11 @@ final class Responsable
     {
         if (($resultado['estado_vigente'] ?? $resultado['estado'] ?? null) === 'decision_revisar') {
             return self::CLIENTE;
+        }
+
+        $delCatalogo = $resultado['responsable_catalogo'] ?? null;
+        if (is_string($delCatalogo) && isset(self::ETIQUETAS[$delCatalogo])) {
+            return $delCatalogo;
         }
 
         return self::POR_CRITERIO[(string) ($resultado['id_criterio'] ?? '')] ?? self::DESARROLLO;

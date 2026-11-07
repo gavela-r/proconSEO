@@ -374,6 +374,7 @@ final class Informe
         return $r + [
             'titulo' => $ficha?->nombre ?? (string) $r['id_comprobacion'],
             'nombre_criterio' => $ficha !== null ? (string) ($ficha->extra['nombre_criterio'] ?? '') : '',
+            'responsable_catalogo' => $ficha !== null && is_string($ficha->extra['responsable'] ?? null) ? $ficha->extra['responsable'] : null,
         ];
     }
 }

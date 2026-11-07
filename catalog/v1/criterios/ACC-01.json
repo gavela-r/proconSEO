@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Las personas ciegas usan programas que leen la pantalla en voz alta. Si una imagen no tiene descripción, para ellas no existe.",
   "modo": "hibrido",
   "esfuerzo": "bajo",
+  "responsable": "contenido",
   "mvp": "parcial",
   "ref_investigacion": [],
   "reutiliza": [],

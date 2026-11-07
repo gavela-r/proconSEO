@@ -175,6 +175,9 @@ $anchoBarra = 300;
                 <?php if ($criterio['esfuerzo'] !== ''): ?>
                     <div><dt>Esfuerzo orientativo</dt><dd><?= e($criterio['esfuerzo']) ?></dd></div>
                 <?php endif; ?>
+                <?php if (($criterio['responsable'] ?? '') !== ''): ?>
+                    <div><dt>Quién suele arreglarlo</dt><dd><?= e($criterio['responsable']) ?></dd></div>
+                <?php endif; ?>
                 <?php if ($criterio['fuentes'] !== []): ?>
                     <div><dt>Fuente</dt><dd>
                         <?php foreach ($criterio['fuentes'] as $i => $fuente): ?>

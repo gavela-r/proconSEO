@@ -7,6 +7,7 @@
   "explicacion_sencilla": "En tiendas con muchos filtros pueden generarse miles de direcciones casi iguales. Es poco relevante para las tiendas pequeñas del Kit Digital.",
   "modo": "automatico",
   "esfuerzo": "medio",
+  "responsable": "desarrollo",
   "mvp": "parcial",
   "ref_investigacion": [
     "T16"

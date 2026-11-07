@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Además de robots.txt, cada página puede pedir que no se la guarde en el buscador o que no se muestre ningún trozo de su texto. Si se hace sin querer, la página desaparece de Google y de las respuestas de IA.",
   "modo": "automatico",
   "esfuerzo": "bajo",
+  "responsable": "desarrollo",
   "mvp": "si",
   "ref_investigacion": [
     "C02"

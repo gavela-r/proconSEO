@@ -19,6 +19,31 @@ final class ResponsableTest extends TestCase
         self::assertSame(Responsable::DESARROLLO, Responsable::de(Filas::resultado(['id_criterio' => 'XX-99'])), 'Criterio desconocido: desarrollo');
     }
 
+    public function testElCatalogoManda(): void
+    {
+        $catalogo = \ProconSEO\Engine\Catalogo\CatalogoJson::v1();
+        $conCatalogo = \ProconSEO\Results\Informe::conTitulos([Filas::resultado(['id_comprobacion' => 'ACC-05.contraste-texto', 'id_criterio' => 'ACC-05', 'estado' => 'problema', 'gravedad' => 'medio'])], $catalogo)[0];
+
+        self::assertSame('diseno', $conCatalogo['responsable_catalogo']);
+        self::assertSame(Responsable::DISENO, Responsable::de($conCatalogo));
+        self::assertSame(Responsable::CONTENIDO, Responsable::de(['id_criterio' => 'ACC-05', 'estado_vigente' => 'problema', 'responsable_catalogo' => 'contenido']), 'Si el catálogo dice otra cosa, vale lo del catálogo');
+        self::assertSame(Responsable::DISENO, Responsable::de(['id_criterio' => 'ACC-05', 'estado_vigente' => 'problema', 'responsable_catalogo' => 'inventado']), 'Un valor desconocido no se usa');
+    }
+
+    public function testLaTablaDeRespaldoCoincideConElCatalogo(): void
+    {
+        $catalogo = \ProconSEO\Engine\Catalogo\CatalogoJson::v1();
+        $porCriterio = [];
+        foreach ($catalogo->todas() as $ficha) {
+            $porCriterio[$ficha->idCriterio] = $ficha->extra['responsable'] ?? null;
+        }
+        ksort($porCriterio);
+        $respaldo = Responsable::POR_CRITERIO;
+        ksort($respaldo);
+
+        self::assertSame($respaldo, $porCriterio, 'Si cambias el responsable en el catálogo, cámbialo también en Responsable::POR_CRITERIO');
+    }
+
     public function testFiltroPorResponsableYNivelWcag(): void
     {
         $alt = Filas::resultado(['id_criterio' => 'ACC-01', 'estado' => 'problema', 'wcag_criterio' => '1.1.1', 'wcag_nivel' => 'A']);
