@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Si la misma página existe en varias direcciones, Google tiene que adivinar cuál mostrar. Eso solo es un problema si las señales se contradicen.",
   "modo": "automatico",
   "esfuerzo": "medio",
+  "responsable": "contenido",
   "mvp": "parcial",
   "ref_investigacion": [
     "T6"

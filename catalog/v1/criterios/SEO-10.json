@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Google mira primero la versión para móvil. Si la web no se adapta o en móvil falta contenido, se resiente.",
   "modo": "automatico",
   "esfuerzo": "medio",
+  "responsable": "desarrollo",
   "mvp": "parcial",
   "ref_investigacion": [
     "T10"

@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Para que un buscador o una IA use la página, primero tiene que poder leerla. Si la web bloquea a los robots o el texto solo aparece después de cargar programas, puede que no lo vean.",
   "modo": "automatico",
   "esfuerzo": "medio",
+  "responsable": "desarrollo",
   "mvp": "parcial",
   "ref_investigacion": [
     "C01"

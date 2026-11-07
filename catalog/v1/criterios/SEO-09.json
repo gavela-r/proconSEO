@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Parte del contenido de algunas webs solo aparece cuando se ejecutan programas o se pulsa algo. Google no siempre lo ve.",
   "modo": "automatico",
   "esfuerzo": "medio",
+  "responsable": "desarrollo",
   "mvp": "no",
   "ref_investigacion": [
     "T9"

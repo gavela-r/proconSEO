@@ -165,6 +165,12 @@ final class OrquestadorTest extends TestCase
         self::assertSame(1, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND id_comprobacion = 'SEO-03.title-duplicado'", [$id]), 'Una sola fila para todo el sitio');
         self::assertSame('mejorable', $this->valor("SELECT estado FROM resultados WHERE analisis_id = ? AND id_comprobacion = 'SEO-03.title-duplicado'", [$id]));
         self::assertStringContainsString('https://ejemplo.es/servicios', (string) $this->valor("SELECT contenido FROM evidencias WHERE analisis_id = ? AND codigo LIKE 'S-%'", [$id]));
+        // Lo que es del sitio (robots.txt, llms.txt, sitemap) se guarda una vez; el permiso de cada agente, por página.
+        foreach (\ProconSEO\Run\Orquestador::SOLO_PRIMERA_PAGINA as $delSitio) {
+            self::assertLessThanOrEqual(1, (int) $this->valor('SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND id_comprobacion = ?', [$id, $delSitio]), "{$delSitio} una sola vez");
+        }
+        self::assertSame(1, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND id_comprobacion = 'IA-01.robots-recuperado'", [$id]));
+        self::assertSame(3, (int) $this->valor("SELECT COUNT(*) FROM resultados WHERE analisis_id = ? AND id_comprobacion = 'IA-01.permiso-buscadores'", [$id]), 'El permiso depende de la ruta: uno por página');
         // La misma causa en varias páginas es un solo grupo.
         self::assertSame(0, (int) $this->valor("SELECT COUNT(*) FROM grupos_causa WHERE analisis_id = ? AND REGEXP_LIKE(codigo, '^P[0-9]+-', 'c')", [$id]));
     }

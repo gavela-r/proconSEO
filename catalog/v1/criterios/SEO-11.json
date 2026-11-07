@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Mide si la página carga rápido, responde rápido al tocarla y no da saltos mientras se carga. Los datos vienen de Google PageSpeed Insights.",
   "modo": "automatico",
   "esfuerzo": "alto",
+  "responsable": "desarrollo",
   "mvp": "psi",
   "ref_investigacion": [
     "V1",

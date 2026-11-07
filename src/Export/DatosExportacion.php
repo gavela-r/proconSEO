@@ -95,6 +95,11 @@ final class DatosExportacion
             'eventos_seguridad' => array_map(static fn (array $e): array => [
                 'regla' => $e['regla'], 'fase' => $e['fase'], 'url' => $e['url_recurso'], 'condicion' => $e['condicion'], 'decision' => $e['decision'],
             ], $this->repo->eventosSeguridad($id)),
+            // Lo revisado a mano de cada criterio WCAG (la última fila de cada criterio es la vigente).
+            'revisiones_manuales' => array_map(static fn (array $m): array => [
+                'criterio_wcag' => $m['criterio_wcag'], 'resultado' => $m['resultado'], 'revisor' => $m['revisor'],
+                'paginas' => $m['paginas'], 'notas' => $m['notas'], 'creada_en_utc' => $m['creado_en'],
+            ], $this->repo->revisionesManuales($id)),
         ];
     }
 

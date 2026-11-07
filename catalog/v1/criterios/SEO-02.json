@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Cuando una dirección salta a otra, y esa a otra más, los buscadores pierden tiempo y a veces se rinden. También conviene que todas las variantes lleven a una sola versión.",
   "modo": "automatico",
   "esfuerzo": "bajo",
+  "responsable": "desarrollo",
   "mvp": "si",
   "ref_investigacion": [
     "T4",

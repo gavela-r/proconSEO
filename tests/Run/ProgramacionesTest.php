@@ -171,6 +171,17 @@ final class ProgramacionesTest extends TestCase
         self::assertNotNull($this->valor('SELECT leido_en FROM avisos WHERE id = ?', [$creados[0]]));
     }
 
+    public function testLoAceptadoConMotivoNoAvisa(): void
+    {
+        $anterior = $this->analisis(programado: true);
+        $this->resultado($anterior, 'SEO-01.noindex-desarrollo', 'correcto');
+        $actual = $this->analisis(programado: true);
+        $this->resultado($actual, 'SEO-01.noindex-desarrollo', 'problema', 'critico');
+        (new \ProconSEO\Results\Seguimientos($this->bd))->registrar($this->proyectoId, 'SEO-01.noindex-desarrollo', 'aceptado', 'Test', 'Web en pruebas: el noindex es a propósito', $anterior);
+
+        self::assertSame([], (new Avisos($this->bd, CatalogoJson::v1()))->trasAnalisis($actual));
+    }
+
     public function testSinCambiosGravesNoHayAviso(): void
     {
         $anterior = $this->analisis(programado: true);

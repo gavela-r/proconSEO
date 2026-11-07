@@ -33,7 +33,7 @@ final class InformeTest extends TestCase
         self::assertSame(1, $informe->resumen['acc']['no_implementadas']);
         self::assertSame(1, $informe->resumen['acc']['pendientes']);
         self::assertSame(0, $informe->resumen['ia']['total']);
-        self::assertEqualsCanonicalizing(['recuento', 'total', 'no_implementadas', 'pendientes'], array_keys($informe->resumen['ia']), 'El resumen no tiene ningún campo de nota o porcentaje');
+        self::assertEqualsCanonicalizing(['recuento', 'total', 'comprobaciones', 'no_implementadas', 'pendientes'], array_keys($informe->resumen['ia']), 'El resumen no tiene ningún campo de nota o porcentaje');
     }
 
     public function testUnaCausaSeMuestraUnaVezConTodosSusEfectos(): void
@@ -51,6 +51,34 @@ final class InformeTest extends TestCase
         self::assertCount(2, $informe->incidencias[0]['resultados']);
         self::assertEqualsCanonicalizing(['seo', 'ia'], $informe->incidencias[0]['bloques']);
         self::assertSame(3, $informe->numeroIncidencias());
+    }
+
+    public function testLaMismaComprobacionEnVariasPaginasSeMuestraUnaVez(): void
+    {
+        $fila = static fn (string $url, array $mas = []): array => Filas::resultado($mas + ['id_comprobacion' => 'ACC-01.alt-ausente', 'estado' => 'problema', 'gravedad' => 'alto', 'url_recurso' => $url]);
+        $informe = new Informe([
+            $fila('https://ejemplo.es/a'),
+            $fila('https://ejemplo.es/b'),
+            $fila('https://ejemplo.es/c'),
+            $fila('https://ejemplo.es/d', ['gravedad' => 'medio']),
+            Filas::resultado(['estado' => 'mejorable']),
+        ], [], []);
+
+        self::assertCount(3, $informe->incidencias, 'Las tres de gravedad alta juntas; la de gravedad media aparte');
+        self::assertSame('repetido', $informe->incidencias[0]['tipo']);
+        self::assertCount(3, $informe->incidencias[0]['resultados']);
+        self::assertSame('resultado', $informe->incidencias[1]['tipo']);
+        self::assertSame(5, $informe->numeroIncidencias(), 'El recuento sigue contando cada resultado');
+    }
+
+    public function testEnLaMismaPaginaNoSeAgrupa(): void
+    {
+        $informe = new Informe([
+            Filas::resultado(['estado' => 'problema', 'gravedad' => 'alto']),
+            Filas::resultado(['estado' => 'problema', 'gravedad' => 'alto']),
+        ], [], []);
+
+        self::assertSame(['resultado', 'resultado'], array_column($informe->incidencias, 'tipo'));
     }
 
     public function testIncidenciasOrdenadasPorEstadoYGravedad(): void
@@ -102,6 +130,53 @@ final class InformeTest extends TestCase
         self::assertSame([$principalCaida['id'], $sitemapProhibido['id']], array_column($informe->recursosBloqueados, 'id'));
         self::assertSame([$robotsNoExiste['id']], array_column($informe->recursosNoEncontrados, 'id'), 'Un robots.txt que no existe no es un bloqueo');
         self::assertSame([$truncado['id']], array_column($informe->recursosTruncados, 'id'));
+    }
+
+    public function testLoQueQuedoFueraDelAmbitoNoEsUnBloqueo(): void
+    {
+        $fuera = static fn (string $url): array => Filas::recurso(['url' => $url, 'resultado' => 'fuera_de_ambito', 'motivo' => 'no autorizado']);
+        $informe = new Informe([], [
+            $fuera('https://www.ejemplo.es/a'), $fuera('https://www.ejemplo.es/b'), $fuera('https://www.ejemplo.es/a'),
+            $fuera('https://otro.com/'),
+            Filas::recurso(['resultado' => 'error_http', 'estado_http' => 503]),
+        ], []);
+
+        self::assertCount(1, $informe->recursosBloqueados, 'Solo el 503 es un bloqueo');
+        self::assertSame([
+            ['host' => 'www.ejemplo.es', 'total' => 2, 'ejemplos' => ['https://www.ejemplo.es/a', 'https://www.ejemplo.es/b']],
+            ['host' => 'otro.com', 'total' => 1, 'ejemplos' => ['https://otro.com/']],
+        ], $informe->fueraDeAmbito, 'Uno por host, sin repetir direcciones, el que más primero');
+    }
+
+    public function testAgruparJuntaLaMismaComprobacionEnVariasPaginas(): void
+    {
+        $fila = static fn (string $id, string $url, string $estado = 'correcto'): array => Filas::resultado(['id_comprobacion' => $id, 'estado' => $estado, 'url_recurso' => $url]);
+        $grupos = Informe::agrupar([
+            $fila('SEO-03.title', 'https://ejemplo.es/a'),
+            $fila('SEO-03.title', 'https://ejemplo.es/b'),
+            $fila('SEO-04.description', 'https://ejemplo.es/a'),
+            $fila('SEO-03.title', 'https://ejemplo.es/b'),
+            $fila('SEO-03.title', 'https://ejemplo.es/c', 'no_aplicable'),
+        ]);
+
+        self::assertSame(['SEO-03.title', 'SEO-04.description', 'SEO-03.title'], array_map(static fn (array $g): string => $g['principal']['id_comprobacion'], $grupos), 'En el orden en que llegan; otro estado es otro grupo');
+        self::assertSame([2, 1, 1], array_column($grupos, 'paginas'), 'Páginas distintas, no resultados');
+        self::assertCount(3, $grupos[0]['resultados']);
+    }
+
+    public function testLosEfectosDeUnaCausaSeAgrupanPorComprobacion(): void
+    {
+        $causa = ['grupo_causa_id' => 3, 'causa_codigo' => 'imagenes-sin-alt', 'causa_descripcion' => 'Imágenes sin alt'];
+        $filas = [];
+        foreach (['a', 'b', 'c'] as $pagina) {
+            $filas[] = Filas::resultado($causa + ['id_comprobacion' => 'ACC-01.img-alt', 'bloque' => 'acc', 'estado' => 'problema', 'gravedad' => 'alto', 'url_recurso' => "https://ejemplo.es/{$pagina}"]);
+            $filas[] = Filas::resultado($causa + ['id_comprobacion' => 'SEO-12.imagenes-alt', 'bloque' => 'seo', 'estado' => 'mejorable', 'url_recurso' => "https://ejemplo.es/{$pagina}"]);
+        }
+        $informe = new Informe($filas, [], []);
+
+        self::assertCount(1, $informe->incidencias);
+        self::assertCount(6, $informe->incidencias[0]['resultados']);
+        self::assertSame([3, 3], array_column($informe->incidencias[0]['efectos'], 'paginas'), 'Dos efectos, cada uno en 3 páginas, en vez de 6 líneas iguales');
     }
 
     public function testUnaPaginaPrincipalQueNoExisteSiEsBloqueo(): void

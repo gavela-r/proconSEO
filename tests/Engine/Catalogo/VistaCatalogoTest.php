@@ -139,7 +139,10 @@ final class VistaCatalogoTest extends TestCase
         self::assertStringContainsString('id="SEO-03.title-presente"', $html);
         self::assertStringNotContainsString('id="ACC-01.img-alt-presente"', $html);
         self::assertStringContainsString('Quitar filtros', $html);
-        self::assertMatchesRegularExpression('/<option value="seo" selected>/', $html);
+        self::assertMatchesRegularExpression('/aria-current="true">SEO</', $html, 'El filtro elegido se marca');
+        self::assertMatchesRegularExpression('/aria-current="true">Implementada</', $html);
+        self::assertStringContainsString('name="bloque" value="seo"', $html, 'Al buscar texto se conservan los filtros');
+        self::assertStringContainsString(' open>', $html, 'Con filtros, los criterios salen abiertos');
     }
 
     public function testLaBusquedaSeEscapa(): void

@@ -7,6 +7,7 @@
   "explicacion_sencilla": "Los datos estructurados son una ficha oculta que describe la página (empresa, producto, dirección…) para que las máquinas la entiendan sin adivinar.",
   "modo": "hibrido",
   "esfuerzo": "medio",
+  "responsable": "desarrollo",
   "mvp": "parcial",
   "ref_investigacion": [
     "C16"
