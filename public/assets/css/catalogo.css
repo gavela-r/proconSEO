@@ -21,7 +21,43 @@
 .catalogo__filtros > div { display: flex; flex-direction: column; min-width: 12rem; }
 .catalogo__botones { flex-direction: row !important; gap: .5rem; min-width: 0 !important; }
 
-.criterio { margin-top: 2.5rem; scroll-margin-top: 1rem; }
+/* De un vistazo: tres tarjetas por cobertura y una barra por bloque. */
+.catalogo__cobertura { list-style: none; padding: 0; margin: 0 0 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem; }
+.catalogo__tarjeta { border-top: 3px solid currentColor; padding-top: .6rem; }
+.catalogo__tarjeta a { display: block; text-decoration: none; color: inherit; }
+.catalogo__tarjeta a:hover .catalogo__tarjeta-titulo, .catalogo__tarjeta a:focus-visible .catalogo__tarjeta-titulo { text-decoration: underline; }
+.catalogo__numero { display: block; font: 600 2rem/1.1 var(--fuente-datos); color: var(--texto); }
+.catalogo__tarjeta-titulo { font-weight: 600; }
+.catalogo__tarjeta-texto { display: block; color: var(--texto-suave); font-size: .875rem; margin-top: .2rem; }
+.catalogo__tarjeta--implementada { color: var(--estado-correcto); }
+.catalogo__tarjeta--parcialmente_implementada { color: var(--estado-mejorable); }
+.catalogo__tarjeta--no_implementada { color: var(--estado-no-verificable); }
+.catalogo__col-barra { width: 40%; min-width: 8rem; vertical-align: middle; }
+.catalogo__barra { width: 100%; height: 14px; display: block; }
+.barra-cobertura--implementada { fill: var(--estado-correcto); }
+.barra-cobertura--parcialmente_implementada { fill: var(--estado-mejorable); }
+.barra-cobertura--no_implementada { fill: #c7d3df; }
+
+/* Barra fija: buscar, filtrar y saltar a un criterio sin bajar hasta el final. */
+.catalogo__barra-fija { position: sticky; top: 0; z-index: 5; background: var(--fondo); border-bottom: 1px solid var(--borde); padding: .75rem 0; display: grid; gap: .5rem; }
+.catalogo__buscar { display: flex; gap: .5rem; }
+.catalogo__buscar input { flex: 1; min-width: 0; }
+.catalogo__chips, .catalogo__indice { display: flex; flex-wrap: wrap; gap: .35rem; }
+.catalogo__chips a { font-size: .85rem; padding: .2rem .7rem; border: 1px solid var(--borde-fuerte); border-radius: 999px; text-decoration: none; color: var(--texto-suave); min-height: 24px; display: inline-flex; align-items: center; }
+.catalogo__chips a[aria-current="true"] { background: var(--texto); border-color: var(--texto); color: var(--fondo); }
+.catalogo__indice a { font: 500 .78rem/1 var(--fuente-datos); padding: .3rem .4rem; text-decoration: none; color: var(--texto-suave); min-height: 24px; display: inline-flex; align-items: center; }
+.catalogo__indice a:hover, .catalogo__indice a:focus-visible { color: var(--texto); text-decoration: underline; }
+.catalogo__estado { margin: 1rem 0; }
+@media (max-width: 40rem) { .catalogo__barra-fija { position: static; } .catalogo__col-barra { display: none; } }
+
+/* Cada criterio, plegado: el resumen dice ya qué parte está hecha. */
+.criterio { border-bottom: 1px solid var(--borde); scroll-margin-top: 12rem; }
+.criterio > summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: .35rem .75rem; align-items: baseline; padding: .875rem 0; list-style-position: outside; }
+.criterio > summary::marker { color: var(--texto-tenue); }
+.criterio__nombre { font-weight: 600; font-size: 1.05rem; }
+.criterio__recuento { display: flex; flex-wrap: wrap; gap: .35rem; margin-left: auto; min-width: 0; max-width: 100%; }
+.criterio__recuento .cobertura { font-size: .78rem; }
+.criterio__cuerpo { padding: 0 0 1.25rem; }
 .criterio h3 { display: flex; flex-wrap: wrap; gap: .5rem; align-items: baseline; }
 .criterio__id { font-family: ui-monospace, monospace; }
 .criterio__bloque {
