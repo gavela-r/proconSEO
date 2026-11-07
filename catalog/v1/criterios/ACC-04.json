@@ -91,7 +91,7 @@
     },
     {
       "id": "ACC-04.zoom-bloqueado",
-      "nombre": "Ampliación no bloqueada",
+      "nombre": "Bloqueo de la ampliación (zoom)",
       "que_comprueba": "La meta viewport no impide ampliar la página: sin user-scalable=no ni maximum-scale menor que 2 (regla ACT b4f0c3).",
       "cuando_aplica": "Si la página tiene meta viewport.",
       "condicion": null,

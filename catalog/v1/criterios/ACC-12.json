@@ -45,7 +45,7 @@
   "subcomprobaciones": [
     {
       "id": "ACC-12.nombres-controles",
-      "nombre": "Controles con nombre accesible",
+      "nombre": "Nombre accesible de los controles",
       "que_comprueba": "Botones, campos y controles personalizados tienen nombre accesible.",
       "cuando_aplica": "Siempre que la página se haya podido descargar.",
       "condicion": null,
@@ -66,7 +66,7 @@
     },
     {
       "id": "ACC-12.roles-aria-validos",
-      "nombre": "Roles y atributos ARIA válidos",
+      "nombre": "Roles y atributos ARIA",
       "que_comprueba": "Los roles ARIA existen y los atributos aria-* son válidos y permitidos para su rol.",
       "cuando_aplica": "Siempre que la página se haya podido descargar.",
       "condicion": null,
@@ -87,7 +87,7 @@
     },
     {
       "id": "ACC-12.iframe-title",
-      "nombre": "iframes con título",
+      "nombre": "Título de los iframes",
       "que_comprueba": "Cada <iframe> tiene title o nombre accesible.",
       "cuando_aplica": "Si hay iframes.",
       "condicion": null,

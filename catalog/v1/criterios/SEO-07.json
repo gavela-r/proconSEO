@@ -79,7 +79,7 @@
     },
     {
       "id": "SEO-07.paginas-minimas",
-      "nombre": "Al menos 3 páginas",
+      "nombre": "Número de páginas (al menos 3)",
       "que_comprueba": "La web tiene al menos 3 páginas internas enlazadas y accesibles.",
       "cuando_aplica": "Proyectos Kit Digital, con alcance con contexto o sitio completo.",
       "condicion": "kit_digital",

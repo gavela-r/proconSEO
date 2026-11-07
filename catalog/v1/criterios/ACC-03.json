@@ -67,7 +67,7 @@
   "subcomprobaciones": [
     {
       "id": "ACC-03.title-pagina",
-      "nombre": "Página con título",
+      "nombre": "Título de la página",
       "que_comprueba": "La página tiene un <title> no vacío. Su adecuación la valora una persona.",
       "cuando_aplica": "Siempre que la página se haya podido descargar.",
       "condicion": null,
@@ -111,7 +111,7 @@
     },
     {
       "id": "ACC-03.tablas-encabezados",
-      "nombre": "Tablas de datos con encabezados",
+      "nombre": "Encabezados de las tablas de datos",
       "que_comprueba": "Las tablas de datos tienen celdas de encabezado (th o scope) y, si procede, caption.",
       "cuando_aplica": "Si hay tablas de datos.",
       "condicion": "tabla",

@@ -33,7 +33,7 @@
   "subcomprobaciones": [
     {
       "id": "ACC-01.img-alt-presente",
-      "nombre": "Imágenes con atributo alt",
+      "nombre": "Texto alternativo de las imágenes",
       "que_comprueba": "Toda <img> tiene atributo alt (vacío solo si es decorativa).",
       "cuando_aplica": "Si la página tiene imágenes.",
       "condicion": null,
@@ -76,7 +76,7 @@
     },
     {
       "id": "ACC-01.input-image-alt",
-      "nombre": "Botones de imagen con alt",
+      "nombre": "Texto alternativo de los botones de imagen",
       "que_comprueba": "<input type=\"image\"> tiene alt.",
       "cuando_aplica": "Si hay botones de imagen.",
       "condicion": null,
@@ -97,7 +97,7 @@
     },
     {
       "id": "ACC-01.svg-area-nombre",
-      "nombre": "SVG y áreas de mapa con nombre",
+      "nombre": "Nombre de los SVG y de las áreas de mapa",
       "que_comprueba": "<svg role=\"img\"> y <area> tienen nombre accesible.",
       "cuando_aplica": "Si hay SVG con rol img o mapas de imagen.",
       "condicion": null,

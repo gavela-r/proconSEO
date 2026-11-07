@@ -117,7 +117,7 @@
     },
     {
       "id": "SEO-01.rastreable",
-      "nombre": "Rastreable por Googlebot",
+      "nombre": "Rastreo por Googlebot",
       "que_comprueba": "robots.txt permite a Googlebot rastrear la URL.",
       "cuando_aplica": "Siempre.",
       "condicion": null,
@@ -138,7 +138,7 @@
     },
     {
       "id": "SEO-01.indexable",
-      "nombre": "Indexable",
+      "nombre": "Indexación",
       "que_comprueba": "No hay noindex en meta robots ni en X-Robots-Tag.",
       "cuando_aplica": "Siempre que la página se haya podido descargar.",
       "condicion": null,
@@ -177,7 +177,7 @@
     },
     {
       "id": "SEO-01.noindex-desarrollo",
-      "nombre": "noindex de desarrollo olvidado",
+      "nombre": "Noindex de desarrollo olvidado",
       "que_comprueba": "noindex, o robots.txt que bloquea todo, que suele quedarse puesto al publicar la web (en WordPress: «Disuadir a los motores de búsqueda»). Sin objetivo «no indexar» declarado es problema crítico; con ese objetivo declarado, es correcto.",
       "cuando_aplica": "Proyectos de tipo Web Kit Digital o Tienda Kit Digital.",
       "condicion": "kit_digital",

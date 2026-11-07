@@ -80,7 +80,7 @@
     },
     {
       "id": "SEO-02.canonical-coherente",
-      "nombre": "Canonical coherente",
+      "nombre": "Coherencia del canonical",
       "que_comprueba": "El canonical apunta a una URL que responde 200, es indexable y no redirige.",
       "cuando_aplica": "Si hay canonical y el alcance permite consultarlo.",
       "condicion": null,

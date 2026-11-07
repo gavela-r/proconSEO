@@ -46,7 +46,7 @@
   "subcomprobaciones": [
     {
       "id": "IA-01.robots-recuperado",
-      "nombre": "robots.txt recuperado",
+      "nombre": "Lectura de robots.txt",
       "que_comprueba": "Se ha podido obtener /robots.txt y se registra su respuesta: 200 se interpreta; 4xx equivale a «sin restricciones»; 429 y 5xx se tratan como restricción temporal sin inventar la caché del buscador.",
       "cuando_aplica": "Siempre.",
       "condicion": null,
@@ -133,7 +133,7 @@
     },
     {
       "id": "IA-01.llms-txt",
-      "nombre": "llms.txt (informativo)",
+      "nombre": "Fichero llms.txt (informativo)",
       "que_comprueba": "Si existe /llms.txt. Solo se informa; no se valora ni a favor ni en contra.",
       "cuando_aplica": "Alcance con contexto o sitio completo.",
       "condicion": null,
