@@ -1,45 +1,99 @@
-/* Parte 1: pantallas de nuevo análisis y progreso. */
+/* Parte 1: pantallas de nuevo análisis, progreso, programados y avisos. Usa las variables de base.css. */
 
-.ayuda { color: var(--texto-suave); font-size: .9rem; margin: .25rem 0 0; max-width: 40rem; }
-.opcional { font-weight: 400; color: var(--texto-suave); }
-fieldset { border: 1px solid var(--borde); border-radius: var(--radio); margin: 1rem 0; padding: .5rem 1rem 1rem; max-width: 40rem; }
-legend { font-weight: 600; padding: 0 .25rem; }
-.opcion { display: flex; align-items: center; gap: .5rem; min-height: 32px; }
-.opcion input { width: auto; }
-.opcion label { margin: 0; font-weight: 400; }
+.ayuda { color: var(--texto-tenue); font-size: .875rem; margin: .4375rem 0 0; max-width: 40rem; }
+.opcional { font-weight: 400; color: var(--texto-tenue); }
 
-.fases { list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: .5rem; }
-.fase {
-    display: grid;
-    grid-template-columns: minmax(10rem, 1fr) minmax(8rem, auto);
-    gap: .25rem 1rem;
-    padding: .6rem .8rem;
-    border: 1px solid var(--borde);
-    border-left-width: 4px;
-    border-radius: var(--radio);
-}
-.fase__nombre { font-weight: 600; }
-.fase__estado { text-align: right; }
-.fase__mensaje { grid-column: 1 / -1; color: var(--texto-suave); font-size: .9rem; }
+/* ---------- Nuevo análisis ---------- */
+.nuevo { display: grid; grid-template-columns: minmax(0, 1fr) 21rem; gap: 4rem; align-items: start; }
+.paso { display: grid; grid-template-columns: 2.75rem minmax(0, 1fr); padding: 1.75rem 0; border-bottom: 1px solid var(--borde); }
+.paso__numero { font: 500 .8125rem/1.7 var(--fuente-datos); color: var(--marca); }
+.paso label:first-child, .paso legend { margin-top: 0; }
+.paso input, .paso select, .paso textarea { max-width: none; }
+#url { min-height: 56px; font: 400 1.1875rem/1.2 var(--fuente-datos); border-color: var(--texto-tenue); }
+
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+legend { font-weight: 600; padding: 0; margin-bottom: .5rem; }
+.alcances { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--borde-fuerte); border-radius: var(--radio); }
+.alcance { position: relative; display: block; margin: 0; padding: 1.125rem 1.125rem 1rem; font-weight: 400; cursor: pointer; border-right: 1px solid var(--borde-fuerte); }
+.alcance:last-child { border-right: 0; }
+.alcance input { position: absolute; opacity: 0; }
+.alcance__nombre { display: flex; align-items: center; gap: .625rem; font-weight: 600; }
+.alcance__marca { width: 16px; height: 16px; flex: none; display: grid; place-items: center; border: 1.5px solid var(--texto-tenue); border-radius: 50%; }
+.alcance__texto { display: block; margin-top: .5rem; color: var(--texto-suave); font-size: .875rem; }
+.alcance__dato { display: block; margin-top: .75rem; font: 400 .78rem/1.3 var(--fuente-datos); color: var(--texto-tenue); }
+.alcance:has(input:checked) { background: var(--superficie); box-shadow: inset 0 -3px 0 var(--texto); }
+.alcance:has(input:checked) .alcance__marca { border-color: var(--texto); }
+.alcance:has(input:checked) .alcance__marca::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--texto); }
+.alcance:has(input:focus-visible) { outline: 2px solid var(--foco); outline-offset: -2px; }
+
+.envio { display: flex; flex-wrap: wrap; align-items: center; gap: 1.125rem; padding-top: 1.75rem; }
+.envio .meta { max-width: 44ch; margin: 0; }
+
+.ficha { border-top: 1px solid var(--texto); padding-top: 1.125rem; }
+.ficha + .ficha { margin-top: 2rem; }
+.ficha h2 { margin: 0 0 .875rem; font-size: .8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--texto-suave); }
+.ficha ul { list-style: none; margin: 0; padding: 0; }
+.ficha li { padding: .5rem 0; border-bottom: 1px solid var(--borde); font-size: .875rem; }
+.ficha p { margin: .75rem 0 0; }
+.ficha dl { display: grid; grid-template-columns: max-content 1fr; gap: .5625rem 1.125rem; margin: 0; font-size: .9rem; }
+.ficha dt { color: var(--texto-tenue); }
+.ficha dd { margin: 0; }
+
+/* ---------- Progreso: la línea de medición ---------- */
+.progreso__url { font: 400 1.625rem/1.2 var(--fuente-datos); letter-spacing: -.01em; word-break: break-all; margin: .5rem 0 0; }
+.estado-analisis { margin: 0; }
+
+.fases { position: relative; list-style: none; margin: 3rem 0 .5rem; padding: 1.5rem 0 0; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); }
+.fases::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--borde-fuerte); }
+.fase { position: relative; padding: .875rem .625rem 0; border-left: 1px solid var(--borde-fuerte); min-width: 0; }
+.fase::before { content: ""; position: absolute; left: -5px; top: -1.8rem; width: 9px; height: 9px; border-radius: 50%; background: #fff; border: 1.5px solid var(--borde-fuerte); }
+.fase::after { content: ""; position: absolute; left: 0; right: 0; top: -1.5rem; height: 3px; transform: translateY(-1px); }
+.fase__nombre { display: block; font-weight: 600; font-size: .9rem; line-height: 1.3; }
+.fase__estado { display: block; margin-top: .5rem; font-size: .8125rem; color: var(--texto-tenue); }
+.fase__mensaje { display: block; margin-top: .25rem; font-size: .78rem; color: var(--texto-tenue); overflow-wrap: anywhere; }
 .fase__mensaje:empty { display: none; }
-.fase--en_curso { border-left-color: var(--primario); }
-.fase--terminada { border-left-color: var(--estado-correcto); }
+.fase--terminada { border-left-color: var(--texto); }
+.fase--terminada::before { background: var(--texto); border-color: var(--texto); }
+.fase--terminada::after { background: var(--texto); }
+.fase--en_curso { border-left-color: var(--marca); }
+.fase--en_curso::before { background: var(--marca); border-color: var(--marca); box-shadow: 0 0 0 4px #fbe3e6; }
+.fase--en_curso .fase__estado { color: var(--marca); font-weight: 600; }
 .fase--parcial { border-left-color: var(--estado-mejorable); }
+.fase--parcial::before { background: var(--estado-mejorable); border-color: var(--estado-mejorable); }
+.fase--parcial::after { background: var(--estado-mejorable); }
 .fase--fallida { border-left-color: var(--estado-problema); }
-.fase--omitida, .fase--pendiente { border-left-color: var(--borde); }
+.fase--fallida::before { background: #fff; border-color: var(--estado-problema); border-width: 2px; }
+.fase--omitida { border-left-style: dashed; }
+.fase--omitida::before { border-style: dashed; border-color: var(--texto-tenue); }
+.fase--omitida .fase__nombre, .fase--pendiente .fase__nombre { color: var(--texto-tenue); font-weight: 500; }
 
-.acciones { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin: 1rem 0; }
-.detalles { margin-top: 1.5rem; }
-.detalles summary { cursor: pointer; font-weight: 600; min-height: 24px; }
+.acciones { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin: 2rem 0 1rem; }
+.detalles { margin-top: 2rem; border-top: 1px solid var(--borde); }
+.detalles summary { cursor: pointer; font-weight: 600; padding: .875rem 0; min-height: 24px; }
+.detalles ul { margin: 0 0 1rem; padding-left: 1.25rem; color: var(--texto-suave); }
 
-@media (max-width: 30rem) {
-    .fase { grid-template-columns: 1fr; }
-    .fase__estado { text-align: left; }
+/* ---------- Análisis programados y avisos ---------- */
+.programaciones, .avisos { list-style: none; padding: 0; margin: 1rem 0; border-top: 1px solid var(--texto); }
+.programacion, .aviso-item { border-bottom: 1px solid var(--borde); border-left: 3px solid var(--texto); padding: 1rem 0 1rem 1rem; }
+.programacion--pausada, .aviso-item--leido { border-left-color: var(--borde-fuerte); }
+.programacion p, .aviso-item p { margin: .25rem 0; }
+.etiqueta-nuevo { display: inline-block; margin-left: .5rem; padding: .25rem .5rem; border-radius: var(--radio); background: var(--estado-problema); color: #fff; font: 500 .75rem/1 var(--fuente-datos); text-transform: uppercase; letter-spacing: .05em; }
+
+@media (max-width: 56rem) {
+    .nuevo { grid-template-columns: 1fr; gap: 2.5rem; }
+    .alcances { grid-template-columns: 1fr; }
+    .alcance { border-right: 0; border-bottom: 1px solid var(--borde-fuerte); }
+    .alcance:last-child { border-bottom: 0; }
+    .fases { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 2.5rem; }
+}
+@media (max-width: 40rem) {
+    .paso { grid-template-columns: 1fr; }
+    .paso__numero { margin-bottom: .25rem; }
+    .fases { grid-template-columns: 1fr 1fr; padding-top: 0; }
+    .fases::before, .fase::before, .fase::after { display: none; }
+    .progreso__url { font-size: 1.1875rem; }
 }
 
-/* Análisis programados y avisos */
-.programaciones, .avisos { list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: .75rem; }
-.programacion, .aviso-item { border: 1px solid var(--borde); border-left: 4px solid var(--primario); border-radius: var(--radio); padding: .75rem 1rem; }
-.programacion--pausada, .aviso-item--leido { border-left-color: var(--borde); }
-.programacion p, .aviso-item p { margin: .25rem 0; }
-.etiqueta-nuevo { display: inline-block; margin-left: .5rem; padding: .05rem .5rem; border-radius: var(--radio); background: var(--estado-problema); color: #fff; font-size: .8rem; font-weight: 700; }
+/* Formulario de análisis programados */
+.programar__alcance { margin-top: 1.25rem; max-width: 40rem; }
+.programar__alcance .alcance { padding: .875rem 1rem; }

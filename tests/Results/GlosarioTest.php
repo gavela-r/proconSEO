@@ -28,7 +28,8 @@ final class GlosarioTest extends TestCase
         $html = self::glosario()->enlazar('La página tiene noindex. Quitar el noindex de la plantilla.');
 
         self::assertSame(1, substr_count($html, '<a class="termino"'), 'Solo la primera vez');
-        self::assertStringContainsString('<a class="termino" href="/glosario#noindex" title="Pide que no se indexe.">noindex</a>', $html);
+        self::assertMatchesRegularExpression('#<span class="pista"><a class="termino" href="/glosario\#noindex" aria-describedby="(def-noindex-\d+)">noindex</a><span class="pista__globo" id="\1" role="tooltip" hidden><strong>noindex</strong>Pide que no se indexe.</span></span>#', $html);
+        self::assertStringNotContainsString('title=', $html, 'Sin title: no se ve con teclado ni en el móvil');
         self::assertStringContainsString('Quitar el noindex de', $html, 'El término sigue en el texto');
     }
 
@@ -56,7 +57,7 @@ final class GlosarioTest extends TestCase
         self::assertStringNotContainsString('<script>', $html);
         self::assertStringNotContainsString('<img', $html);
         self::assertStringContainsString('&lt;script&gt;', $html);
-        self::assertStringContainsString('title="Etiqueta &lt;meta name=&quot;robots&quot;&gt;."', self::glosario()->enlazar('meta robots'), 'La definición también va escapada');
+        self::assertStringContainsString('Etiqueta &lt;meta name=&quot;robots&quot;&gt;.</span>', self::glosario()->enlazar('meta robots'), 'La definición también va escapada');
     }
 
     public function testAnclasSinTildes(): void
@@ -76,6 +77,15 @@ final class GlosarioTest extends TestCase
             self::assertNotSame('', trim($t['definicion']), $t['termino']);
         }
         self::assertStringContainsString('href="/glosario#noindex"', $g->enlazar('Tiene un noindex.'));
+    }
+
+    public function testCadaGloboTieneUnIdDistinto(): void
+    {
+        $html = self::glosario()->enlazar('noindex') . self::glosario()->enlazar('noindex');
+        preg_match_all('/id="(def-[^"]+)"/', $html, $m);
+
+        self::assertCount(2, $m[1]);
+        self::assertNotSame($m[1][0], $m[1][1], 'aria-describedby apunta a un solo globo');
     }
 
     public function testSinTextoDevuelveVacio(): void

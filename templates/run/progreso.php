@@ -17,15 +17,22 @@ $hosts = json_decode((string) $analisis['hosts_autorizados'], true) ?: [];
     <?= \ProconSEO\Shared\Vista::render('layout/aviso_prueba', [], false) ?>
 <?php endif; ?>
 
-<h1>Análisis de <?= e($analisis['url_normalizada']) ?></h1>
-<p>Proyecto: <?= e($proyecto['nombre'] ?? '—') ?> · Alcance: <?= e(Alcance::from((string) $analisis['alcance'])->etiqueta()) ?></p>
-
 <div id="progreso" data-id="<?= e($analisis['id']) ?>" data-en-marcha="<?= $enMarcha ? '1' : '0' ?>">
-    <p class="estado-analisis">
-        Estado: <strong id="estado-texto"><?= e($estado->etiqueta()) ?></strong>
-    </p>
+    <div class="titular">
+        <div>
+            <p class="meta"><?= e($proyecto['nombre'] ?? '—') ?> · <?= e(Alcance::from((string) $analisis['alcance'])->etiqueta()) ?></p>
+            <h1>Análisis de la web</h1>
+            <p class="progreso__url"><?= e($analisis['url_normalizada']) ?></p>
+            <p class="estado-analisis meta" role="status">Estado: <strong id="estado-texto"><?= e($estado->etiqueta()) ?></strong></p>
+        </div>
+        <form method="post" action="/analisis/<?= e($analisis['id']) ?>/cancelar" id="form-cancelar"<?= $enMarcha ? '' : ' hidden' ?>>
+            <?= csrf_campo() ?>
+            <button type="submit" class="boton boton--secundario">Cancelar análisis</button>
+        </form>
+    </div>
     <p id="motivo" class="aviso"<?= $analisis['motivo_cierre'] ? '' : ' hidden' ?>><?= e($analisis['motivo_cierre']) ?></p>
 
+    <h2 class="visualmente-oculto">Fases del análisis</h2>
     <ol class="fases" id="fases" aria-live="polite">
         <?php foreach ($fases as $f): ?>
             <li class="fase fase--<?= e($f['estado']) ?>" data-fase="<?= e($f['fase']) ?>">
@@ -37,10 +44,6 @@ $hosts = json_decode((string) $analisis['hosts_autorizados'], true) ?: [];
     </ol>
 
     <div class="acciones">
-        <form method="post" action="/analisis/<?= e($analisis['id']) ?>/cancelar" id="form-cancelar"<?= $enMarcha ? '' : ' hidden' ?>>
-            <?= csrf_campo() ?>
-            <button type="submit" class="boton boton--secundario">Cancelar análisis</button>
-        </form>
         <a class="boton" id="ver-resultados" href="/analisis/<?= e($analisis['id']) ?>"<?= $enMarcha ? ' hidden' : '' ?>>Ver resultados</a>
     </div>
 </div>
