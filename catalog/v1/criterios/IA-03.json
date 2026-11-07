@@ -26,7 +26,7 @@
   "subcomprobaciones": [
     {
       "id": "IA-03.respuesta-http",
-      "nombre": "Respuesta HTTP utilizable",
+      "nombre": "Respuesta HTTP",
       "que_comprueba": "La respuesta final es 200 y el tipo de contenido real coincide con el declarado (HTML).",
       "cuando_aplica": "Siempre.",
       "condicion": null,

@@ -67,7 +67,7 @@
     },
     {
       "id": "ACC-07.recarga-automatica",
-      "nombre": "Sin recarga ni redirección temporizada",
+      "nombre": "Recarga o redirección temporizada",
       "que_comprueba": "No hay <meta http-equiv=\"refresh\"> que recargue la página o lleve a otra pasado un tiempo (regla ACT bc659a: se admite 0 s o más de 20 horas).",
       "cuando_aplica": "Si la página tiene meta refresh.",
       "condicion": null,

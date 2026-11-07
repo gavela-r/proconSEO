@@ -26,7 +26,7 @@
   "subcomprobaciones": [
     {
       "id": "IA-08.canonical-declarado",
-      "nombre": "Canonical declarado",
+      "nombre": "Declaración de canonical",
       "que_comprueba": "Hay un único canonical, con URL absoluta y dentro del ámbito.",
       "cuando_aplica": "Siempre que la página se haya podido descargar.",
       "condicion": null,

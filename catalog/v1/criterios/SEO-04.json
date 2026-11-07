@@ -22,7 +22,7 @@
   "subcomprobaciones": [
     {
       "id": "SEO-04.description-presente",
-      "nombre": "Meta description presente",
+      "nombre": "Meta description",
       "que_comprueba": "Hay una <meta name=\"description\"> con texto.",
       "cuando_aplica": "Siempre que la página se haya podido descargar.",
       "condicion": null,
@@ -41,7 +41,7 @@
     },
     {
       "id": "SEO-04.description-unica",
-      "nombre": "Una sola meta description",
+      "nombre": "Número de meta descriptions",
       "que_comprueba": "La página tiene una única meta description.",
       "cuando_aplica": "Siempre que la página se haya podido descargar.",
       "condicion": null,

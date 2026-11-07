@@ -53,7 +53,7 @@
   "subcomprobaciones": [
     {
       "id": "ACC-10.lang-presente",
-      "nombre": "Idioma de la página declarado",
+      "nombre": "Idioma declarado de la página",
       "que_comprueba": "El elemento <html> tiene atributo lang.",
       "cuando_aplica": "Siempre que la página se haya podido descargar.",
       "condicion": null,
@@ -75,7 +75,7 @@
     },
     {
       "id": "ACC-10.lang-valido",
-      "nombre": "Código de idioma válido",
+      "nombre": "Código de idioma",
       "que_comprueba": "El valor de lang es un código de idioma válido (BCP 47).",
       "cuando_aplica": "Siempre que la página se haya podido descargar.",
       "condicion": null,
@@ -97,7 +97,7 @@
     },
     {
       "id": "ACC-10.lang-coincide",
-      "nombre": "Idioma declarado coincide con el contenido",
+      "nombre": "Idioma declarado frente al idioma del texto",
       "que_comprueba": "El idioma declarado coincide con el del texto principal.",
       "cuando_aplica": "Siempre que la página se haya podido descargar.",
       "condicion": null,

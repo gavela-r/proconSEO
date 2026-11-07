@@ -81,7 +81,7 @@
   "subcomprobaciones": [
     {
       "id": "ACC-09.labels-asociados",
-      "nombre": "Campos con etiqueta",
+      "nombre": "Etiquetas de los campos",
       "que_comprueba": "Cada campo tiene una etiqueta asociada (label for, label envolvente, aria-label o aria-labelledby).",
       "cuando_aplica": "Si hay formularios.",
       "condicion": "formulario",
@@ -104,7 +104,7 @@
     },
     {
       "id": "ACC-09.placeholder-como-etiqueta",
-      "nombre": "placeholder usado como etiqueta",
+      "nombre": "Placeholder usado como etiqueta",
       "que_comprueba": "Campos cuya única indicación es el placeholder.",
       "cuando_aplica": "Si hay formularios.",
       "condicion": "formulario",
@@ -125,7 +125,7 @@
     },
     {
       "id": "ACC-09.autocomplete",
-      "nombre": "autocomplete en datos personales",
+      "nombre": "Autocompletado en datos personales",
       "que_comprueba": "Los campos de datos personales (nombre, correo, teléfono, dirección) tienen un valor autocomplete válido.",
       "cuando_aplica": "Si hay campos de datos personales.",
       "condicion": "formulario",
@@ -146,7 +146,7 @@
     },
     {
       "id": "ACC-09.campos-obligatorios",
-      "nombre": "Campos obligatorios indicados",
+      "nombre": "Indicación de los campos obligatorios",
       "que_comprueba": "Los campos obligatorios se indican en el código (required o aria-required) y en el texto.",
       "cuando_aplica": "Si hay formularios.",
       "condicion": "formulario",
@@ -273,7 +273,7 @@
     },
     {
       "id": "ACC-09.formulario-billetes",
-      "nombre": "Formulario de billetes accesible",
+      "nombre": "Accesibilidad del formulario de billetes",
       "que_comprueba": "Formularios de búsqueda o compra de billetes con etiquetas e instrucciones accesibles.",
       "cuando_aplica": "Proyectos del sector transporte o páginas con formulario de billetes.",
       "condicion": "sector_transporte",
