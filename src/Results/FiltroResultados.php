@@ -9,11 +9,18 @@ use ProconSEO\Shared\Enum\EstadoResultado;
 
 /**
  * Filtros del dashboard (RF-23): bloque, estado vigente, criterio, revisión pendiente,
- * página o recurso, y búsqueda por texto. Los valores que no son válidos se ignoran.
+ * página o recurso, responsable, nivel WCAG y búsqueda por texto. Los valores que no son válidos
+ * se ignoran.
  */
 final class FiltroResultados
 {
     public const MAX_TEXTO = 200;
+
+    /** Niveles WCAG que se pueden filtrar: A, AA o solo los criterios nuevos de WCAG 2.2. */
+    /** Seguimiento: los estados guardados y «sin aceptados» para ocultar lo que el equipo ya dio por bueno. */
+    public const SEGUIMIENTOS = ['sin_aceptados' => 'Todos menos los aceptados', 'pendiente' => 'Pendientes', 'en_curso' => 'En curso', 'corregido' => 'Corregidos', 'aceptado' => 'Aceptados'];
+
+    public const NIVELES = ['A' => 'Solo nivel A', 'AA' => 'Solo nivel AA', 'nuevo22' => 'Nuevos en WCAG 2.2'];
 
     /** Campos en los que busca el texto. */
     private const CAMPOS_TEXTO = [
@@ -28,6 +35,9 @@ final class FiltroResultados
         public readonly bool $pendiente,
         public readonly ?string $url,
         public readonly string $texto,
+        public readonly ?string $responsable = null,
+        public readonly ?string $nivel = null,
+        public readonly ?string $seguimiento = null,
     ) {
     }
 
@@ -46,6 +56,9 @@ final class FiltroResultados
             $cadena('pendiente') === '1',
             $url !== '' && strlen($url) <= 2048 ? $url : null,
             mb_substr($cadena('q'), 0, self::MAX_TEXTO),
+            isset(Responsable::ETIQUETAS[$cadena('responsable')]) ? $cadena('responsable') : null,
+            isset(self::NIVELES[$cadena('nivel')]) ? $cadena('nivel') : null,
+            isset(self::SEGUIMIENTOS[$cadena('seguimiento')]) ? $cadena('seguimiento') : null,
         );
     }
 
@@ -57,7 +70,8 @@ final class FiltroResultados
     public function activo(): bool
     {
         return $this->bloque !== null || $this->estado !== null || $this->criterio !== null
-            || $this->pendiente || $this->url !== null || $this->texto !== '';
+            || $this->pendiente || $this->url !== null || $this->texto !== ''
+            || $this->responsable !== null || $this->nivel !== null || $this->seguimiento !== null;
     }
 
     /**
@@ -88,6 +102,16 @@ final class FiltroResultados
             if ($this->url !== null && $r['url_recurso'] !== $this->url) {
                 return false;
             }
+            if ($this->responsable !== null && Responsable::de($r) !== $this->responsable) {
+                return false;
+            }
+            if ($this->nivel !== null && !self::cumpleNivel($r, $this->nivel)) {
+                return false;
+            }
+            $seguimiento = (string) ($r['seguimiento'] ?? 'pendiente');
+            if ($this->seguimiento === 'sin_aceptados' ? $seguimiento === 'aceptado' : ($this->seguimiento !== null && $seguimiento !== $this->seguimiento)) {
+                return false;
+            }
             if ($buscado === '') {
                 return true;
             }
@@ -110,8 +134,25 @@ final class FiltroResultados
             'criterio' => $this->criterio ?? '',
             'pendiente' => $this->pendiente ? '1' : '',
             'url' => $this->url ?? '',
+            'responsable' => $this->responsable ?? '',
+            'nivel' => $this->nivel ?? '',
+            'seguimiento' => $this->seguimiento ?? '',
             'q' => $this->texto,
         ], static fn (string $v): bool => $v !== '');
+    }
+
+    /**
+     * Un resultado sin criterio WCAG (SEO, IA o normativa) no cumple ningún filtro de nivel.
+     *
+     * @param array<string, mixed> $r
+     */
+    private static function cumpleNivel(array $r, string $nivel): bool
+    {
+        if (($r['wcag_criterio'] ?? null) === null || $r['wcag_criterio'] === '') {
+            return false;
+        }
+
+        return $nivel === 'nuevo22' ? Etiquetas::esNuevo22($r) : ($r['wcag_nivel'] ?? null) === $nivel;
     }
 
     /** Minúsculas y sin tildes, para que «titulo» encuentre «Título». */

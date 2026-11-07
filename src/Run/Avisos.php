@@ -8,6 +8,7 @@ use PDO;
 use ProconSEO\Results\ComparacionAnalisis;
 use ProconSEO\Results\Informe;
 use ProconSEO\Results\RepositorioResultados;
+use ProconSEO\Results\Seguimientos;
 use ProconSEO\Shared\Contract\Catalogo;
 
 /**
@@ -59,10 +60,17 @@ final class Avisos
                 $resultados->resultados((int) $anterior['id']),
                 Informe::conTitulos($resultados->resultados($analisisId), $this->catalogo),
             );
+            // Lo que el equipo ya aceptó con motivo no vuelve a avisar; lo marcado como corregido que
+            // reaparece sí, porque es justo lo que hay que saber.
+            $aceptados = array_keys(array_filter(
+                (new Seguimientos($this->bd))->actuales((int) $analisis['proyecto_id']),
+                static fn (array $s): bool => $s['estado'] === Seguimientos::ACEPTADO,
+            ));
             $graves = array_values(array_filter(
                 [...$comparacion->grupos[ComparacionAnalisis::NUEVOS], ...$comparacion->grupos[ComparacionAnalisis::EMPEORADOS]],
                 static fn (array $par): bool => ($par['ahora']['estado_vigente'] ?? null) === 'problema'
-                    && in_array($par['ahora']['gravedad'] ?? null, ['critico', 'alto'], true),
+                    && in_array($par['ahora']['gravedad'] ?? null, ['critico', 'alto'], true)
+                    && !in_array((string) ($par['ahora']['id_comprobacion'] ?? ''), $aceptados, true),
             ));
             if ($graves !== []) {
                 $lineas = array_map(static fn (array $par): string => '· ' . ($par['ahora']['titulo'] ?? $par['ahora']['id_comprobacion'])

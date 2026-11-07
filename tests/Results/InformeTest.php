@@ -53,6 +53,34 @@ final class InformeTest extends TestCase
         self::assertSame(3, $informe->numeroIncidencias());
     }
 
+    public function testLaMismaComprobacionEnVariasPaginasSeMuestraUnaVez(): void
+    {
+        $fila = static fn (string $url, array $mas = []): array => Filas::resultado($mas + ['id_comprobacion' => 'ACC-01.alt-ausente', 'estado' => 'problema', 'gravedad' => 'alto', 'url_recurso' => $url]);
+        $informe = new Informe([
+            $fila('https://ejemplo.es/a'),
+            $fila('https://ejemplo.es/b'),
+            $fila('https://ejemplo.es/c'),
+            $fila('https://ejemplo.es/d', ['gravedad' => 'medio']),
+            Filas::resultado(['estado' => 'mejorable']),
+        ], [], []);
+
+        self::assertCount(3, $informe->incidencias, 'Las tres de gravedad alta juntas; la de gravedad media aparte');
+        self::assertSame('repetido', $informe->incidencias[0]['tipo']);
+        self::assertCount(3, $informe->incidencias[0]['resultados']);
+        self::assertSame('resultado', $informe->incidencias[1]['tipo']);
+        self::assertSame(5, $informe->numeroIncidencias(), 'El recuento sigue contando cada resultado');
+    }
+
+    public function testEnLaMismaPaginaNoSeAgrupa(): void
+    {
+        $informe = new Informe([
+            Filas::resultado(['estado' => 'problema', 'gravedad' => 'alto']),
+            Filas::resultado(['estado' => 'problema', 'gravedad' => 'alto']),
+        ], [], []);
+
+        self::assertSame(['resultado', 'resultado'], array_column($informe->incidencias, 'tipo'));
+    }
+
     public function testIncidenciasOrdenadasPorEstadoYGravedad(): void
     {
         $mejorable = Filas::resultado(['estado' => 'mejorable']);
