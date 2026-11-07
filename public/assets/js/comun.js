@@ -42,7 +42,12 @@
         if (e.key === 'Escape') for (const pista of [...abiertas]) cerrar(pista);
     });
 
-    // Botones «Copiar» (data-copiar="#id"): copian el texto del elemento y lo anuncian.
+    // Botones «Copiar» (data-copiar="#id"): copian el texto del elemento y lo anuncian, también al
+    // lector de pantalla (WCAG 4.1.3).
+    const anuncio = document.createElement('p');
+    anuncio.className = 'visualmente-oculto';
+    anuncio.setAttribute('role', 'status');
+    document.body.append(anuncio);
     for (const boton of document.querySelectorAll('[data-copiar]')) {
         boton.addEventListener('click', async () => {
             const origen = document.querySelector(boton.dataset.copiar);
@@ -52,9 +57,10 @@
             } catch {
                 return;
             }
-            const antes = boton.textContent;
+            const antes = boton.innerHTML;
             boton.textContent = 'Copiado';
-            setTimeout(() => { boton.textContent = antes; }, 1800);
+            anuncio.textContent = 'Copiado al portapapeles';
+            setTimeout(() => { boton.innerHTML = antes; anuncio.textContent = ''; }, 1800);
         });
     }
 })();

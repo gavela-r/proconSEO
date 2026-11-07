@@ -59,6 +59,8 @@ return static function (Router $r): void {
     $r->get('/analisis/{id}/exportar/pdf', static function (Peticion $p) use ($analisis, $catalogo, $descarga): Respuesta {
         // Un análisis con cientos de resultados tarda varios segundos en maquetarse.
         set_time_limit(120);
+        // Un sitio completo de cientos de páginas necesita más memoria que el límite por defecto (128 MB).
+        ini_set('memory_limit', '512M');
         $d = $analisis($p);
         $id = (int) $d['analisis']['id'];
         $repo = new RepositorioResultados(BaseDatos::conexion());
