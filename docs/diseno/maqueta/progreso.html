@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Análisis en curso · proconSEO</title>
+<link rel="stylesheet" href="estilos.css">
+<link rel="stylesheet" href="paginas.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-correcto" viewBox="0 0 24 24"><path d="M4.5 12.5l4.8 4.8L19.5 7"/></symbol>
+  <symbol id="i-mejorable" viewBox="0 0 24 24"><path d="M12 19V5.5M6.5 11 12 5.5l5.5 5.5"/></symbol>
+  <symbol id="i-problema" viewBox="0 0 24 24"><path d="M12 3.8 2.9 19.6h18.2Z"/><path d="M12 10v4.6"/><path d="M12 17.3v.05"/></symbol>
+  <symbol id="i-decision" viewBox="0 0 24 24"><path d="M12 4v16M6.5 20h11M4.5 7.5h15"/><path d="M7 7.5 4.2 13.5a2.9 2.9 0 0 0 5.6 0Z"/><path d="M17 7.5l-2.8 6a2.9 2.9 0 0 0 5.6 0Z"/></symbol>
+  <symbol id="i-no-verificable" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.4"/><path d="M12 16.6v.05"/></symbol>
+  <symbol id="i-no-aplicable" viewBox="0 0 24 24"><path d="M6.5 12h11"/></symbol>
+  <symbol id="i-mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-descarga" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/></symbol>
+  <symbol id="i-buscar" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 4.5 4.5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.8v.05"/></symbol>
+  <symbol id="i-parar" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="1"/></symbol>
+</svg>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<header class="cabecera">
+  <div class="cabecera__dentro">
+    <a class="marca" href="index.html" aria-label="proconSEO, inicio">
+      <img src="logo-proconsi.png" alt="Proconsi">
+      <span class="marca__separador" aria-hidden="true"></span>
+      <span class="marca__nombre">proconSEO</span>
+    </a>
+    <nav class="navegacion" aria-label="Principal">
+      <a href="index.html">Inicio</a>
+      <a href="#" aria-current="page">Proyectos</a>
+      <a href="nuevo.html">Nuevo análisis</a>
+      <a href="#">Catálogo</a>
+      <a href="#">Glosario</a>
+      <a href="#">Avisos <span class="contador">2</span></a>
+    </nav>
+    <div class="cabecera__estado" aria-label="Estado del servicio">
+      <span><span class="punto" aria-hidden="true"></span>Worker en marcha</span>
+      <span>Catálogo 1.3 · Perfil v3</span>
+    </div>
+  </div>
+</header>
+
+<main id="contenido">
+  <p class="migas"><a href="index.html">Inicio</a><span aria-hidden="true">/</span><a href="#">Estaciones de servicio Ruiz</a><span aria-hidden="true">/</span>Análisis en curso</p>
+  <div class="titular">
+    <div>
+      <p class="meta">Sitio completo · empezó a las 10:42</p>
+      <h1>Analizando la web</h1>
+      <p class="identificacion__url">https://www.gasolinera-ejemplo.es/</p>
+    </div>
+    <div class="titular__acciones">
+      <button class="boton boton--peligro" type="button"><svg class="icono"><use href="#i-parar"/></svg>Cancelar análisis</button>
+    </div>
+  </div>
+
+  <section class="medicion" aria-labelledby="s-fases">
+    <h2 id="s-fases" class="visualmente-oculto">Fases del análisis</h2>
+    <div class="medicion__regla" aria-hidden="true">
+      <div class="medicion__marcas"></div>
+      <div class="medicion__hecho" style="width:68.75%"></div>
+    </div>
+    <ol class="fases">
+      <li class="fase fase--hecha"><span class="fase__n">01</span><span class="fase__nombre">Validación de URL y ámbito</span><span class="fase__tiempo">0,2 s</span></li>
+      <li class="fase fase--hecha"><span class="fase__n">02</span><span class="fase__nombre">Recuperación: robots.txt y portada</span><span class="fase__tiempo">1,4 s</span></li>
+      <li class="fase fase--hecha"><span class="fase__n">03</span><span class="fase__nombre">Descubrimiento de URLs</span><span class="fase__tiempo">18 s</span></li>
+      <li class="fase fase--omitida"><span class="fase__n">04</span><span class="fase__nombre">Renderizado</span><span class="fase__tiempo">omitida: sin navegador</span></li>
+      <li class="fase fase--hecha"><span class="fase__n">05</span><span class="fase__nombre">Extracción de datos</span><span class="fase__tiempo">1 min 52 s</span></li>
+      <li class="fase fase--actual" aria-current="step"><span class="fase__n">06 · en curso</span><span class="fase__nombre">Comprobaciones IA, SEO y accesibilidad</span><span class="fase__tiempo">48 de 131 páginas</span></li>
+      <li class="fase fase--pendiente"><span class="fase__n">07</span><span class="fase__nombre">Agrupación por causa</span><span class="fase__tiempo">pendiente</span></li>
+      <li class="fase fase--pendiente"><span class="fase__n">08</span><span class="fase__nombre">Cierre</span><span class="fase__tiempo">pendiente</span></li>
+    </ol>
+  </section>
+
+  <dl class="cifras">
+    <div class="cifra"><dt>Páginas</dt><dd>131 <small>de 200 como máximo</small></dd></div>
+    <div class="cifra"><dt>Peticiones</dt><dd>412</dd></div>
+    <div class="cifra"><dt>Descargado</dt><dd>38,6 <small>MB de 200</small></dd></div>
+    <div class="cifra"><dt>Tiempo</dt><dd>3:21</dd></div>
+  </dl>
+
+  <section class="seccion" aria-labelledby="s-diario">
+    <div class="seccion__cabeza"><span class="seccion__numero">01</span><h2 id="s-diario">Lo último que ha pasado</h2></div>
+    <table class="registro diario">
+      <tbody>
+        <tr><td>10:46:03</td><td>Comprobando <span class="url">/servicios/lavado-de-coches/</span></td></tr>
+        <tr><td>10:45:58</td><td>Comprobando <span class="url">/estaciones/leon-centro/</span></td></tr>
+        <tr><td>10:45:41</td><td><span class="estado estado--no-verificable"><svg class="icono"><use href="#i-no-verificable"/></svg>No se ha seguido</span> <span class="url">/area-clientes/</span> — robots.txt lo prohíbe</td></tr>
+        <tr><td>10:44:35</td><td><span class="estado estado--problema"><svg class="icono"><use href="#i-problema"/></svg>Bloqueado por seguridad</span> <span class="url">http://192.168.1.20/intranet</span> — dirección de red interna</td></tr>
+        <tr><td>10:42:44</td><td>Sitemap leído: <span class="url">/sitemap.xml</span>, 126 URLs</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="pie__dentro">
+    <span>proconSEO · herramienta interna de Proconsi · solo red interna</span>
+    <span>Maqueta de diseño · datos de ejemplo</span>
+  </div>
+</footer>
+</body>
+</html>
