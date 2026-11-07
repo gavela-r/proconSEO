@@ -16,6 +16,9 @@ final class Ambito
     /** @var list<string> */
     private readonly array $hosts;
 
+    /** Cualquier host vale (solo para subrecursos del navegador; ver subrecursos()). */
+    private bool $cualquierHost = false;
+
     /**
      * @param list<string> $hosts Hosts ya normalizados (minúsculas, punycode)
      */
@@ -30,9 +33,23 @@ final class Ambito
         return new self([$url->host]);
     }
 
+    /**
+     * Ámbito de los subrecursos que el navegador necesita para pintar la página (hojas de
+     * estilo, scripts y fuentes), que a menudo vienen de un CDN. Solo lo usa NavegadorAislado,
+     * que antes decide qué tipos de petición se permiten (FiltroPeticiones). SEG-01/02 se
+     * aplican igual: un host que apunta a una IP interna se sigue bloqueando.
+     */
+    public static function subrecursos(): self
+    {
+        $ambito = new self([]);
+        $ambito->cualquierHost = true;
+
+        return $ambito;
+    }
+
     public function permite(DestinoUrl $url): bool
     {
-        return in_array(strtolower($url->host), $this->hosts, true);
+        return $this->cualquierHost || in_array(strtolower($url->host), $this->hosts, true);
     }
 
     /** @return list<string> */
