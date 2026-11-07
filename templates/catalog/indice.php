@@ -20,12 +20,12 @@ use ProconSEO\Shared\Enum\Cobertura;
 $mostradas = array_sum(array_map(static fn (array $c): int => count($c['subcomprobaciones']), $criterios));
 $filtrado = $filtros['bloque'] !== null || $filtros['cobertura'] !== null || $filtros['texto'] !== '';
 /** Enlace al catálogo cambiando un filtro y conservando los demás. */
-$enlace = static function (array $cambios) use ($filtros): string {
-    $actual = array_filter([
-        'bloque' => $filtros['bloque']?->value,
-        'cobertura' => $filtros['cobertura']?->value,
-        'texto' => $filtros['texto'] !== '' ? $filtros['texto'] : null,
-    ], static fn (?string $v): bool => $v !== null);
+$actual = array_filter([
+    'bloque' => $filtros['bloque']?->value,
+    'cobertura' => $filtros['cobertura']?->value,
+    'texto' => $filtros['texto'] !== '' ? $filtros['texto'] : null,
+], static fn (?string $v): bool => $v !== null);
+$enlace = static function (array $cambios) use ($actual): string {
     $consulta = array_filter(array_merge($actual, $cambios), static fn (?string $v): bool => $v !== null && $v !== '');
 
     return '/catalogo' . ($consulta === [] ? '' : '?' . http_build_query($consulta)) . '#subcomprobaciones';
