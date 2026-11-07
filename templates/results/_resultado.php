@@ -21,6 +21,9 @@ $esfuerzo = Esfuerzo::tryFrom((string) $r['esfuerzo']);
             <span class="gravedad gravedad--<?= e(Etiquetas::claseGravedad($r)) ?>"><?= e($gravedad) ?></span>
         <?php endif; ?>
         <span class="chip"><?= e(Etiquetas::bloque((string) $r['bloque'])) ?></span>
+        <?php if (in_array($estado, ['problema', 'mejorable', 'decision_revisar'], true)): ?>
+            <span class="chip chip--responsable"><span class="solo-lectores">Responsable: </span><?= e(\ProconSEO\Results\Responsable::etiqueta($r)) ?></span>
+        <?php endif; ?>
         <?php if ($wcag !== null): ?>
             <span class="chip <?= Etiquetas::esNuevo22($r) ? 'chip--wcag22' : 'chip--wcag21' ?>"><?= e($wcag) ?></span>
         <?php elseif (($normativa = Etiquetas::normativa($r)) !== null): ?>

@@ -96,9 +96,12 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
                         <?php if ($ev['url_recurso'] !== null): ?><span class="codigo"><?= e($ev['url_recurso']) ?></span><?php endif; ?>
                         <span>capturada el <?= e(Formato::fecha((string) $ev['capturado_en'])) ?></span>
                         <?php if ($ev['truncado']): ?><span>· recortada</span><?php endif; ?>
+                        <?php if ($ev['contenido'] !== null): ?>
+                            <button type="button" class="boton boton--secundario boton--pequeno evidencia__copiar" data-copiar="#ev-<?= e($ev['codigo']) ?>">Copiar<span class="solo-lectores"> la evidencia <?= e($ev['codigo']) ?></span></button>
+                        <?php endif; ?>
                     </div>
                     <?php if ($ev['contenido'] !== null): ?>
-                        <pre><code><?= e($ev['contenido']) ?></code></pre>
+                        <pre id="ev-<?= e($ev['codigo']) ?>"><code><?= e($ev['contenido']) ?></code></pre>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
@@ -126,6 +129,23 @@ $sinTexto = static fn (?string $valor): bool => $valor === null || trim($valor) 
                     <h3>En el gestor de contenidos</h3>
                     <p><?= e($r['correccion_cms']) ?></p>
                 <?php endif; ?>
+                <?php
+                // Texto listo para pegar en Jira, Trello o un correo. Sin integraciones: no sale nada
+                // de la herramienta (SEG-10, SEG-17); solo se copia al portapapeles.
+                $tarea = array_filter([
+                    '[' . (($estado === 'problema' ? \ProconSEO\Shared\Enum\Gravedad::tryFrom((string) $r['gravedad'])?->etiqueta() : null) ?? Etiquetas::estado($estado)) . '] ' . $titulo . ($r['url_recurso'] !== null ? ' — ' . $r['url_recurso'] : ''),
+                    $sinTexto($r['explicacion_sencilla']) ? null : 'Qué pasa: ' . trim((string) $r['explicacion_sencilla']),
+                    $sinTexto($r['elemento']) ? null : 'Dónde: ' . trim((string) $r['elemento']),
+                    $sinTexto($r['correccion']) ? null : 'Cómo corregirlo: ' . trim((string) $r['correccion']),
+                    $sinTexto($r['correccion_cms']) ? null : 'En el gestor de contenidos: ' . trim((string) $r['correccion_cms']),
+                    'Detectado con proconSEO' . ($analisis !== null ? ' el ' . Formato::fecha((string) $analisis['creado_en']) : '') . ' (' . $r['id_comprobacion'] . ').',
+                ]);
+                ?>
+                <p class="tarea">
+                    <button type="button" class="boton boton--secundario boton--pequeno" data-copiar="#tarea-<?= e($r['id']) ?>">Copiar como tarea</button>
+                    <span class="meta">Para pegarla en Jira, Trello o un correo.</span>
+                </p>
+                <span hidden id="tarea-<?= e($r['id']) ?>" data-texto="<?= e(implode("\n", $tarea)) ?>"></span>
             </section>
         <?php endif; ?>
 

@@ -324,3 +324,11 @@ details.plegable[open] { padding-bottom: 1rem; }
 .rapidos li { display: flex; flex-direction: column; gap: .125rem; padding: .625rem 0; border-bottom: 1px solid var(--borde); }
 .rapidos a { font-weight: 600; }
 @media (max-width: 56rem) { .empezar { grid-template-columns: 1fr; gap: 2rem; } }
+
+/* Copiar la evidencia y la tarea */
+.evidencia__cabecera { align-items: center; }
+.evidencia__copiar { margin-left: auto; min-height: 32px; }
+.tarea { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin-top: 1.25rem; }
+
+/* Responsable de cada incidencia */
+.chip--responsable { background: #fff; border-color: var(--texto-tenue); color: var(--texto); }

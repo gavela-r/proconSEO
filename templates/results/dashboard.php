@@ -166,6 +166,24 @@ $plural = static fn (int $n, string $uno, string $varios): string => $n === 1 ? 
             <?php endforeach; ?>
         </select>
     </div>
+    <div>
+        <label for="f-responsable">Responsable</label>
+        <select id="f-responsable" name="responsable">
+            <option value="">Todos</option>
+            <?php foreach (\ProconSEO\Results\Responsable::ETIQUETAS as $valor => $texto): ?>
+                <option value="<?= e($valor) ?>"<?= $filtro->responsable === $valor ? ' selected' : '' ?>><?= e($texto) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div>
+        <label for="f-nivel">Nivel WCAG</label>
+        <select id="f-nivel" name="nivel">
+            <option value="">Todos</option>
+            <?php foreach (\ProconSEO\Results\FiltroResultados::NIVELES as $valor => $texto): ?>
+                <option value="<?= e($valor) ?>"<?= $filtro->nivel === $valor ? ' selected' : '' ?>><?= e($texto) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
     <?php if (count($informe->urls) > 1): ?>
         <div>
             <label for="f-url">Página o recurso</label>
