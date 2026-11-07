@@ -7,8 +7,10 @@ use ProconSEO\Results\ComparacionAnalisis;
 use ProconSEO\Results\CompromisosKitDigital;
 use ProconSEO\Results\FiltroResultados;
 use ProconSEO\Results\Glosario;
+use ProconSEO\Results\GuiaWcag;
 use ProconSEO\Results\Informe;
 use ProconSEO\Results\RepositorioResultados;
+use ProconSEO\Results\RevisionesManuales;
 use ProconSEO\Results\PanelesSitio;
 use ProconSEO\Results\Seguimientos;
 use ProconSEO\Results\VistaPaginas;
@@ -124,9 +126,71 @@ return static function (Router $r): void {
             'titulo' => 'Criterios WCAG 2.2',
             'estilos' => $estilos,
             'analisis' => $analisis,
-            'wcag' => new VistaWcag(Informe::conTitulos($repositorio->resultados($id), $catalogo())),
+            'wcag' => new VistaWcag(Informe::conTitulos($repositorio->resultados($id), $catalogo()), (new RevisionesManuales(BaseDatos::conexion()))->vigentes($id)),
             'conKitDigital' => CompromisosKitDigital::aplica($analisis['proyecto_tipo']),
         ]));
+    });
+
+    // Revisión manual guiada de un criterio WCAG: qué ha visto la herramienta, cómo revisarlo y dónde apuntarlo.
+    $criterioWcag = static function (Peticion $p, ?string $error = null, array $valores = [], int $estado = 200) use ($repo, $catalogo, $estilos): Respuesta {
+        $repositorio = $repo();
+        $id = (int) $p->parametro('id');
+        $analisis = $repositorio->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+        $numero = (string) $p->entrada('criterio', '');
+        if (!RevisionesManuales::esCriterio($numero)) {
+            throw new ErrorDominio('no_encontrado', 'Ese criterio no es de WCAG 2.2 A o AA.', 404);
+        }
+        $manuales = new RevisionesManuales(BaseDatos::conexion());
+        $wcag = new VistaWcag(Informe::conTitulos($repositorio->resultados($id), $catalogo()), $manuales->vigentes($id));
+        $criterio = array_values(array_filter($wcag->criterios, static fn (array $c): bool => $c['numero'] === $numero))[0];
+
+        return Respuesta::html(Vista::render('results/wcag_criterio', [
+            'titulo' => 'WCAG ' . $numero . ' · ' . $criterio['nombre'],
+            'estilos' => $estilos,
+            'analisis' => $analisis,
+            'criterio' => $criterio,
+            'pasos' => GuiaWcag::pasos($numero),
+            'historial' => $manuales->historial($id, $numero),
+            'error' => $error,
+            'valores' => $valores,
+            'guardado' => $p->entrada('guardado') === '1',
+        ]), $estado);
+    };
+
+    // El criterio (2.1.1) va en ?criterio=: el router común solo admite parámetros numéricos.
+    $r->get('/analisis/{id}/wcag/revisar', static fn (Peticion $p): Respuesta => $criterioWcag($p));
+
+    // Solo inserta: cada revisión manual es una fila nueva con quién, qué miró y qué vio.
+    $r->post('/analisis/{id}/wcag/revisiones', static function (Peticion $p) use ($repo, $criterioWcag): Respuesta {
+        $id = (int) $p->parametro('id');
+        $analisis = $repo()->analisis($id) ?? throw new ErrorDominio('no_encontrado', 'El análisis no existe.', 404);
+        $numero = (string) $p->entrada('criterio', '');
+        $valores = array_map(
+            static fn (mixed $v): string => is_string($v) ? $v : '',
+            array_intersect_key($p->cuerpo, array_flip(['resultado', 'revisor', 'paginas', 'notas'])),
+        ) + ['resultado' => '', 'revisor' => '', 'paginas' => '', 'notas' => ''];
+
+        try {
+            $revision = (new RevisionesManuales(BaseDatos::conexion()))->registrar($id, $numero, $valores['resultado'], $valores['revisor'], $valores['paginas'], $valores['notas']);
+        } catch (ErrorDominio $e) {
+            if ($e->codigo !== 'revision_manual_no_valida') {
+                throw $e;
+            }
+
+            return $criterioWcag($p, $e->getMessage(), $valores, 422);
+        }
+
+        (new Fabrica())->auditoria()->registrar(
+            'revision_manual_guardada',
+            $id,
+            (int) $analisis['proyecto_id'],
+            Fabrica::ipOrigen(),
+            null,
+            null,
+            "Revisión manual {$revision} de WCAG {$numero}: {$valores['resultado']}",
+        );
+
+        return Respuesta::redirigir('/analisis/' . $id . '/wcag/revisar?' . http_build_query(['criterio' => $numero, 'guardado' => '1']) . '#t-revisar');
     });
 
     // Borrado definitivo de un análisis con confirmación previa (RF-16; decisión 16).

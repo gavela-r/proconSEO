@@ -193,6 +193,20 @@ final class RepositorioResultados
         return $consulta->fetchAll();
     }
 
+    /**
+     * Revisiones manuales de los criterios WCAG, de la más antigua a la más reciente (la última de
+     * cada criterio es la vigente).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function revisionesManuales(int $analisisId): array
+    {
+        $consulta = $this->bd->prepare('SELECT criterio_wcag, resultado, revisor, paginas, notas, creado_en FROM revisiones_manuales WHERE analisis_id = ? ORDER BY creado_en, id');
+        $consulta->execute([$analisisId]);
+
+        return $consulta->fetchAll();
+    }
+
     /** Limitaciones y detenciones por seguridad registradas durante el análisis. @return list<array<string, mixed>> */
     public function eventosSeguridad(int $analisisId): array
     {

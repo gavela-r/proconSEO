@@ -452,3 +452,7 @@ details.plegable[open] { padding-bottom: 1rem; }
 /* Los textos solo para lectores de pantalla (position: absolute) dentro de una tabla que se desplaza
    no deben escaparse y ensanchar la página: la caja de desplazamiento es su referencia. */
 .tabla-desplazable { position: relative; }
+/* Revisión manual guiada */
+.guia { padding-left: 1.25rem; }
+.guia li { margin: .4rem 0; }
+.historial p { margin: .25rem 0 .75rem; }

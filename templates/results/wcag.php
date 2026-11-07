@@ -26,8 +26,8 @@ foreach ($wcag->criterios as $c) {
 <section class="seccion" aria-labelledby="t-wcag-resumen">
     <h2 id="t-wcag-resumen">Resumen de los <?= e(count($wcag->criterios)) ?> criterios A y AA</h2>
     <p class="seccion__ayuda">
-        Sirve para preparar la declaración de accesibilidad. «Sin problemas detectados» no es lo mismo que «cumple»: una revisión automática no lo puede garantizar,
-        y los criterios que la herramienta no comprueba hay que revisarlos a mano.
+        Sirve para preparar la declaración de accesibilidad. «Sin problemas detectados» no es lo mismo que «cumple»: una revisión automática no lo puede garantizar.
+        Lo que falta revisar se completa a mano con el botón «Revisar» de cada criterio, que explica paso a paso cómo hacerlo y guarda quién lo revisó y qué vio.
     </p>
     <ul class="wcag-resumen">
         <?php foreach (VistaWcag::SITUACIONES as $clave => $texto): ?>
@@ -41,13 +41,16 @@ foreach ($wcag->criterios as $c) {
         <h2 id="t-principio-<?= e($principio) ?>"><?= e($principio) ?>. <?= e($principios[$principio] ?? '') ?></h2>
         <div class="tabla-desplazable">
             <table class="tabla-wcag">
-                <thead><tr><th scope="col">Criterio</th><th scope="col">Nivel</th><th scope="col">Situación</th><th scope="col">Qué ha comprobado la herramienta</th></tr></thead>
+                <thead><tr><th scope="col">Criterio</th><th scope="col">Nivel</th><th scope="col">Situación</th><th scope="col">Qué ha comprobado la herramienta</th><th scope="col">A mano</th></tr></thead>
                 <tbody>
                     <?php foreach ($criterios as $c): ?>
                         <tr>
                             <th scope="row"><span class="codigo"><?= e($c['numero']) ?></span> <?= e($c['nombre']) ?></th>
                             <td><?= e($c['nivel']) ?><?= $c['nuevo22'] ? ' <span class="chip chip--wcag22">nuevo en 2.2</span>' : '' ?></td>
-                            <td><span class="wcag-situacion wcag-situacion--<?= e($c['situacion']) ?>"><?= e(VistaWcag::SITUACIONES[$c['situacion']]) ?></span></td>
+                            <td>
+                                <span class="wcag-situacion wcag-situacion--<?= e($c['situacion']) ?>"><?= e(VistaWcag::SITUACIONES[$c['situacion']]) ?></span>
+                                <?php if ($c['manual'] !== null): ?><span class="tabla-paginas__nota">Revisado a mano por <?= e($c['manual']['revisor']) ?></span><?php endif; ?>
+                            </td>
                             <td>
                                 <?php if ($c['comprobaciones'] === []): ?>
                                     <span class="vacio">Nada: hay que revisarlo a mano.</span>
@@ -63,6 +66,7 @@ foreach ($wcag->criterios as $c) {
                                     </ul>
                                 <?php endif; ?>
                             </td>
+                            <td><a class="boton boton--secundario boton--pequeno" href="/analisis/<?= e($id) ?>/wcag/revisar?<?= e(http_build_query(['criterio' => $c['numero']])) ?>"><?= $c['manual'] === null ? 'Revisar' : 'Ver revisión' ?><span class="solo-lectores"> <?= e($c['numero']) ?> <?= e($c['nombre']) ?></span></a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

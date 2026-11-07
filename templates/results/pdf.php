@@ -250,6 +250,30 @@ $estado = EstadoAnalisis::tryFrom((string) $analisis['estado']);
 
 <?php endif; ?>
 
+<?php
+$manuales = [];
+foreach ($exportacion['revisiones_manuales'] ?? [] as $m) {
+    $manuales[(string) $m['criterio_wcag']] = $m; // la última de cada criterio es la vigente
+}
+?>
+<?php if ($manuales !== []): ?>
+    <h2>Revisiones manuales de criterios WCAG</h2>
+    <p class="pequeno">Lo que una persona ha revisado a mano siguiendo la guía de cada criterio. No cambia ningún resultado automático.</p>
+    <table class="compacta">
+        <thead><tr><th>Criterio</th><th>Resultado</th><th>Quién y cuándo</th><th>Qué se revisó y qué se vio</th></tr></thead>
+        <tbody>
+        <?php foreach ($manuales as $criterio => $m): ?>
+            <tr>
+                <td><?= e($criterio) ?></td>
+                <td><?= e(\ProconSEO\Results\RevisionesManuales::RESULTADOS[(string) $m['resultado']] ?? $m['resultado']) ?></td>
+                <td><?= e($m['revisor']) ?><br><?= e(Formato::fecha((string) $m['creada_en_utc'])) ?></td>
+                <td><?= $m['paginas'] !== null ? 'Páginas: ' . e($recortar((string) $m['paginas'], 300)) . '<br>' : '' ?><?= e($recortar((string) $m['notas'], 800)) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endif; ?>
+
 <!-- 7. Capacidades pendientes y límites -->
 <h2>5. Límites de este análisis</h2>
 <?php if (Alcance::tryFrom((string) $analisis['alcance']) === Alcance::UrlIndividual): ?>

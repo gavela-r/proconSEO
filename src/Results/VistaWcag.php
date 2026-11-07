@@ -85,15 +85,19 @@ final class VistaWcag
 
     /**
      * @var list<array{numero: string, nombre: string, nivel: string, nuevo22: bool, situacion: string,
-     *                 recuento: array<string, int>, paginas: int, comprobaciones: list<array{id: int, titulo: string, estado: string, paginas: int, total: int}>}>
+     *                 recuento: array<string, int>, paginas: int, comprobaciones: list<array{id: int, titulo: string, estado: string, paginas: int, total: int}>,
+     *                 manual: array<string, mixed>|null, situacion_automatica: string}>
      */
     public readonly array $criterios;
 
     /** @var array<string, int> cuántos criterios hay en cada situación */
     public readonly array $resumen;
 
-    /** @param list<array<string, mixed>> $resultados filas con estado_vigente y la referencia WCAG ya completada (Informe::conTitulos) */
-    public function __construct(array $resultados)
+    /**
+     * @param list<array<string, mixed>>          $resultados filas con estado_vigente y la referencia WCAG ya completada (Informe::conTitulos)
+     * @param array<string, array<string, mixed>> $manuales revisión manual vigente de cada criterio (RevisionesManuales::vigentes)
+     */
+    public function __construct(array $resultados, array $manuales = [])
     {
         $porCriterio = [];
         foreach ($resultados as $r) {
@@ -115,7 +119,9 @@ final class VistaWcag
                 'nombre' => $nombre,
                 'nivel' => $nivel,
                 'nuevo22' => $nuevo,
-                'situacion' => self::situacion($lista),
+                'situacion' => self::conManual(self::situacion($lista), $manuales[$numero] ?? null),
+                'situacion_automatica' => self::situacion($lista),
+                'manual' => $manuales[$numero] ?? null,
                 'recuento' => $recuento,
                 'paginas' => count(array_unique(array_filter(array_map(static fn (array $r): string => (string) ($r['url_recurso'] ?? ''), $lista)))),
                 'comprobaciones' => self::comprobaciones($lista),
@@ -167,6 +173,26 @@ final class VistaWcag
         usort($salida, static fn (array $a, array $b): int => $rango($a['estado']) <=> $rango($b['estado']));
 
         return $salida;
+    }
+
+    /**
+     * Lo que una persona ha revisado a mano completa a la herramienta, pero no tapa un problema
+     * que la herramienta ha encontrado: si hay problemas automáticos, sigue habiendo problemas.
+     *
+     * @param array<string, mixed>|null $manual
+     */
+    private static function conManual(string $automatica, ?array $manual): string
+    {
+        if ($manual === null || $automatica === 'problemas') {
+            return $automatica;
+        }
+
+        return match ((string) $manual['resultado']) {
+            'problema' => 'problemas',
+            'correcto' => 'sin_problemas',
+            'no_aplicable' => 'no_aplica',
+            default => $automatica,
+        };
     }
 
     /** @param list<array<string, mixed>> $lista */
